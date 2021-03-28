@@ -10,3 +10,16 @@ body {
   line-height: 1.5em;
   overflow: hidden;
 }
+
+.controls {
+  position: absolute;
+  top: 0;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  text-align: center;
+  background-color: #111;
+  color: #888;
+  font-size: small;
+}
