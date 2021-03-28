@@ -29,6 +29,8 @@ app.loader.load((loader, resources) => {
   carSprite.anchor.y = 0.5;
   app.stage.addChild(carSprite);
   
+  
+  // https://pixijs.io/examples/#/filters-advanced/pixie-shadow-filter.js
   const filter = new PIXI.Filter(myVertex, myFragment);
   // first is the horizontal shift, positive is to the right
   // second is the same as scaleY
@@ -57,13 +59,13 @@ const angularDrag = 0.95;
 const turnSpeed = 0.002;
 
 const localCar = {
-  x: app.renderer.width / 2,
-  y: app.renderer.height / 2,
+  x: app.renderer.width / 2 - 30,
+  y: app.renderer.height / 2 - 100,
   xVelocity: 0,
   yVelocity: 0,
   power: 0,
   reverse: 0,
-  angle: 0,
+  angle: 0.15,
   angularVelocity: 0,
   isThrottling: false,
   isReversing: false
@@ -88,9 +90,18 @@ const wasdKeys = {
   right: 68
 };
 
+let banner = true;
 const keyActive = (key) => {
-  return keysDown[wasdKeys[key]] || false;
+  let active = keysDown[wasdKeys[key]];
+  if(active && banner)
+      hideBanner();
+  return active || false;
 };
+
+function hideBanner() {
+  document.querySelector('.controls').style.visibility = 'hidden';
+  banner = false;
+}
 
 
 function updateCar (car) {  
@@ -152,6 +163,7 @@ function updateCar (car) {
   carSprite.x = car.x;
   carSprite.y = car.y;  
   
+// Very bad performance - need to find a better way - maybe rendertexture
 //   if ((car.power > 0.0025) || car.reverse) {
 //     if (((maxReverse === car.reverse) || (maxPower === car.power)) && Math.abs(car.angularVelocity) < 0.002) {
 //       return;
