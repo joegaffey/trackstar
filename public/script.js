@@ -3,11 +3,17 @@ document.body.appendChild(app.view);
 
 let carSprite = {};
 let mapSprite = {};
+let engine = {};
+let minEngineSpeed = 2.8;
+let maxEngineSpeed = 10;
+let revFactor = 45;
 
 const graphics = new PIXI.Graphics();
 
 app.loader.add('map', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg?v=1616936163121')
-          .add('car', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png?v=1616942278883');
+          .add('car', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png?v=1616942278883')
+          .add('engine', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fengine.wav?v=1616964690904');
+          // .add('engine', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Floop_5.wav?v=1616970419514');
 
 app.loader.load((loader, resources) => {
   mapSprite = new PIXI.Sprite(resources.map.texture);
@@ -29,7 +35,6 @@ app.loader.load((loader, resources) => {
   carSprite.anchor.y = 0.5;
   app.stage.addChild(carSprite);
   
-  
   // https://pixijs.io/examples/#/filters-advanced/pixie-shadow-filter.js
   const filter = new PIXI.Filter(myVertex, myFragment);
   // first is the horizontal shift, positive is to the right
@@ -47,11 +52,14 @@ app.loader.load((loader, resources) => {
       filter.uniforms.floorY = carSprite.toGlobal(new PIXI.Point(0, 0)).y;
   });
   
+  engine = resources.engine.sound.play({ loop: true, speed: minEngineSpeed, volume: 0.1 });
+  console.log(engine);
+  
 });
 
 const maxPower = 0.2;
-const maxReverse = 0.0375;
-const powerFactor = 0.002;
+const maxReverse = 0.05;
+const powerFactor = 0.001;
 const reverseFactor = 0.0005;
 
 const drag = 0.95;
@@ -71,8 +79,8 @@ const localCar = {
   isReversing: false
 };
 
-app.stage.position.x = app.renderer.width/2;
-app.stage.position.y = app.renderer.height/2;
+app.stage.position.x = app.renderer.width / 2;
+app.stage.position.y = app.renderer.height / 2;
 app.stage.scale.x = 1;
 app.stage.scale.y = 1;
 
@@ -93,8 +101,10 @@ const wasdKeys = {
 let banner = true;
 const keyActive = (key) => {
   let active = keysDown[wasdKeys[key]];
-  if(active && banner)
-      hideBanner();
+  if(active && banner) {
+    hideBanner();
+    // startAudio();
+  }
   return active || false;
 };
 
@@ -136,6 +146,9 @@ function updateCar (car) {
   else {
     car.reverse -= reverseFactor;
   }
+  
+  if(car.power * revFactor > minEngineSpeed)
+    engine.speed = car.power * revFactor;
 
   car.power = Math.max(0, Math.min(maxPower, car.power));
   car.reverse = Math.max(0, Math.min(maxReverse, car.reverse));
@@ -163,7 +176,7 @@ function updateCar (car) {
   carSprite.x = car.x;
   carSprite.y = car.y;  
   
-// Very bad performance - need to find a better way - maybe rendertexture
+// Wheel tracks - Very bad performance - need to find a better way - maybe rendertexture
 //   if ((car.power > 0.0025) || car.reverse) {
 //     if (((maxReverse === car.reverse) || (maxPower === car.power)) && Math.abs(car.angularVelocity) < 0.002) {
 //       return;
