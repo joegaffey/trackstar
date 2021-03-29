@@ -1,4 +1,6 @@
-/* this file is loaded by index.html and styles the page */
+ @viewport {  
+   orientation: portrait;  
+ }  
 
 * {
   box-sizing: border-box;
@@ -13,7 +15,7 @@ body {
 
 .controls {
   position: absolute;
-  top: 0;
+  top: -50px;
   margin-left: auto;
   margin-right: auto;
   left: 0;
@@ -22,4 +24,56 @@ body {
   background-color: #111;
   color: #888;
   font-size: small;
+  transition: top 0.5s;
+}
+
+.initial {
+  top: 0px;
+}
+
+.controlsTrigger {
+  position: absolute;
+  height: 100px;
+  top: 0;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+}
+
+.controlsTrigger:hover > .controls {
+  top: 0px; 
+  transition: top 0.5s;
+}
+
+.button {
+  position: absolute;
+  width: 15%;
+}
+
+.left {
+  left: 12%;
+  bottom: 12%;
+  transform: rotate(-180deg);
+}
+
+.right {
+  left: 35%;
+  bottom: 12%;
+}
+
+.down {
+  right: 15%;
+  bottom: 12%;
+  transform: rotate(90deg);
+}
+
+.up {
+  right: 15%;
+  bottom: 25%;
+  transform: rotate(-90deg);
+}
+
+.buttons {
+  visibility: hidden;
 }
