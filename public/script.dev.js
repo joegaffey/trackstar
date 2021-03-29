@@ -1,6 +1,64 @@
 const app = new PIXI.Application({ resizeTo: window });
 document.body.appendChild(app.view);
 
+document.addEventListener('touchstart', e => { 
+  e.preventDefault();
+  // app.view.requestFullscreen();
+});
+document.addEventListener('touchmove', e => { e.preventDefault() });
+
+
+let joyUp, joyDown, joyLeft, joyRight = false;
+function touchControls() { 
+  const leftRight = nipplejs.create({
+    zone: document.getElementById('leftRight'),
+    color: 'blue',
+    // mode: 'static',
+    // position: {left: '50%', top: '50%'},
+    lockX: true
+  });
+  leftRight.on('move', (e, data) => {
+    if(data.direction) {
+      if(data.direction.x === 'left') {
+        joyLeft = true;
+        joyRight = false;
+      }
+      else if(data.direction.x === 'right') {
+        joyLeft = false;
+        joyRight = true;
+      }        
+    }      
+  }); 
+  leftRight.on('end', (e, data) => {
+    joyLeft = false;
+    joyRight = false;
+  }); 
+
+  const upDown = nipplejs.create({
+    zone: document.getElementById('upDown'),
+    color: 'red',
+    // mode: 'static',
+    // position: {left: '50%', top: '50%'},
+    lockY: true
+  });
+  upDown.on('move', (e, data) => {
+    if(data.direction) {
+      if(data.direction.y === 'up') {
+        joyUp = true;
+        joyDown = false;
+      }
+      else if(data.direction.y === 'down') {
+        joyUp = false;
+        joyDown = true;
+      }        
+    }      
+  }); 
+  upDown.on('end', (e, data) => {
+    joyUp = false;
+    joyDown = false;
+  }); 
+}
+
 let carSprite = {};
 let mapSprite = {};
 let engineSound = {};
@@ -41,6 +99,7 @@ app.loader.load((loader, resources) => {
   if(isMobile) {
     hideBanner();
     banner = false;
+    touchControls();
     document.querySelector('.buttons').style.visibility = 'visible';
   }
   
@@ -92,7 +151,7 @@ function addCarSprite(texture) {
 
 const maxPower = 0.2;
 const maxReverse = 0.05;//0.05;
-const powerFactor = 0.001;
+const powerFactor = 0.0005;//0.001;
 const reverseFactor = 0.01;//0.0005;
 
 const drag = 0.95;
@@ -148,16 +207,16 @@ const mouseSteeringEnabled = false;
 
 function updateCar (car) {  
   const canTurn = car.power > 0.0025 || car.reverse;
-  const pressingUp = keyActive('up') || mouseDown[0] || touches[2]; 
-  const pressingDown = keyActive('down') || mouseDown[2] || touches[3]; 
+  const pressingUp = keyActive('up') || mouseDown[0] || joyUp;
+  const pressingDown = keyActive('down') || mouseDown[2] || joyDown;
   
   if (car.isThrottling !== pressingUp || car.isReversing !== pressingDown) {
     car.isThrottling = pressingUp;
     car.isReversing = pressingDown;
   }
   
-  const turnLeft = canTurn && (keyActive('left') || touches[0] || (mouseSteeringEnabled && mouseSteer < 0.5));
-  const turnRight = canTurn && (keyActive('right') || touches[1] || (mouseSteeringEnabled && mouseSteer > 0.5));
+  const turnLeft = canTurn && (keyActive('left') || joyLeft || (mouseSteeringEnabled && mouseSteer < 0.5));
+  const turnRight = canTurn && (keyActive('right') || joyRight || (mouseSteeringEnabled && mouseSteer > 0.5));
 
   if (car.isTurningLeft !== turnLeft) {
     car.isTurningLeft = turnLeft;

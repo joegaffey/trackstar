@@ -46,6 +46,10 @@ body {
   transition: top 0.5s;
 }
 
+/* .buttons {
+  z-index: 1000;
+}
+ */
 .button {
   position: absolute;
   width: 15%;
@@ -76,4 +80,20 @@ body {
 
 .buttons {
   visibility: hidden;
+}
+
+#leftRight {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 50%;
+  width: 50%;
+}
+
+#upDown {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 50%;
+  width: 50%;
 }

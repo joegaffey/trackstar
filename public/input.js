@@ -24,5 +24,3 @@ window.addEventListener('contextmenu', e => {
   e.preventDefault(); 
   return false; 
 });
-
-const touches = [false, false, false, false];

@@ -1,32 +1,30 @@
-<!-- This is a static file -->
-<!-- served from your routes in server.js -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
     <meta name="description" content="Top down 2D racer">
-
+    
     <title>Track Star</title>
 
     <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
     <link rel="stylesheet" href="/style.css">
+    
     <script src="/lib/pixi.min.js"></script>
     <script src="/lib/pixi-sound.js"></script>
+    <script src="/lib/nipplejs.min.js"></script>
+    
     <script src="/shaders.js"></script>    
     <script src="/input.js"></script>    
+    
     <script type="module" src="/script.dev.js" defer></script>    
   </head>
   <body>
     <div class="controlsTrigger">
       <div class="controls initial">Use WASD keys to drive</div>
     </div>
-    <div class="buttons">
-      <img class="button left"  onpointerdown="touches[0] = true" onpointerup="touches[0] = false" src="https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Farrow.png?v=1617032724659">
-      <img class="button right" onpointerdown="touches[1] = true" onpointerup="touches[1] = false" src="https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Farrow.png?v=1617032724659">
-      <img class="button up"    onpointerdown="touches[2] = true" onpointerup="touches[2] = false" src="https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Farrow.png?v=1617032724659">
-      <img class="button down"  onpointerdown="touches[3] = true" onpointerup="touches[3] = false" src="https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Farrow.png?v=1617032724659">
-    </div>
+    <div id="leftRight"></div>
+    <div id="upDown"></div>    
   </body>
 </html>
