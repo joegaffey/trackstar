@@ -1,30 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, user-scalable=no" />
-    <meta name="description" content="Top down 2D racer">
-    
-    <title>Track Star</title>
-
-    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
-    <link rel="stylesheet" href="/style.css">
-    
-    <script src="/lib/pixi.min.js"></script>
-    <script src="/lib/pixi-sound.js"></script>
-    <script src="/lib/nipplejs.min.js"></script>
-    
-    <script src="/shaders.js"></script>    
-    <script src="/input.js"></script>    
-    
-    <script type="module" src="/script.dev.js" defer></script>    
-  </head>
-  <body>
-    <div class="controlsTrigger">
-      <div class="controls initial">Use WASD keys to drive</div>
+<html>
+<head>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+  <script src="/script.js"></script>
+</head>
+<body>
+    <div class="bannerTrigger">
+      <div class="banner initial">Use arrows or WASD keys to drive</div>
     </div>
-    <div id="leftRight"></div>
-    <div id="upDown"></div>    
-  </body>
+</body>
 </html>

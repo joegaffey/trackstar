@@ -1,154 +1,3 @@
-const app = new PIXI.Application({ resizeTo: window });
-document.body.appendChild(app.view);
-
-document.addEventListener('touchstart', e => { 
-  e.preventDefault();
-  // app.view.requestFullscreen();
-});
-document.addEventListener('touchmove', e => { e.preventDefault() });
-
-
-let joyUp, joyDown, joyLeft, joyRight = false;
-function touchControls() { 
-  const leftRight = nipplejs.create({
-    zone: document.getElementById('leftRight'),
-    color: 'blue',
-    // mode: 'static',
-    // position: {left: '50%', top: '50%'},
-    lockX: true
-  });
-  leftRight.on('move', (e, data) => {
-    if(data.direction) {
-      if(data.direction.x === 'left') {
-        joyLeft = true;
-        joyRight = false;
-      }
-      else if(data.direction.x === 'right') {
-        joyLeft = false;
-        joyRight = true;
-      }        
-    }      
-  }); 
-  leftRight.on('end', (e, data) => {
-    joyLeft = false;
-    joyRight = false;
-  }); 
-
-  const upDown = nipplejs.create({
-    zone: document.getElementById('upDown'),
-    color: 'red',
-    // mode: 'static',
-    // position: {left: '50%', top: '50%'},
-    lockY: true
-  });
-  upDown.on('move', (e, data) => {
-    if(data.direction) {
-      if(data.direction.y === 'up') {
-        joyUp = true;
-        joyDown = false;
-      }
-      else if(data.direction.y === 'down') {
-        joyUp = false;
-        joyDown = true;
-      }        
-    }      
-  }); 
-  upDown.on('end', (e, data) => {
-    joyUp = false;
-    joyDown = false;
-  }); 
-}
-
-let carSprite = {};
-let mapSprite = {};
-let engineSound = {};
-let minEngineSpeed = 2.8;
-let maxEngineSpeed = 10;
-let revFactor = 45;
-let mapScale = 1;
-let carScale = 1;
-let isMobile = false;
-
-const graphics = new PIXI.Graphics();
-
-let mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg?v=1616936163121';
-
-if(PIXI.utils.isMobile.any) {
-  isMobile = true;
-  //Mobile fix for gl.getParameter(gl.MAX_TEXTURE_SIZE) 
-  mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg?v=1617031366035';
-  mapScale = 4;
-  carScale = 1;
-  if(screen.lockOrientation)
-    screen.lockOrientation('portrait');
-  if(screen.orientation.lock)
-    screen.orientation.lock('portrait');
-}
-
-app.loader.add('map', mapUrl)
-          .add('car', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png?v=1616942278883')
-          .add('engine', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fengine.wav?v=1616964690904');
-          // .add('engine', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Floop_5.wav?v=1616970419514');
-      
-app.loader.load((loader, resources) => {
-  
-  addMapSprite(resources.map.texture);
-  //app.stage.addChild(graphics);
-  addCarSprite(resources.car.texture);  
-  
-  if(isMobile) {
-    hideBanner();
-    banner = false;
-    touchControls();
-    document.querySelector('.buttons').style.visibility = 'visible';
-  }
-  
-  // https://pixijs.io/examples/#/filters-advanced/pixie-shadow-filter.js
-  const filter = new PIXI.Filter(shadowVertex, shadowFragment);
-  // first is the horizontal shift, positive is to the right
-  // second is the same as scaleY
-  filter.uniforms.shadowDirection = [0.1, 1.4];
-  filter.uniforms.floorY = 0.0;
-  // how big is max shadow shift to the side?
-  // try to switch that off ;)
-  filter.padding = 100;
-
-  carSprite.filters = [filter];
-
-  app.ticker.add(() => {
-      // take ground Y in screen coords to uniforms
-      filter.uniforms.floorY = carSprite.toGlobal(new PIXI.Point(0, 0)).y;
-  });
-  
-  engineSound = resources.engine.sound;  
-  engineSound.speed = minEngineSpeed;
-  engineSound.volume = 0.1;
-  engineSound.loop = true;
-  engineSound.play();
-});
-
-function addMapSprite(texture) {
-  mapSprite = new PIXI.Sprite(texture);
-  mapSprite.x = app.renderer.width / 2;
-  mapSprite.y = app.renderer.height / 2;
-  mapSprite.scale.x = mapSprite.scale.y = mapScale;
-  mapSprite.anchor.x = 0.5;
-  mapSprite.anchor.y = 0.5;
-  app.stage.addChild(mapSprite);
-}
-
-function addCarSprite(texture) {
-  carSprite = new PIXI.Sprite(texture);
-  carSprite.x = app.renderer.width / 2;
-  carSprite.y = app.renderer.height / 2;
-  carSprite.scale.x = carSprite.scale.y = 0.035 * carScale;
-  carSprite.scale.y *=-1;
-  carSprite.rotation = -3.14159;
-  carSprite.anchor.x = 0.5;
-  carSprite.anchor.y = 0.5;
-  app.stage.addChild(carSprite);
-}
-
 const maxPower = 0.2;
 const maxReverse = 0.05;//0.05;
 const powerFactor = 0.0005;//0.001;
@@ -158,65 +7,106 @@ const drag = 0.95;
 const angularDrag = 0.9;//0.95;
 const turnSpeed = 0.002;//0.002
 
-const playerCar = {
-  x: app.renderer.width / 2 - 30,
-  y: app.renderer.height / 2 - 100,
+let carSprite;
+let shadow;
+let engine;
+let map;
+let engineSound = {};
+let minEngineSpeed = 3;
+let maxEngineSpeed = 12;
+let revFactor = 75;
+let mapScale = 1;
+let carScale = 1
+let isMobile = false;
+let joyUp, joyDown, joyLeft, joyRight = false;
+
+const car = {
+  x: -334 / mapScale,
+  y: 1148 / mapScale,
   xVelocity: 0,
   yVelocity: 0,
   power: 0,
   reverse: 0,
-  angle: 0.15,
+  angle: -1.6,
   angularVelocity: 0,
   isThrottling: false,
   isReversing: false
 };
+let mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg?v=1616936163121';
 
-app.stage.position.x = app.renderer.width / 2;
-app.stage.position.y = app.renderer.height / 2;
-app.stage.scale.x = 1;
-app.stage.scale.y = 1;
-
-app.ticker.add(() => {
-  updateCar(playerCar);
-  app.stage.pivot.x = carSprite.x;
-  app.stage.pivot.y = carSprite.y;
-});
-
-const wasdKeys = {
-  up: 87,
-  down: 83,
-  left: 65,
-  right: 68
-};
-
-let banner = true;
-const keyActive = (key) => {
-  let active = keysDown[wasdKeys[key]];
-  if(active && banner) {
-    hideBanner();
+class MainScene extends Phaser.Scene {
+  
+  constructor() {
+    super({key: 'MainScene', active: true});
   }
-  return active || false;
-};
 
-function hideBanner() {
-  document.querySelector('.controls').classList.remove('initial');
-  banner = false;
+  preload () {
+    isMobile = !game.device.os.desktop && game.device.input.touch;
+    if(isMobile) {
+      mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg?v=1617031366035';
+      mapScale = 4;
+      carScale = 1;
+    }
+    this.load.image('map', mapUrl);
+    this.load.image('car', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png?v=1616942278883');
+    this.load.audio('engine', ['https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fengine.wav?v=1616964690904']);
+  }
+
+  create () {
+    map = this.add.image(0, 0, 'map');
+    map.scaleX = map.scaleY = mapScale;
+
+    shadow = this.add.sprite(0, 0, 'car');
+    shadow.setOrigin(0.8, 0.6)
+    shadow.scaleX = shadow.scaleY = 0.03 * carScale;
+    shadow.flipY = true;
+    shadow.tint = 0x000000;
+    shadow.alpha = 0.4;
+
+    carSprite = this.add.sprite(0, 0, 'car');
+    carSprite.scaleX = carSprite.scaleY = 0.03 * carScale;
+    carSprite.flipY = true;
+    carSprite.depth = 10;
+
+    engine = this.sound.add('engine');
+    engine.rate = minEngineSpeed;
+    engine.play({loop: true, volume: 0.1});
+
+    this.cameras.main.startFollow(carSprite);
+  }
+
+  update () {    
+    updateCar();
+
+    const curveSkid = car.angularVelocity < -0.015 || car.angularVelocity > 0.015;
+    const powerSkid = car.isThrottling && (car.power > 0.02 && car.velocity < 2);
+    const brakeSkid = car.reverse > 0.02 && (car.velocity > 3);
+
+    if(curveSkid || powerSkid || brakeSkid) {    
+      this.add.rectangle(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 2 * Math.PI / 2) * 3, 
+                        car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 2 * Math.PI / 2) * 3, 2, 2, 0x333333);
+      this.add.rectangle(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 4 * Math.PI / 2) * 3, 
+                        car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 4 * Math.PI / 2) * 3, 2, 2, 0x333333);
+    }
+  }
 }
 
-const mouseSteeringEnabled = false;
-
-function updateCar (car) {  
+function updateCar() {  
+  
+  if(car.power * revFactor > minEngineSpeed)
+    engine.rate = car.power * revFactor;
+  
   const canTurn = car.power > 0.0025 || car.reverse;
-  const pressingUp = keyActive('up') || mouseDown[0] || joyUp;
-  const pressingDown = keyActive('down') || mouseDown[2] || joyDown;
+  const pressingUp = joyUp;
+  const pressingDown = joyDown;
   
   if (car.isThrottling !== pressingUp || car.isReversing !== pressingDown) {
     car.isThrottling = pressingUp;
     car.isReversing = pressingDown;
   }
   
-  const turnLeft = canTurn && (keyActive('left') || joyLeft || (mouseSteeringEnabled && mouseSteer < 0.5));
-  const turnRight = canTurn && (keyActive('right') || joyRight || (mouseSteeringEnabled && mouseSteer > 0.5));
+  const turnLeft = canTurn && joyLeft;
+  const turnRight = canTurn && joyRight;
 
   if (car.isTurningLeft !== turnLeft) {
     car.isTurningLeft = turnLeft;
@@ -248,46 +138,124 @@ function updateCar (car) {
   
   if (car.isTurningLeft) {
     car.angularVelocity -= direction * turnSpeed * car.isTurningLeft;
-    if(mouseSteeringEnabled)
-      car.angularVelocity *= (1 - mouseSteer);
   }
   if (car.isTurningRight) {
     car.angularVelocity += direction * turnSpeed * car.isTurningRight;
-    if(mouseSteeringEnabled)
-      car.angularVelocity *= mouseSteer;
   }
 
   car.xVelocity += Math.sin(car.angle) * (car.power - car.reverse);
   car.yVelocity += Math.cos(car.angle) * (car.power - car.reverse);
-
+  
+  car.velocity = Math.abs(car.xVelocity)**2 + Math.abs(car.yVelocity)**2;
+  
   car.x += car.xVelocity;
   car.y -= car.yVelocity;
   car.xVelocity *= drag;
   car.yVelocity *= drag;
   car.angle += car.angularVelocity;
   car.angularVelocity *= angularDrag;  
+
+  carSprite.rotation = shadow.rotation =  car.angle;
+  carSprite.x = shadow.x = car.x;
+  carSprite.y = shadow.y = car.y;  
   
-  carSprite.rotation = car.angle;
-  carSprite.x = car.x;
-  carSprite.y = car.y;  
-  
-// Wheel tracks - Very bad performance - need to find a better way - maybe rendertexture
-//   if ((car.power > 0.0025) || car.reverse) {
-//     if (((maxReverse === car.reverse) || (maxPower === car.power)) && Math.abs(car.angularVelocity) < 0.002) {
-//       return;
-//     }
-    
-//     graphics.beginFill(0x444444);
-//     graphics.drawRect(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 2 * Math.PI / 2) * 3, 
-//                       car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 2 * Math.PI / 2) * 3, 2, 2);
-//     graphics.drawRect(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 4 * Math.PI / 2) * 3, 
-//                       car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 4 * Math.PI / 2) * 3, 2, 2);
-//     graphics.endFill();
-//   }
+  // console.log(car.x + ' ' + car.y)
 }
 
-let mouseSteer = 0;
 
-window.addEventListener('mousemove', e => { 
-  mouseSteer = 1 / (app.renderer.width / e.clientX);
-});
+class UIScene extends Phaser.Scene {
+  
+  constructor ()  {
+    super({ key: 'UIScene', active: true });
+    this.touches = { left: false, right: false, up: false, down: false };
+    this.banner = true;
+  }
+  
+  preload() {
+    this.load.image('arrow', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Farrow.png?v=1617402036719');
+  }
+
+  create () {
+    const box = this.add.rectangle(80, 80, 100, 100, 0x000000);
+    box.alpha = 0.6;
+    this.uiSpeed = this.add.text(50, 50, '0', { font: '36px Helvetica', fill: '#aaaaaa' });
+    this.add.text(50, 100, 'KMPH', { font: '16px Helvetica', fill: '#aaaaaa' });
+
+    if(isMobile) {
+      game.input.addPointer(1);    
+      const w = window.innerWidth, h = window.innerHeight;
+      this.up = this.add.image(w - 200, h - 350, 'arrow').setOrigin(0.5, 0.5);
+      this.up.scaleX = this.up.scaleY = 0.2;
+      this.up.alpha = 0.75;
+      this.up.rotation = -1.57;
+      
+      this.down = this.add.image(w - 200, h - 200, 'arrow').setOrigin(0.5, 0.5);
+      this.down.scaleX = this.down.scaleY = 0.2;
+      this.down.alpha = 0.75;
+      this.down.rotation = 1.57;
+      
+      this.left = this.add.image(200, h - 250, 'arrow').setOrigin(0.5, 0.5);
+      this.left.scaleX = this.left.scaleY = 0.2;
+      this.left.alpha = 0.75;
+      this.left.flipX = true;
+      
+      this.right = this.add.image(350, h - 250, 'arrow').setOrigin(0.5, 0.5);
+      this.right.scaleX = this.right.scaleY = 0.2;
+      this.right.alpha = 0.75;
+    }
+    this.arrowKeys = this.input.keyboard.createCursorKeys();
+    this.wasdKeys = this.input.keyboard.addKeys({  
+      up : Phaser.Input.Keyboard.KeyCodes.W,
+      down : Phaser.Input.Keyboard.KeyCodes.S,
+      left : Phaser.Input.Keyboard.KeyCodes.A,
+      right : Phaser.Input.Keyboard.KeyCodes.D
+    });
+  }
+  
+  update() {
+    
+    this.uiSpeed.setText(Math.round(car.velocity * 15));
+    if (isMobile) {
+      this.hideBanner();
+      this.touches = { left: false, right: false, up: false, down: false };    
+    
+      if(this.input.pointer1.isDown) {
+        let x = this.input.pointer1.x, y = this.input.pointer1.y;
+        if(Phaser.Math.Distance.Between(x, y, this.up.x, this.up.y) < 80) this.touches.up = true; 
+        if(Phaser.Math.Distance.Between(x, y, this.down.x, this.down.y) < 80) this.touches.down = true; 
+        if(Phaser.Math.Distance.Between(x, y, this.left.x, this.left.y) < 80) this.touches.left = true; 
+        if(Phaser.Math.Distance.Between(x, y, this.right.x, this.right.y) < 80) this.touches.right = true;
+      }
+      if(this.input.pointer2.isDown) {
+        let x = this.input.pointer2.x, y = this.input.pointer2.y;
+        if(Phaser.Math.Distance.Between(x, y, this.up.x, this.up.y) < 80) this.touches.up = true; 
+        if(Phaser.Math.Distance.Between(x, y, this.down.x, this.down.y) < 80) this.touches.down = true; 
+        if(Phaser.Math.Distance.Between(x, y, this.left.x, this.left.y) < 80) this.touches.left = true; 
+        if(Phaser.Math.Distance.Between(x, y, this.right.x, this.right.y) < 80) this.touches.right = true;
+      }
+      // console.log(touches);
+    }
+    joyLeft = this.wasdKeys.left.isDown || this.arrowKeys.left.isDown || this.touches.left;
+    joyRight = this.wasdKeys.right.isDown || this.arrowKeys.right.isDown || this.touches.right;
+    joyUp = this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
+    joyDown = this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
+    
+    if(this.banner && joyUp) {
+      this.hideBanner();
+    }      
+  }  
+  
+  hideBanner() {
+    document.querySelector('.banner').classList.remove('initial');
+    this.banner = false;
+  }
+}
+
+var config = {
+  type: Phaser.AUTO,
+  width: window.innerWidth,
+  height: window.innerHeight,
+  scene: [MainScene, UIScene]
+};
+
+const game = new Phaser.Game(config);
