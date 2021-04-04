@@ -10,7 +10,6 @@ const turnSpeed = 0.002;//0.002
 let carSprite;
 let shadow;
 let engine;
-let map;
 let engineSound = {};
 let minEngineSpeed = 3;
 let maxEngineSpeed = 12;
@@ -32,64 +31,6 @@ const car = {
   isThrottling: false,
   isReversing: false
 };
-let mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg?v=1616936163121';
-
-class MainScene extends Phaser.Scene {
-  
-  constructor() {
-    super({key: 'MainScene', active: true});
-  }
-
-  preload () {
-    isMobile = !game.device.os.desktop && game.device.input.touch;
-    if(isMobile) {
-      mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg?v=1617031366035';
-      mapScale = 4;
-      carScale = 1;
-    }
-    this.load.image('map', mapUrl);
-    this.load.image('car', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png?v=1616942278883');
-    this.load.audio('engine', ['https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fengine.wav?v=1616964690904']);
-  }
-
-  create () {
-    map = this.add.image(0, 0, 'map');
-    map.scaleX = map.scaleY = mapScale;
-
-    shadow = this.add.sprite(0, 0, 'car');
-    shadow.setOrigin(0.8, 0.6)
-    shadow.scaleX = shadow.scaleY = 0.03 * carScale;
-    shadow.flipY = true;
-    shadow.tint = 0x000000;
-    shadow.alpha = 0.4;
-
-    carSprite = this.add.sprite(0, 0, 'car');
-    carSprite.scaleX = carSprite.scaleY = 0.03 * carScale;
-    carSprite.flipY = true;
-    carSprite.depth = 10;
-
-    engine = this.sound.add('engine');
-    engine.rate = minEngineSpeed;
-    engine.play({loop: true, volume: 0.1});
-
-    this.cameras.main.startFollow(carSprite);
-  }
-
-  update () {    
-    updateCar();
-
-    const curveSkid = car.angularVelocity < -0.015 || car.angularVelocity > 0.015;
-    const powerSkid = car.isThrottling && (car.power > 0.02 && car.velocity < 2);
-    const brakeSkid = car.reverse > 0.02 && (car.velocity > 3);
-
-    if(curveSkid || powerSkid || brakeSkid) {    
-      this.add.rectangle(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 2 * Math.PI / 2) * 3, 
-                        car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 2 * Math.PI / 2) * 3, 2, 2, 0x333333);
-      this.add.rectangle(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 4 * Math.PI / 2) * 3, 
-                        car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 4 * Math.PI / 2) * 3, 2, 2, 0x333333);
-    }
-  }
-}
 
 function updateCar() {  
   
@@ -162,6 +103,63 @@ function updateCar() {
   // console.log(car.x + ' ' + car.y)
 }
 
+class MainScene extends Phaser.Scene {
+  
+  constructor() {
+    super({key: 'MainScene', active: true});
+    this.mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg?v=1616936163121';
+  }
+
+  preload () {
+    isMobile = !game.device.os.desktop && game.device.input.touch;
+    if(isMobile) {
+      this.mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg?v=1617031366035';
+      mapScale = 4;
+      carScale = 1;
+    }
+    this.load.image('map', this.mapUrl);
+    this.load.image('car', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png?v=1616942278883');
+    this.load.audio('engine', ['https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fengine.wav?v=1616964690904']);
+  }
+
+  create () {
+    this.map = this.add.image(0, 0, 'map');
+    this.map.scaleX = this.map.scaleY = mapScale;
+
+    shadow = this.add.sprite(0, 0, 'car');
+    shadow.setOrigin(0.8, 0.6)
+    shadow.scaleX = shadow.scaleY = 0.03 * carScale;
+    shadow.flipY = true;
+    shadow.tint = 0x000000;
+    shadow.alpha = 0.4;
+
+    carSprite = this.add.sprite(0, 0, 'car');
+    carSprite.scaleX = carSprite.scaleY = 0.03 * carScale;
+    carSprite.flipY = true;
+    carSprite.depth = 10;
+
+    engine = this.sound.add('engine');
+    engine.rate = minEngineSpeed;
+    engine.play({loop: true, volume: 0.1});
+
+    this.cameras.main.startFollow(carSprite);
+  }
+
+  update () {    
+    updateCar();
+
+    const curveSkid = car.angularVelocity < -0.015 || car.angularVelocity > 0.015;
+    const powerSkid = car.isThrottling && (car.power > 0.02 && car.velocity < 2);
+    const brakeSkid = car.reverse > 0.02 && (car.velocity > 3);
+
+    if(curveSkid || powerSkid || brakeSkid) {    
+      this.add.rectangle(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 2 * Math.PI / 2) * 3, 
+                        car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 2 * Math.PI / 2) * 3, 2, 2, 0x333333);
+      this.add.rectangle(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 4 * Math.PI / 2) * 3, 
+                        car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 4 * Math.PI / 2) * 3, 2, 2, 0x333333);
+    }
+  }
+}
 
 class UIScene extends Phaser.Scene {
   
