@@ -2,26 +2,38 @@
 
 Get out on that track and show them what you can do!
 
-Inspired by top down racers like [Circuit Superstars](https://store.steampowered.com/app/1097130/Circuit_Superstars/) and [Ultimate Racing 2D](https://store.steampowered.com/app/808080/Ultimate_Racing_2D/) TrackStar is an attempt to create a semi-realistic car racing simulator that runs in the browser so anyone can hop into a virtual car anywhere they have access to an internet connection (or even offline via upcoming PWA support).
+Inspired by top down racers like [Circuit Superstars](https://store.steampowered.com/app/1097130/Circuit_Superstars/) and [Ultimate Racing 2D](https://store.steampowered.com/app/808080/Ultimate_Racing_2D/), TrackStar is an attempt to create a semi-realistic car racing simulator that runs in the browser so anyone can hop into a virtual car anywhere they have access to an internet connection (or even offline via upcoming PWA support).
 
-Borrowing physics code from [car.js.org](https://car.js.org/), TrackStars is built using modern Web Standards based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
+Borrowing physics code from [car.js.org](https://car.js.org/), TrackStar is built using modern Web Standards based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
 
 Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys to drive. Enjoy!
 
 ## Backlog
 
-* Surface and barrier physics 
+* ~~Basic graphics~~
+* ~~Basic physics~~
+* ~~Basic audio~~
+* ~~Keyboard controls~~
+* ~~Touch controls~~
+* ~~Basic HUD UI (speed)~~
+* ~~Basic help banner~~
+* ~~Skidmarks~~
+* Surface dependent physics (tarmac, grass, sand, kerbs)
+* Fixed barrier physics
 * PWA support for fullscreen mobile and offline use
 * Handle screen resize
 * Controller support
 * Externalize config data
 * Masks for bridges and other track overlays
+* Track markers (start/finsh, sectors, corners)
 * Lap & sector times
 * Driver leaderboards
+* Camera zoom controls
+* User settings persistence
 * Collision physics
 * AI drivers
-* Car damage model
-* Tyre health model
+* Damage model
+* Tyre model
 * More tracks and cars
 * HUD UIs (damage, tyres, RPM, lap/sector times)
 * Customizable HUD
