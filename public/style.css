@@ -13,7 +13,7 @@ body {
   overflow: hidden;
 }
 
-.controls {
+.banner {
   position: absolute;
   top: -50px;
   margin-left: auto;
@@ -31,7 +31,7 @@ body {
   top: 0px;
 }
 
-.controlsTrigger {
+.bannerTrigger {
   position: absolute;
   height: 100px;
   top: 0;
@@ -41,59 +41,7 @@ body {
   right: 0;
 }
 
-.controlsTrigger:hover > .controls {
+.bannerTrigger:hover > .banner {
   top: 0px; 
   transition: top 0.5s;
-}
-
-/* .buttons {
-  z-index: 1000;
-}
- */
-.button {
-  position: absolute;
-  width: 15%;
-}
-
-.left {
-  left: 12%;
-  bottom: 12%;
-  transform: rotate(-180deg);
-}
-
-.right {
-  left: 35%;
-  bottom: 12%;
-}
-
-.down {
-  right: 15%;
-  bottom: 12%;
-  transform: rotate(90deg);
-}
-
-.up {
-  right: 15%;
-  bottom: 25%;
-  transform: rotate(-90deg);
-}
-
-.buttons {
-  visibility: hidden;
-}
-
-#leftRight {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 50%;
-  width: 50%;
-}
-
-#upDown {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  height: 50%;
-  width: 50%;
 }
