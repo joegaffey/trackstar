@@ -18,6 +18,8 @@ Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys t
 * ~~Basic HUD UI (speed)~~
 * ~~Basic help banner~~
 * ~~Skidmarks~~
+* ~~Particle effects for dirt and smoke~~
+* ~~Camera zoom controls (desktop)~~
 * Surface dependent physics (tarmac, grass, sand, kerbs)
 * Fixed barrier physics
 * Split map into tiles
@@ -28,8 +30,7 @@ Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys t
 * Masks for bridges and other track overlays
 * Track markers (start/finsh, sectors, corners)
 * Lap & sector times
-* ~~Particle effects for dirt and smoke~~
-* Camera zoom controls
+* Camera zoom controls (mobile)
 * User settings with persistence
 * Collision physics
 * AI drivers
@@ -39,12 +40,14 @@ Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys t
 * AI Engineer
 * Damage model
 * Tyre model
+* Tyre selection
 * More tracks and cars
 * HUD UIs (damage, tyres, RPM, lap/sector times)
 * Customizable HUD
 * Manual gearbox
 * Human engineer (player)
 * Human race director (player)
+* Mouse steering
 * Dirt track physics
 * Trackside objects and movable barriers
 * Telemetry recording and replays
