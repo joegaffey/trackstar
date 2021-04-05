@@ -119,6 +119,7 @@ class MainScene extends Phaser.Scene {
     }
     this.load.image('map', this.mapUrl);
     this.load.image('car', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png?v=1616942278883');
+    this.load.image('dust', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fdust.png?v=1617615529526');
     this.load.audio('engine', ['https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fengine.wav?v=1616964690904']);
   }
 
@@ -143,6 +144,32 @@ class MainScene extends Phaser.Scene {
     engine.play({loop: true, volume: 0.1});
 
     this.cameras.main.startFollow(carSprite);
+    
+    var particles = this.add.particles('dust');
+    var emitter = particles.createEmitter({
+        speed: {
+            onEmit: function (particle, key, t, value) {
+                return car.velocity;
+            }
+        },
+        lifespan: {
+            onEmit: function (particle, key, t, value)  {
+              return car.velocity * 100;
+            }
+        },
+        alpha: {
+            onEmit: function (particle, key, t, value) {
+              if(car.isSkidding)  
+                return 200;
+              else
+                return 1000;  
+            }
+        },
+        scale: { start: 0.1, end: 1.0 },
+        blendMode: 'NORMAL'
+    });
+
+    emitter.startFollow(carSprite);
   }
 
   update () {    
@@ -151,8 +178,10 @@ class MainScene extends Phaser.Scene {
     const curveSkid = car.angularVelocity < -0.015 || car.angularVelocity > 0.015;
     const powerSkid = car.isThrottling && (car.power > 0.02 && car.velocity < 2);
     const brakeSkid = car.reverse > 0.02 && (car.velocity > 3);
+    
+    car.isSkidding = curveSkid || powerSkid || brakeSkid
 
-    if(curveSkid || powerSkid || brakeSkid) {    
+    if(car.isSkidding) {    
       this.add.rectangle(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 2 * Math.PI / 2) * 3, 
                         car.y - Math.sin(car.angle + 3 * Math.PI / 2) * 3 + Math.sin(car.angle + 2 * Math.PI / 2) * 3, 2, 2, 0x333333);
       this.add.rectangle(car.x - Math.cos(car.angle + 3 * Math.PI / 2) * 3 + Math.cos(car.angle + 4 * Math.PI / 2) * 3, 
