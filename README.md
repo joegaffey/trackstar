@@ -50,6 +50,11 @@ Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys t
 * Telemetry recording and replays
 * Driver names
 * Championships
+* Rubber build up on track impacts grip
+* Wet track conditions
+* Snow/icy track conditions
+* Better lighting/shadows
+* Night races
 * Pitstops
 * Online multiplayer
 * Track and car editor and SDK
