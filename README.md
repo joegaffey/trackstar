@@ -20,7 +20,10 @@ Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys t
 * ~~Skidmarks~~
 * ~~Particle effects for dirt and smoke~~
 * ~~Camera zoom controls (desktop)~~
-* Surface dependent physics (tarmac, grass, sand, kerbs)
+* ~~Surface dependent physics - tarmac~~
+* ~~Surface dependent physics - grass~~
+* Surface dependent physics - sand 
+* Surface dependent physics - kerbs
 * Fixed barrier physics
 * Split map into tiles
 * PWA support for fullscreen mobile and offline use
