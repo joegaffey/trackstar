@@ -18,6 +18,7 @@ let mapScale = 1;
 let carScale = 1
 let isMobile = false;
 let joyUp, joyDown, joyLeft, joyRight = false;
+let mainCamera;
 
 const car = {
   x: -334 / mapScale,
@@ -143,7 +144,9 @@ class MainScene extends Phaser.Scene {
     engine.rate = minEngineSpeed;
     engine.play({loop: true, volume: 0.1});
 
-    this.cameras.main.startFollow(carSprite);
+    this.cameras.main.startFollow(carSprite);    
+    this.cameras.main.zoom = 1;
+    mainCamera = this.cameras.main;
     
     var particles = this.add.particles('dust');
     var emitter = particles.createEmitter({
@@ -236,6 +239,10 @@ class UIScene extends Phaser.Scene {
       down : Phaser.Input.Keyboard.KeyCodes.S,
       left : Phaser.Input.Keyboard.KeyCodes.A,
       right : Phaser.Input.Keyboard.KeyCodes.D
+    });
+    this.input.keyboard.on('keydown', (key) =>  { 
+      if(key.code === "Minus") { mainCamera.zoom -= 0.1; }
+      else if(key.code === "Equal") { mainCamera.zoom += 0.1; }
     });
   }
   
