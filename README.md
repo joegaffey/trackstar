@@ -20,6 +20,7 @@ Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys t
 * ~~Skidmarks~~
 * Surface dependent physics (tarmac, grass, sand, kerbs)
 * Fixed barrier physics
+* Split map into tiles
 * PWA support for fullscreen mobile and offline use
 * Handle screen resize
 * Controller support
@@ -27,24 +28,28 @@ Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys t
 * Masks for bridges and other track overlays
 * Track markers (start/finsh, sectors, corners)
 * Lap & sector times
-* Driver leaderboards
+* ~~Particle effects for dirt and smoke~~
 * Camera zoom controls
-* User settings persistence
+* User settings with persistence
 * Collision physics
 * AI drivers
+* Flag rules (AI race director)
+* Driver leaderboards
+* Race weekend (practice, quali, race)
+* AI Engineer
 * Damage model
 * Tyre model
 * More tracks and cars
 * HUD UIs (damage, tyres, RPM, lap/sector times)
 * Customizable HUD
-* Particle effects for dirt and smoke
 * Manual gearbox
+* Human engineer (player)
+* Human race director (player)
 * Dirt track physics
 * Trackside objects and movable barriers
 * Telemetry recording and replays
 * Driver names
 * Championships
-* Flag rules
 * Pitstops
 * Online multiplayer
 * Track and car editor and SDK
