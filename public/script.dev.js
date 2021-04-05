@@ -20,7 +20,8 @@ const grass = {
   angularDrag: 0.98,
   drag: 0.93,
   skidMarkColor: 0x8B4513,
-  particleColor: 999966
+  particleColor: 999966,
+  particleAlpha: 0.5
 }
 
 const tarmac = { 
@@ -28,7 +29,8 @@ const tarmac = {
   angularDrag: 0.9,
   drag: 0.95,
   skidMarkColor: 0x333333,
-  particleColor: 0xFFFFFF        
+  particleColor: 0xFFFFFF,
+  particleAlpha: 1
 }
 
 let carSprite;
@@ -153,7 +155,8 @@ class MainScene extends Phaser.Scene {
     this.load.audio('engine', ['https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fengine.wav?v=1616964690904']);
   }
 
-  create () {
+  create () {    
+    
     this.map = this.add.image(0, 0, 'map');
     this.map.scaleX = this.map.scaleY = mapScale;
 
@@ -177,36 +180,41 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.zoom = 1;
     mainCamera = this.cameras.main;
     
-    var particles = this.add.particles('dust');
-    var emitter = particles.createEmitter({
-        speed: {
-            onEmit: function (particle, key, t, value) {
-                return car.velocity;
-            }
-        },
-        lifespan: {
-            onEmit: function (particle, key, t, value)  {
-              return car.velocity * 100;
-            }
-        },
-        alpha: {
-            onEmit: function (particle, key, t, value) {
-              if(car.isSkidding)  
-                return 500;
-              else
-                return 1000;  
-            }
-        },
-        tint: {
-            onEmit: function (particle, key, t, value)  {
-              return car.surface.particleColor;
-            }
-        },
-        scale: { start: 0.1, end: 1.0 },
-        blendMode: 'NORMAL'
+    let particles = this.add.particles('dust');
+    this.carEmitter = particles.createEmitter({
+      speed: {
+        onEmit: function (particle, key, t, value) {
+            return car.velocity;
+        }
+      },
+      lifespan: {
+        onEmit: function (particle, key, t, value)  {
+          return car.velocity * 100;
+        }
+      },
+      alpha: {
+        onEmit: function (particle, key, t, value) {
+          if(car.surface.type === surface.TARMAC && car.isSkidding)  
+            return 200 * car.surface.particleAlpha;
+          else
+            return 1000 * car.surface.particleAlpha;  
+        }
+      },
+      tint: {
+        onEmit: function (particle, key, t, value)  {
+          return car.surface.particleColor;
+        }
+      },
+      // angle: {
+      //   onEmit: function (particle, key, t, value)  {
+      //     return Math.sin(car.angle)  * 360;
+      //   }
+      // },
+      scale: { start: 0.1, end: 1.0 },
+      blendMode: 'NORMAL'
     });
 
-    emitter.startFollow(carSprite);
+    this.carEmitter.startFollow(carSprite);
   }
 
   update () {    
@@ -250,6 +258,13 @@ class UIScene extends Phaser.Scene {
   }
 
   create () {
+    
+    this.gamepad = {};    
+    this.input.gamepad.once('down', function (pad, button, index) {
+      console.log('Playing with ' + pad.id);
+      this.gamepad = pad;      
+    }, this);     
+    
     const box = this.add.rectangle(80, 80, 100, 100, 0x000000);
     box.alpha = 0.6;
     this.uiSpeed = this.add.text(50, 50, '0', { font: '36px Helvetica', fill: '#aaaaaa' });
@@ -313,10 +328,10 @@ class UIScene extends Phaser.Scene {
       }
       // console.log(touches);
     }
-    joyLeft = this.wasdKeys.left.isDown || this.arrowKeys.left.isDown || this.touches.left;
-    joyRight = this.wasdKeys.right.isDown || this.arrowKeys.right.isDown || this.touches.right;
-    joyUp = this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
-    joyDown = this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
+    joyLeft = (this.gamepad.leftStick && this.gamepad.leftStick.x < 0) || this.gamepad.left || this.wasdKeys.left.isDown || this.arrowKeys.left.isDown || this.touches.left;
+    joyRight = (this.gamepad.leftStick && this.gamepad.leftStick.x > 0) ||this.gamepad.right || this.wasdKeys.right.isDown || this.arrowKeys.right.isDown || this.touches.right;
+    joyUp = this.gamepad.A || this.gamepad.R2 || this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
+    joyDown = this.gamepad.B || this.gamepad.L2 || this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
     
     if(this.banner && joyUp) {
       this.hideBanner();
@@ -329,11 +344,14 @@ class UIScene extends Phaser.Scene {
   }
 }
 
-var config = {
+const config = {
   type: Phaser.AUTO,
   width: window.innerWidth,
   height: window.innerHeight,
+  input: {
+    gamepad: true
+  },
   scene: [MainScene, UIScene]
-};
+}
 
 const game = new Phaser.Game(config);
