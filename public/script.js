@@ -19,8 +19,17 @@ const grass = {
   type: surface.GRASS,
   angularDrag: 0.98,
   drag: 0.93,
-  skidMarkColor: 0x8B4513,
-  particleColor: 999966,
+  skidMarkColor: 0x999966,
+  particleColor: 0x999966,
+  particleAlpha: 0.5
+}
+
+const sand = { 
+  type: surface.SAND,
+  angularDrag: 0.8,
+  drag: 0.90,
+  skidMarkColor: 0xc2b280,
+  particleColor: 0xc2b280,
   particleAlpha: 0.5
 }
 
@@ -59,6 +68,12 @@ const car = {
   isReversing: false,
   surface: tarmac
 };
+
+car.crash = () => {
+  car.xVelocity *= -1.5;
+  car.yVelocity *= -1.5;
+  car.power = 0;
+}
 
 function updateCar() {  
   
