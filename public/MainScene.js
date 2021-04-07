@@ -3,14 +3,14 @@ class MainScene extends Phaser.Scene {
   constructor() {
     super({key: 'MainScene', active: true});
     this.mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg?v=1616936163121';
-    this.physicsUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics.png?v=1617647112929';
+    this.physicsUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics.png?v=1617832435552';
   }
 
   preload () {
     isMobile = !game.device.os.desktop && game.device.input.touch;
     if(isMobile) {
       this.mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg?v=1617031366035';
-      this.physicUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics_small.png?v=1617647863895';
+      this.physicUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics_small.png?v=1617820109964';
       mapScale = 4;
       carScale = 1;
     }
@@ -27,18 +27,18 @@ class MainScene extends Phaser.Scene {
     this.map.scaleX = this.map.scaleY = mapScale;    
 
     this.tyresSprite = this.add.sprite(0, 0, 'tyres');
-    this.tyresSprite.scaleX = this.tyresSprite.scaleY = 0.03 * carScale;
+    this.tyresSprite.scaleX = this.tyresSprite.scaleY = 0.025 * carScale;
     this.tyresSprite.flipY = true;
     
     this.shadow = this.add.sprite(0, 0, 'car');
     this.shadow.setOrigin(0.8, 0.6);
-    this.shadow.scaleX = this.shadow.scaleY = 0.03 * carScale;
+    this.shadow.scaleX = this.shadow.scaleY = 0.025 * carScale;
     this.shadow.flipY = true;
     this.shadow.tint = 0x000000;
     this.shadow.alpha = 0.4;
 
     this.carSprite = this.add.sprite(0, 0, 'car');
-    this.carSprite.scaleX = this.carSprite.scaleY = 0.03 * carScale;
+    this.carSprite.scaleX = this.carSprite.scaleY = 0.025 * carScale;
     this.carSprite.flipY = true;
     this.carSprite.depth = 10;
     
@@ -62,15 +62,19 @@ class MainScene extends Phaser.Scene {
     this.surfaceGraphicsPixel = this.textures.getPixel(this.carSprite.x + (this.map.width / 2), this.carSprite.y + (this.map.height / 2), 'map');
     
     if(!isMobile && surfacePhysicsPixel) {
-      if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.r == 255)
+      if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
         car.surface = tarmac;
+      else if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 0)
+        car.surface = sand;
+      else if(surfacePhysicsPixel.r == 0 &&  surfacePhysicsPixel.g == 0 && surfacePhysicsPixel.b == 0)
+        car.crash();
       else
         car.surface = grass;
     }
     else 
       car.surface = tarmac;
     updateCar();
-
+    
     const curveSkid = car.angularVelocity < -0.015 || car.angularVelocity > 0.015;
     const powerSkid = car.isThrottling && (car.power > 0.02 && car.velocity < 2);
     const brakeSkid = car.reverse > 0.02 && (car.velocity > 3);

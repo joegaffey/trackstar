@@ -23,9 +23,9 @@ Try it out [here](http://trackstar.glitch.me/). Use a gamepad, touch, arrows or 
 * ~~Surface dependent physics - tarmac~~
 * ~~Surface dependent physics - grass~~
 * ~~Basic (digital) controller support~~
-* Surface dependent physics - sand 
+* ~~Surface dependent physics - sand~~ 
+* ~~Basic fixed barrier physics~~
 * Surface dependent physics - kerbs
-* Fixed barrier physics
 * Split map into tiles
 * PWA support for fullscreen mobile and offline use
 * Handle screen resize
