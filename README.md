@@ -6,7 +6,7 @@ Inspired by top down racers like [Circuit Superstars](https://store.steampowered
 
 Borrowing physics code from [car.js.org](https://car.js.org/), TrackStar is built using modern Web Standards based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
 
-Try it out [here](http://trackstar.glitch.me/). Use touch, arrows or WASD keys to drive. Enjoy!
+Try it out [here](http://trackstar.glitch.me/). Use a gamepad, touch, arrows or WASD keys to drive. Enjoy!
 
 ## Backlog
 
