@@ -82,6 +82,7 @@ class MainScene extends Phaser.Scene {
     this.tyresSprite.tint = 0x000000;
     if(car.surface.type !== surface.TARMAC) {    
       this.tyresSprite.alpha = 0.2;
+      this.tyresSprite.tint = car.surface.skidMarkColor;
     } 
     else { 
       this.tyresSprite.alpha = 0.01;
@@ -101,8 +102,8 @@ class MainScene extends Phaser.Scene {
   getCarEmitter() {
     const particles = this.add.particles('dust');
     return particles.createEmitter({
-      frequency: 40,
-      // maxParticles: 90,
+      frequency: 50,
+      maxParticles: 40,
       speed: {
         onEmit: function (particle, key, t, value) {
             return car.velocity;
@@ -116,9 +117,9 @@ class MainScene extends Phaser.Scene {
       alpha: {
         onEmit: function (particle, key, t, value) {
           if(car.surface.type === surface.TARMAC && car.isSkidding)  
-            return 100 / car.surface.particleAlpha;
+            return 20 / car.surface.particleAlpha;
           else
-            return 1000 / car.surface.particleAlpha;  
+            return 200 / car.surface.particleAlpha;  
         }
       },
       tint: {
