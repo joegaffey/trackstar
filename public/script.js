@@ -19,7 +19,7 @@ const grass = {
   type: surface.GRASS,
   angularDrag: 0.98,
   drag: 0.93,
-  skidMarkColor: 0x999966,
+  skidMarkColor: 0x321A02,
   particleColor: 0x999966,
   particleAlpha: 0.5
 }
@@ -70,8 +70,8 @@ const car = {
 };
 
 car.crash = () => {
-  car.xVelocity *= -1.5;
-  car.yVelocity *= -1.5;
+  car.xVelocity *= -1.1;
+  car.yVelocity *= -1.1;
   car.power = 0;
 }
 
@@ -146,6 +146,12 @@ const config = {
   type: Phaser.WEBGL,
   width: window.innerWidth,
   height: window.innerHeight,
+  // physics: {
+  //   default: 'arcade',
+  //   arcade: {
+  //     fps: 60
+  //   }
+  // },
   input: {
     gamepad: true
   },
