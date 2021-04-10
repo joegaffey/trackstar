@@ -25,6 +25,8 @@ Try it out [here](http://trackstar.glitch.me/). Use a gamepad, touch, arrows or 
 * ~~Basic (digital) controller support~~
 * ~~Surface dependent physics - sand~~ 
 * ~~Basic fixed barrier physics~~
+* Pause and menu
+* Performance profiles and settings
 * Surface dependent physics - kerbs
 * Split map into tiles
 * PWA support for fullscreen mobile and offline use
