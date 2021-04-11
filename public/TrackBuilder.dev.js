@@ -212,6 +212,7 @@ class TrackBuilder extends Phaser.Scene {
         if(i === 0 || cpSprite.i == this.points.length)
           this.isOpen = true;
         cpSprite.destroy();
+        this.drawTrack();
       }
       if(cpSprite.i === 0) {
         this.points.push(this.points[0]);

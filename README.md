@@ -10,7 +10,27 @@ Try it out [here](http://trackstar.glitch.me/). Use a gamepad, touch, arrows or 
 
 Also check out the WIP track editor [here](http://trackstar.glitch.me/editor)!
 
-## Backlog
+## Track Editor User Guide
+
+Click on the background to create track control points.
+
+First point is the start/finish line.
+
+Create additional control points to mark out a circuit.
+
+Click on the first point to close the circuit.
+
+Click on the start/finish lie to change the direction of the track.
+
+Drag the control points to change the track layout.
+
+Hold shift and click on a control point to delete it.
+
+Use WASD and aorrow keys to move the map.
+
+Use mouse wheel or + and - keys to zoom in and out.
+
+## Game Backlog
 
 * ~~Basic graphics~~
 * ~~Basic physics~~
@@ -68,7 +88,26 @@ Also check out the WIP track editor [here](http://trackstar.glitch.me/editor)!
 * Night races
 * Pitstops
 * Online multiplayer
-* Track and car editor and SDK
 * Safety car
 * Real world telemetry playback
 * Force feedback 🤯
+
+## Editor Backlog
+
+* ~~Basic track editor~~
+* ~~Start finish line~~
+* ~~Starting positions~~
+* Integrate into game
+* Import/export
+* Undo/redo
+* Add a new control point in track editor
+* Kerbs in track editor
+* Turns and sectors
+* Barriers in track editor
+* Buildings in track editor
+* Sand runoffs
+* Tarmac runnoffs
+* Pitlane
+* Service roads
+* Car graphics editor
+* Car physics editor
