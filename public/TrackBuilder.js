@@ -1,4 +1,4 @@
-class TrackBuilder extends Phaser.Scene {
+class TrackBuilderScene extends Phaser.Scene {
   
   constructor () {
     super();
@@ -20,6 +20,7 @@ class TrackBuilder extends Phaser.Scene {
   }
 
   create () {
+    this.editorUIScene = this.game.scene.scenes[1];
     this.generateTextures();
     
     this.graphics = this.add.graphics();
@@ -34,6 +35,7 @@ class TrackBuilder extends Phaser.Scene {
     });
     
     this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
+      // if(deltaY > 0 && this.cameras.main.zoom > 0.1 || deltaY > 0 && this.cameras.main.zoom < 1)  
       if(deltaY > 0 || this.cameras.main.zoom > 0.1)  
         this.cameras.main.zoom += deltaY * 0.0001;
         this.cameras.main.worldX = pointer.worldX;
@@ -90,7 +92,6 @@ class TrackBuilder extends Phaser.Scene {
   }
   
   resize (gameSize, baseSize, displaySize, resolution) {
-    console.log(resolution)
     var width = gameSize.width;
     var height = gameSize.height;
     this.cameras.resize(width, height);
@@ -209,22 +210,27 @@ class TrackBuilder extends Phaser.Scene {
     cpSprite.on('pointerup', () => {
       if(this.shift.isDown) {
         this.points.splice(cpSprite.i, 1);
-        if(i === 0 || cpSprite.i == this.points.length -1)
+        if(i === 0 || cpSprite.i == this.points.length  -1)
           this.isOpen = true;
         cpSprite.destroy();
         this.drawTrack();
       }
       if(cpSprite.i === 0) {
-        this.points.push(this.points[0]);
-        this.finishTrack();
+        this.closeLoop();
       }
     });
   }
   
   finishTrack() {
     this.isOpen = false;
+    this.drawSpline();
     this.drawFinishLine();
     this.drawStartingPositions();
+  }
+  
+  closeLoop() {
+    this.points.push(this.points[0]);
+    this.finishTrack();    
   }
   
   drawTrack() {
@@ -273,42 +279,60 @@ class TrackBuilder extends Phaser.Scene {
 }
 
 
-class UIScene extends Phaser.Scene {
+class EditorUIScene extends Phaser.Scene {
   
   constructor ()  {
-    super({ key: 'UIScene', active: true });    
+    super({ key: 'UIScene', active: true });
   }
   
   preload() {
   }
 
   create () {    
-    const box = this.add.rectangle(20, 20, 125, 50, 0x000000).setOrigin(0,0);
-    box.alpha = 0.6;
-    this.controlsOnText = this.add.text(35, 35, 'Controls On', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);;
-    box.setInteractive({ draggable: true });
-    box.on('pointerup', (pointer) => {
-      this.game.scene.scenes[0].showControls = !this.game.scene.scenes[0].showControls;
-      if(this.game.scene.scenes[0].showControls)
-        this.controlsOnText.setText('Controls On');
-      else
-        this.controlsOnText.setText('Controls Off');
-      this.game.scene.scenes[0].drawTrack();
-    });
+    this.editorScene = this.game.scene.scenes[0];
+    this.addControlPointsButton();
+    this.addCloseLoopButton();
   }
   
   update() {    
-  }  
+  }
+  
+  addControlPointsButton() {
+    const box = this.add.rectangle(20, 20, 125, 50, 0x000000).setOrigin(0,0);
+    box.alpha = 0.6;
+    this.controlsOnText = this.add.text(35, 35, 'Controls Off', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);;
+    box.setInteractive({ draggable: false });
+    box.on('pointerup', (pointer) => {
+      this.editorScene.showControls = !this.editorScene.showControls;
+      if(this.editorScene.showControls)
+        this.controlsOnText.setText('Controls Off');
+      else
+        this.controlsOnText.setText('Controls On');
+      this.editorScene.drawTrack();
+    });
+  }
+  
+  addCloseLoopButton() {
+    const box = this.add.rectangle(150, 20, 125, 50, 0x000000).setOrigin(0,0);
+    box.alpha = 0.6;
+    const closeLoopText = this.add.text(165, 35, 'Close Loop', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);;
+    box.setInteractive({ draggable: false });
+    box.on('pointerup', (pointer) => {
+      if(this.editorScene.points.length > 4)
+        this.editorScene.closeLoop();
+      else
+        alert('Not enough points! Click on the background.')
+    });
+  }
 }
 
 const config = {
   type: Phaser.AUTO,
-  width: window.innerWidth,
-  height: window.innerHeight,
+  backgroundColor: 0x444444,
   scale: {
     mode: Phaser.Scale.RESIZE
   },
-  scene: [TrackBuilder, UIScene]
+  scene: [TrackBuilderScene, EditorUIScene]
 };
 
 let game = new Phaser.Game(config);
