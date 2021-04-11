@@ -8,6 +8,8 @@ Borrowing physics code from [car.js.org](https://car.js.org/), TrackStar is buil
 
 Try it out [here](http://trackstar.glitch.me/). Use a gamepad, touch, arrows or WASD keys to drive. Enjoy!
 
+Also check out the WIP track editor [here](http://trackstar.glitch.me/editor)!
+
 ## Backlog
 
 * ~~Basic graphics~~
