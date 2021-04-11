@@ -209,9 +209,10 @@ class TrackBuilder extends Phaser.Scene {
     cpSprite.on('pointerup', () => {
       if(this.shift.isDown) {
         this.points.splice(cpSprite.i, 1);
-        if(i === 0 || cpSprite.i == this.points.length)
+        if(i === 0 || cpSprite.i == this.points.length -1)
           this.isOpen = true;
         cpSprite.destroy();
+        this.drawTrack();
       }
       if(cpSprite.i === 0) {
         this.points.push(this.points[0]);
