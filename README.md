@@ -18,15 +18,15 @@ First point is the start/finish line.
 
 Create additional control points to mark out a circuit.
 
-Click on the first point to close the circuit.
+Click on the first point to close the circuit or click the 'Close Loop' button.
 
-Click on the start/finish lie to change the direction of the track.
+Click on the start/finish line to change the direction of the track.
 
 Drag the control points to change the track layout.
 
 Hold shift and click on a control point to delete it.
 
-Use WASD and aorrow keys to move the map.
+Use WASD and arrow keys to move the map.
 
 Use mouse wheel or + and - keys to zoom in and out.
 
@@ -97,10 +97,16 @@ Use mouse wheel or + and - keys to zoom in and out.
 * ~~Basic track editor~~
 * ~~Start finish line~~
 * ~~Starting positions~~
+* ~~Close circuit button~~
+* Add a new control point in track editor
+* Background image support
+* Rendering options
+* Phisics image rendering
+* Restart/clear button
 * Integrate into game
 * Import/export
+* Mobile friendly control points
 * Undo/redo
-* Add a new control point in track editor
 * Kerbs in track editor
 * Turns and sectors
 * Barriers in track editor
@@ -109,5 +115,6 @@ Use mouse wheel or + and - keys to zoom in and out.
 * Tarmac runnoffs
 * Pitlane
 * Service roads
+* Varying track width
 * Car graphics editor
 * Car physics editor
