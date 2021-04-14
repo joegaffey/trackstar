@@ -2,6 +2,7 @@ const maxPower = 0.2;
 const maxReverse = 0.05;//0.05;
 const powerFactor = 0.0005;//0.001;
 const reverseFactor = 0.01;//0.0005;
+const engineBrakingFactor = 0.0005;
 
 const drag = 0.95;
 const angularDrag = 0.9;//0.95;
@@ -17,8 +18,8 @@ const surface = {
 
 const grass = { 
   type: surface.GRASS,
-  angularDrag: 0.98,
-  drag: 0.93,
+  angularDrag: 0.97,
+  drag: 0.935,
   skidMarkColor: 0x321A02,
   particleColor: 0x999966,
   particleAlpha: 0.5
@@ -26,7 +27,7 @@ const grass = {
 
 const sand = { 
   type: surface.SAND,
-  angularDrag: 0.8,
+  angularDrag: 0.85,
   drag: 0.90,
   skidMarkColor: 0xc2b280,
   particleColor: 0xc2b280,
@@ -103,13 +104,13 @@ function updateCar() {
     car.power += powerFactor * car.isThrottling;
   } 
   else {
-    car.power -= powerFactor;
+    car.power -= engineBrakingFactor;
   }
   if (car.isReversing) {
     car.reverse += reverseFactor;
   } 
   else {
-    car.reverse -= reverseFactor;
+    car.reverse -= engineBrakingFactor;
   }
   
   if(car.power * revFactor > minEngineSpeed)
