@@ -16,7 +16,27 @@ class TrackBuilderScene extends Phaser.Scene {
 
   preload () {
     this.load.image('grass', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fgrass.jpg?v=1617915781926');
-    this.load.image('track', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Ftrack1.png?v=1617921495645');
+    this.load.image('track', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Ftrack.png?v=1618435886222');
+    this.load.image('car1', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_1.png');
+    this.load.image('car2', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_2.png');
+    this.load.image('car3', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_3.png');
+    this.load.image('car4', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_4.png');
+    this.load.image('car5', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png');
+    this.load.image('car6', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_6.png');
+    this.load.image('car7', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_7.png');
+    this.load.image('car8', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_8.png');
+    this.load.image('car9', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_9.png');
+    this.load.image('car10', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_10.png');
+    this.load.image('car11', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_11.png');
+    this.load.image('car12', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_12.png');
+    this.load.image('car13', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_13.png');
+    this.load.image('car14', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_14.png');
+    this.load.image('car15', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_15.png');
+    this.load.image('car16', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_16.png');
+    this.load.image('car17', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_17.png');
+    this.load.image('car18', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_18.png');
+    this.load.image('car19', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_19.png');
+    this.load.image('car20', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_20.png');
   }
 
   create () {
@@ -26,53 +46,62 @@ class TrackBuilderScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
     this.splinePointSprites = this.add.group();    
     this.startPositionSprites = this.add.group();
+    this.carSprites = this.add.group();
     this.cameras.main.zoom = 0.2;
     this.cameras.main.setOrigin(0.5, 0.5);
-        
-    this.input.keyboard.on('keydown', (key) =>  { 
-      if(key.code === "Minus") { this.cameras.main.zoom -= 0.1; }
-      else if(key.code === "Equal") { this.cameras.main.zoom += 0.1; }
-    });
-    
-    this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
-      // if(deltaY > 0 && this.cameras.main.zoom > 0.1 || deltaY > 0 && this.cameras.main.zoom < 1)  
-      if(deltaY > 0 || this.cameras.main.zoom > 0.1)  
-        this.cameras.main.zoom += deltaY * 0.0001;
-        this.cameras.main.worldX = pointer.worldX;
-        this.cameras.main.worldY = pointer.worldY;
-    });
-    
+            
     this.scale.on('resize', this.resize, this);    
     this.shift = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);     
     
     this.background = this.add.tileSprite(0, 0, 2048, 2048, 'grass').setOrigin(0, 0);
     
+    this.input.keyboard.on('keydown', (key) =>  { 
+      if(key.code === "Minus") { this.cameras.main.zoom -= 0.1; }
+      else if(key.code === "Equal") { this.cameras.main.zoom += 0.1; }
+    });
+    
+    this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+      // if(deltaY > 0 && this.cameras.main.zoom > 0.1 || deltaY > 0 && this.cameras.main.zoom < 1)  
+      if(deltaY > 0 || this.cameras.main.zoom > 0.1)  
+        this.cameras.main.zoom += deltaY * 0.0001;
+        // this.cameras.main.x = pointer.x - this.background.width / 2;
+        // this.cameras.main.y = pointer.y - this.background.height / 2;
+    });
+    
     // @TODO background dragging
 //     this.background.setInteractive({ draggable: true });
     
-//     this.input.on('dragstart', (pointer, background) => {  
+//     this.background.on('dragstart', (pointer) => {  
 //       this.dragOn = true;
 //       console.log(1)
 //     });
     
-//     this.input.on('dragend', (pointer, background) => {  
+//     this.background.on('dragend', (pointer) => {  
 //       console.log(2)
 //       setTimeout(() => {
 //         this.dragOn = false;
 //       }, 100);
 //     });
     
-//     this.input.on('drag', (pointer, background) => {  
+//     this.background.on('drag', (pointer) => {  
 //       console.log(3);
+//       this.cameras.main.x = pointer.worldX;
+//       this.cameras.main.y = pointer.worldY;
 //     });       
     
-    this.input.on('pointerup', (pointer, background) => {      
+    this.input.on('pointerup', (pointer) => {     
       if(this.isOpen && !this.dragOn)
         this.points.push(new Phaser.Math.Vector2(pointer.worldX, pointer.worldY));
+      else if(this.shapePoints) {
+        this.graphics.fillStyle(0xffffff, 1);
+        this.graphics.fillPoints(this.shapePoints);
+        this.shapePoints = null;
+      }
       
-      this.drawSpline();
-      if(this.spline) {
-        const bounds = this.spline.getBounds();
+      this.drawTrack();
+      if(this.points.length > 1) {
+        const spline = new Phaser.Curves.Spline(this.points);
+        const bounds = spline.getBounds();
         this.background.x = bounds.x - this.margin;
         this.background.y = bounds.y - this.margin;
         this.background.width = bounds.width + this.margin * 2;
@@ -80,6 +109,34 @@ class TrackBuilderScene extends Phaser.Scene {
       }
     });
     
+    this.input.on('pointerdown', (pointer) => {      
+      if(this.shapeMode)
+        this.shapePoints = [];
+    });
+    
+    this.input.on('pointermove', (pointer) => {      
+      if(this.shapePoints) {
+        this.shapePoints.push(pointer.position);
+        this.graphics.fillStyle(0xffffff, 1);
+        this.graphics.fillCircle(pointer.worldX, pointer.worldY, 2 / this.cameras.main.zoom, 2 / this.cameras.main.zoom);
+      }
+    });
+    
+    
+    // @TODO draw bitmaps for sand etc
+//     var rt = this.make.renderTexture({ 
+//       x: this.background.x, 
+//       y: this.background.y,
+//       width: this.background.width, 
+//       height: this.background.height 
+//     }).setOrigin(0, 0);    
+
+//     this.input.on('pointermove', (pointer) => {
+//         if (!this.isOpen && pointer.isDown) {
+//             rt.draw('ball', pointer.worldX, pointer.worldY);
+//         }
+//     });    
+   
     this.input.keyboard.on('keydown', (key) =>  { 
       if(key.code === "KeyW" || key.code === "ArrowUp") { this.cameras.main.y -= 10; }
       else if(key.code === "KeyS" || key.code === "ArrowDown") { this.cameras.main.y += 10; }
@@ -95,8 +152,7 @@ class TrackBuilderScene extends Phaser.Scene {
     var width = gameSize.width;
     var height = gameSize.height;
     this.cameras.resize(width, height);
-  }  
-  
+  }    
   
   generateTextures() {
     const graphicsGen = this.make.graphics({x: 0, y: 0, add: false});
@@ -104,11 +160,11 @@ class TrackBuilderScene extends Phaser.Scene {
     graphicsGen.fillCircle(this.cpSize / 2, this.cpSize / 2, this.cpSize / 2, this.cpSize / 2); 
     graphicsGen.generateTexture('ball', this.cpSize, this.cpSize);
     graphicsGen.clear();
-    graphicsGen.lineStyle(8, 0xffffff);
-    graphicsGen.strokeRect(0, 0, 40, 40);
-    graphicsGen.generateTexture('start', 40, 12);
+    graphicsGen.lineStyle(5, 0xffffff);
+    graphicsGen.strokeRect(0, 0, 40, 50);
+    graphicsGen.generateTexture('start', 40, 40);
     graphicsGen.clear();
-    graphicsGen.fillStyle(0xffffff, 0.8);
+    graphicsGen.fillStyle(0xffffff);
     graphicsGen.fillRect(0, 0, this.trackWidth, 10);    
     graphicsGen.generateTexture('finish', this.trackWidth, 20);
     graphicsGen.destroy();    
@@ -116,8 +172,6 @@ class TrackBuilderScene extends Phaser.Scene {
     
   drawSpline() {
     this.graphics.depth = 10;
-    this.graphics.clear();
-    this.splinePointSprites.clear(true, true);
     if(this.points.length > 0) {
       this.graphics.fillStyle(0xaaaaaa, 1);
       this.graphics.fillCircle(this.points[0].x, this.points[0].y, this.trackWidth / 2 + this.trackBorderWidth / 2);
@@ -129,23 +183,14 @@ class TrackBuilderScene extends Phaser.Scene {
       this.graphics.fillCircle(this.points[this.points.length - 1].x, this.points[this.points.length - 1].y, this.trackWidth / 2 + this.trackBorderWidth / 2);
       this.graphics.fillStyle(0x666666, 1);
       this.graphics.fillCircle(this.points[this.points.length -1].x, this.points[this.points.length -1].y, this.trackWidth / 2);      
-      this.spline = new Phaser.Curves.Spline(this.points);
+      const spline = new Phaser.Curves.Spline(this.points);
       this.graphics.lineStyle(this.trackWidth + this.trackBorderWidth, 0xaaaaaa, 0.7);
-      this.spline.draw(this.graphics, this.points.length * 16);
+      spline.draw(this.graphics, this.points.length * 16);
       this.graphics.lineStyle(this.trackWidth, 0x666666, 1);
-      this.spline.draw(this.graphics, this.points.length * 16);
-      if(this.showControls) {
-        this.graphics.lineStyle(4, 0xffffff, 1);
-        this.spline.draw(this.graphics, this.points.length * 16);
-      }
-    }
-    if(this.showControls) {
-      this.points.forEach((point, i) => {
-        this.addControlPoint(point, i);
-      });
+      spline.draw(this.graphics, this.points.length * 16);
     }
     
-    // @TODO Interactive track grapics - click, drag behaviour
+    // @TODO Interactive track graphics - click, drag behaviour
     // this.graphics.setInteractive({ draggable: false });
     // this.graphics.on('pointerup', () => {
     //   if(!this.isOpen) {
@@ -154,6 +199,17 @@ class TrackBuilderScene extends Phaser.Scene {
     //   }
     // });
   }  
+  
+  drawControls() {
+    this.splinePointSprites.clear(true, true);
+    const spline = new Phaser.Curves.Spline(this.points);
+    this.graphics.depth = 12;
+    this.graphics.lineStyle(4, 0xffffff, 1);
+    spline.draw(this.graphics, this.points.length * 16);
+    this.points.forEach((point, i) => {
+      this.addControlPoint(point, i);
+    });
+  }
   
   addControlPoint(point, i) {
     let cpSprite = this.add.sprite(point.x, point.y, 'ball');
@@ -165,7 +221,7 @@ class TrackBuilderScene extends Phaser.Scene {
     else 
       cpSprite.tint = 0x00ff00;
 
-    cpSprite.depth = 11;
+    cpSprite.depth = 14;
     this.splinePointSprites.add(cpSprite);
 
     // @TODO fix for better hit area
@@ -193,7 +249,7 @@ class TrackBuilderScene extends Phaser.Scene {
           cpSprite.destroy();
           this.dragOn = false;
           if(!this.isOpen) {
-            this.finishTrack();
+            this.drawTrack();
           }
         }, 200);
     });      
@@ -210,7 +266,7 @@ class TrackBuilderScene extends Phaser.Scene {
     cpSprite.on('pointerup', () => {
       if(this.shift.isDown) {
         this.points.splice(cpSprite.i, 1);
-        if(i === 0 || cpSprite.i == this.points.length  -1)
+        if(i === 0 || cpSprite.i == this.points.length  -1) 
           this.isOpen = true;
         cpSprite.destroy();
         this.drawTrack();
@@ -221,36 +277,49 @@ class TrackBuilderScene extends Phaser.Scene {
     });
   }
   
-  finishTrack() {
-    this.isOpen = false;
-    this.drawSpline();
-    this.drawFinishLine();
-    this.drawStartingPositions();
-  }
-  
   closeLoop() {
     this.points.push(this.points[0]);
-    this.finishTrack();    
+    this.isOpen = false;
+    this.drawTrack();
   }
   
   drawTrack() {
-    this.drawSpline();
-    if(!this.isOpen) {
+    this.graphics.clear();
+    this.splinePointSprites.clear(true, true);
+    if(this.isOpen) 
+      this.drawSpline();
+    else {
+      this.drawSpline();
+      this.drawRope();
       this.drawFinishLine();
       this.drawStartingPositions();
+      this.drawCars();
     }
+    if(this.showControls)
+      this.drawControls();
   }
+  
+  drawRope() {
+    if(this.rope)
+      this.rope.destroy();
+    const spline = new Phaser.Curves.Spline(this.points);
+    this.rope = this.add.rope(0, 0, 'track', null, spline.getPoints(this.points.length * 16), true);  
+    this.rope.depth = 12;
+    this.rope.alpha = 0.8;    
+  }  
   
   drawFinishLine() {
     if(this.fSprite)
       this.fSprite.destroy();
-    let startingPoints = this.spline.getDistancePoints(this.starterGap);
+    const spline = new Phaser.Curves.Spline(this.points);
+    let startingPoints = spline.getDistancePoints(this.starterGap);
     let sp0 = this.points[0];
     let angle = Phaser.Math.Angle.BetweenPoints(sp0, startingPoints[1]);
     this.fSprite = this.add.sprite(sp0.x, sp0.y, 'finish');
-    this.fSprite.depth = 10;
+    this.fSprite.depth = 13;
     this.fSprite.rotation = angle;
     this.fSprite.angle -= 90;      
+    this.fSprite.alpha = 0.5;      
     this.fSprite.setInteractive({ draggable: false });
       this.fSprite.on('pointerup', (pointer) => {
         this.isReverse = !this.isReverse;
@@ -260,7 +329,8 @@ class TrackBuilderScene extends Phaser.Scene {
   
   drawStartingPositions() {
     this.startPositionSprites.clear(true, true);
-    let startingPoints = this.spline.getDistancePoints(this.starterGap);
+    const spline = new Phaser.Curves.Spline(this.points);
+    let startingPoints = spline.getDistancePoints(this.starterGap);
     if(!this.isReverse)
       startingPoints = startingPoints.reverse();
     for(let i = 2; i < this.startersCount; i++) {
@@ -270,11 +340,25 @@ class TrackBuilderScene extends Phaser.Scene {
       const angle = Phaser.Math.Angle.BetweenPoints(p, startingPoints[i + 1]);
       spSprite.rotation = angle;
       spSprite.angle -= 90;      
+      spSprite.setOrigin(0.5, 1);
       const offSet = (i % 2 == 0) ? this.trackWidth / 4  : this.trackWidth / -4;
       spSprite.x += Math.cos(spSprite.rotation) * offSet;
       spSprite.y += Math.sin(spSprite.rotation) * offSet;
       this.startPositionSprites.add(spSprite);
     }
+  }
+  
+  drawCars() {
+    let i = 0;
+    this.carSprites.clear(true, true);
+    this.startPositionSprites.children.entries.forEach(sp => {
+      const carSprite = this.add.sprite(sp.x, sp.y, 'car' + ++i);
+      carSprite.scale = 0.08;
+      carSprite.angle = sp.angle;
+      carSprite.flipY = true;
+      carSprite.depth = 15;
+      this.carSprites.add(carSprite);
+    });
   }
 }
 
