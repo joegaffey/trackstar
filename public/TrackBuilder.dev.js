@@ -200,15 +200,114 @@ class TrackBuilderScene extends Phaser.Scene {
     // });
   }  
   
+  closeLoop() {
+    this.points.push(this.points[0]);
+    this.isOpen = false;
+    this.drawTrack();
+  }
+  
+  drawTrack() {
+    this.graphics.clear();
+    this.splinePointSprites.clear(true, true);
+    if(this.isOpen) 
+      this.drawSpline();
+    else {
+      this.drawRope();
+      this.drawFinishLine();
+      this.drawStartingPositions();
+      this.drawCars();
+    }
+    if(this.showControls)
+      this.drawControls();
+    else
+      this.clearControls();
+  }
+  
+  drawRope() {
+    this.graphics.depth = 10;
+    if(this.rope)
+      this.rope.destroy();
+    this.graphics.fillStyle(0x444444, 0.5);
+    this.graphics.fillCircle(this.points[0].x, this.points[0].y, this.trackWidth / 2);
+    this.graphics.fillStyle(0x444444, 1);
+    this.graphics.fillCircle(this.points[0].x, this.points[0].y, (this.trackWidth / 2) - 5);
+    const spline = new Phaser.Curves.Spline(this.points);
+    this.rope = this.add.rope(0, 0, 'track', null, spline.getPoints(this.points.length * 16), true);  
+    this.rope.depth = 14;
+  }  
+  
+  drawFinishLine() {
+    if(this.fSprite)
+      this.fSprite.destroy();
+    const spline = new Phaser.Curves.Spline(this.points);
+    let startingPoints = spline.getDistancePoints(this.starterGap);
+    let sp0 = this.points[0];
+    let angle = Phaser.Math.Angle.BetweenPoints(sp0, startingPoints[1]);
+    this.fSprite = this.add.sprite(sp0.x, sp0.y, 'finish');
+    this.fSprite.depth = 14;
+    this.fSprite.rotation = angle;
+    this.fSprite.angle -= 90;      
+    this.fSprite.alpha = 0.5;      
+    this.fSprite.setInteractive({ draggable: false });
+      this.fSprite.on('pointerup', (pointer) => {
+        this.isReverse = !this.isReverse;
+        this.drawStartingPositions();
+      });
+  }
+  
+  drawStartingPositions() {
+    this.startPositionSprites.clear(true, true);
+    const spline = new Phaser.Curves.Spline(this.points);
+    let startingPoints = spline.getDistancePoints(this.starterGap);
+    if(!this.isReverse)
+      startingPoints = startingPoints.reverse();
+    for(let i = 2; i < this.startersCount; i++) {
+      const p = startingPoints[i];
+      const spSprite = this.add.sprite(p.x, p.y, 'start');
+      spSprite.depth = 20;
+      const angle = Phaser.Math.Angle.BetweenPoints(p, startingPoints[i + 1]);
+      spSprite.rotation = angle;
+      spSprite.angle -= 90;      
+      spSprite.setOrigin(0.5, 1);
+      spSprite.alpha = 0.6;
+      const offSet = (i % 2 == 0) ? this.trackWidth / 4  : this.trackWidth / -4;
+      spSprite.x += Math.cos(spSprite.rotation) * offSet;
+      spSprite.y += Math.sin(spSprite.rotation) * offSet;
+      this.startPositionSprites.add(spSprite);
+    }
+  }
+  
+  drawCars() {
+    let i = 0;
+    this.carSprites.clear(true, true);
+    this.startPositionSprites.children.entries.forEach(sp => {
+      const carSprite = this.add.sprite(sp.x, sp.y, 'car' + ++i);
+      carSprite.scale = 0.08;
+      carSprite.angle = sp.angle;
+      carSprite.flipY = true;
+      carSprite.depth = 25;
+      this.carSprites.add(carSprite);
+    });
+  }
+  
+  clearControls() {
+    if(this.controlGraphics)
+      this.controlGraphics.clear();
+    this.splinePointSprites.clear(true, true);
+  }
+  
   drawControls() {
+    if(!this.controlGraphics)
+      this.controlGraphics = this.add.graphics({x: 0, y: 0});
+    this.controlGraphics.clear();
+    this.controlGraphics.depth = 16;
     this.splinePointSprites.clear(true, true);
     const spline = new Phaser.Curves.Spline(this.points);
-    this.graphics.depth = 12;
-    this.graphics.lineStyle(4, 0xffffff, 1);
-    spline.draw(this.graphics, this.points.length * 16);
     this.points.forEach((point, i) => {
       this.addControlPoint(point, i);
     });
+    this.controlGraphics.lineStyle(4, 0xffffff, 1);
+    spline.draw(this.controlGraphics, this.points.length * 16);
   }
   
   addControlPoint(point, i) {
@@ -220,8 +319,7 @@ class TrackBuilderScene extends Phaser.Scene {
       cpSprite.tint = 0x0000ff;
     else 
       cpSprite.tint = 0x00ff00;
-
-    cpSprite.depth = 14;
+    cpSprite.depth = 18;
     this.splinePointSprites.add(cpSprite);
 
     // @TODO fix for better hit area
@@ -266,7 +364,7 @@ class TrackBuilderScene extends Phaser.Scene {
     cpSprite.on('pointerup', () => {
       if(this.shift.isDown) {
         this.points.splice(cpSprite.i, 1);
-        if(i === 0 || cpSprite.i == this.points.length  -1) 
+        if(i === 0 || cpSprite.i == this.points.length -1) 
           this.isOpen = true;
         cpSprite.destroy();
         this.drawTrack();
@@ -274,90 +372,6 @@ class TrackBuilderScene extends Phaser.Scene {
       if(cpSprite.i === 0) {
         this.closeLoop();
       }
-    });
-  }
-  
-  closeLoop() {
-    this.points.push(this.points[0]);
-    this.isOpen = false;
-    this.drawTrack();
-  }
-  
-  drawTrack() {
-    this.graphics.clear();
-    this.splinePointSprites.clear(true, true);
-    if(this.isOpen) 
-      this.drawSpline();
-    else {
-      this.drawSpline();
-      this.drawRope();
-      this.drawFinishLine();
-      this.drawStartingPositions();
-      this.drawCars();
-    }
-    if(this.showControls)
-      this.drawControls();
-  }
-  
-  drawRope() {
-    if(this.rope)
-      this.rope.destroy();
-    const spline = new Phaser.Curves.Spline(this.points);
-    this.rope = this.add.rope(0, 0, 'track', null, spline.getPoints(this.points.length * 16), true);  
-    this.rope.depth = 12;
-    this.rope.alpha = 0.8;    
-  }  
-  
-  drawFinishLine() {
-    if(this.fSprite)
-      this.fSprite.destroy();
-    const spline = new Phaser.Curves.Spline(this.points);
-    let startingPoints = spline.getDistancePoints(this.starterGap);
-    let sp0 = this.points[0];
-    let angle = Phaser.Math.Angle.BetweenPoints(sp0, startingPoints[1]);
-    this.fSprite = this.add.sprite(sp0.x, sp0.y, 'finish');
-    this.fSprite.depth = 13;
-    this.fSprite.rotation = angle;
-    this.fSprite.angle -= 90;      
-    this.fSprite.alpha = 0.5;      
-    this.fSprite.setInteractive({ draggable: false });
-      this.fSprite.on('pointerup', (pointer) => {
-        this.isReverse = !this.isReverse;
-        this.drawStartingPositions();
-      });
-  }
-  
-  drawStartingPositions() {
-    this.startPositionSprites.clear(true, true);
-    const spline = new Phaser.Curves.Spline(this.points);
-    let startingPoints = spline.getDistancePoints(this.starterGap);
-    if(!this.isReverse)
-      startingPoints = startingPoints.reverse();
-    for(let i = 2; i < this.startersCount; i++) {
-      const p = startingPoints[i];
-      const spSprite = this.add.sprite(p.x, p.y, 'start');
-      spSprite.depth = 12;
-      const angle = Phaser.Math.Angle.BetweenPoints(p, startingPoints[i + 1]);
-      spSprite.rotation = angle;
-      spSprite.angle -= 90;      
-      spSprite.setOrigin(0.5, 1);
-      const offSet = (i % 2 == 0) ? this.trackWidth / 4  : this.trackWidth / -4;
-      spSprite.x += Math.cos(spSprite.rotation) * offSet;
-      spSprite.y += Math.sin(spSprite.rotation) * offSet;
-      this.startPositionSprites.add(spSprite);
-    }
-  }
-  
-  drawCars() {
-    let i = 0;
-    this.carSprites.clear(true, true);
-    this.startPositionSprites.children.entries.forEach(sp => {
-      const carSprite = this.add.sprite(sp.x, sp.y, 'car' + ++i);
-      carSprite.scale = 0.08;
-      carSprite.angle = sp.angle;
-      carSprite.flipY = true;
-      carSprite.depth = 15;
-      this.carSprites.add(carSprite);
     });
   }
 }
