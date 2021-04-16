@@ -7,4 +7,34 @@ const config = {
   scene: [TrackBuilderScene, EditorUIScene]
 };
 
-let game = new Phaser.Game(config);
+const track = new Track({
+  isReverse: false,
+  isOpen: true,
+  points: [],
+  width: 200,
+  borderWidth: 20,
+  pitBoxCount: 20,
+  starterGap: 80,
+  bgTexture: 'grass',
+  trackTexture: 'track',
+  bgSize: [2048, 2048],
+  bgIsTiled: true,
+  gridPositions: [],
+  shapes: []
+});
+
+const game = new Phaser.Game(config);
+
+const server = '.';
+      
+function sendTrack() {
+  fetch(`${server}/tracks`, {
+  method: 'post',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(track.toJSON())
+}).then(res => res.json())
+  .then(res => console.log(res.id));
+}

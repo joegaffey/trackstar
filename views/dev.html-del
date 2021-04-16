@@ -9,11 +9,14 @@
   <link rel="stylesheet" href="/style.css">
   <script src="//cdn.jsdelivr.net/npm/phaser@3.54.0/dist/phaser.min.js"></script>
 
-  <script src="Track.js"></script>
-  <script src="EditorUIScene.js"></script>
-  <script src="TrackBuilderScene.js"></script>
-  <script src="TrackBuilder.dev.js"></script>
+  <script src="Track.dev.js"></script>
+  <script src="MainScene.dev.js"></script>
+  <script src="UIScene.js"></script>
+  <script src="script.js"></script>
 </head>
 <body>
+  <div class="bannerTrigger">
+    <div class="banner initial">Use a gamepad, arrows keys or WASD keys to drive. '+' and '-' to zoom in and out</div>
+  </div>
 </body>
 </html>

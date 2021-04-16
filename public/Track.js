@@ -1,6 +1,6 @@
 class Track {
   
-  constructor(config, scene) {   
+  constructor(config) {   
     this.isReverse = config.isReverse;
     this.isOpen = config.isOpen;
     this.points = config.points;
@@ -9,26 +9,46 @@ class Track {
     this.pitBoxCount = config.pitBoxCount;
     this.starterGap = config.starterGap;
     this.bgTexture = config.bgTexture;
+    this.physicsTexture = config.physicsTexture;
     this.trackTexture = config.trackTexture;
     this.bgSize = config.bgSize;
     this.bgIsTiled = config.bgIsTiled;
     this.gridPositions = config.gridPositions;
-    this.shapes = config.shapes;    
-    this.scene = scene;
-    
-    this.startPositionSprites = this.scene.add.group();
-    this.graphics = this.scene.add.graphics();
+    this.shapes = config.shapes;
+    this.textures = config.textures;
   }
   
-  draw() {
-    this.drawRope();
-    this.drawFinishLine();
-    this.drawStartingPositions();
+  toJSON() {
+    return {
+      isReverse:this.isReverse,
+      isOpen:this.isOpen,
+      points:this.points,
+      width:this.width,
+      borderWidth:this.borderWidth,
+      pitBoxCount:this.pitBoxCount,
+      starterGap:this.starterGap,
+      bgTexture:this.bgTexture,
+      physicsTexture:this.physicsTexture,
+      trackTexture:this.trackTexture,
+      bgSize:this.bgSize,
+      bgIsTiled:this.bgIsTiled,
+      gridPositions:this.gridPositions,
+      shapes:this.shapes,
+      textures:this.textures
+    }
   }
   
-  drawRope() {
+  draw(scene) {
+    this.drawRope(scene);
+    this.drawFinishLine(scene);
+    this.drawStartingPositions(scene);
+  }
+  
+  drawRope(scene) {
     if(this.rope)
       this.rope.destroy();
+    if(!this.graphics)
+      this.graphics = scene.add.graphics();
     this.graphics.clear();
     this.graphics.depth = 10;
     this.graphics.fillStyle(0x444444, 0.5);
@@ -36,18 +56,18 @@ class Track {
     this.graphics.fillStyle(0x444444, 1);
     this.graphics.fillCircle(this.points[0].x, this.points[0].y, (this.width / 2) - 5);
     const spline = new Phaser.Curves.Spline(this.points);
-    this.rope = this.scene.add.rope(0, 0, this.trackTexture, null, spline.getPoints(this.points.length * 16), true);  
+    this.rope = scene.add.rope(0, 0, this.trackTexture, null, spline.getPoints(this.points.length * 16), true);  
     this.rope.depth = 14;
   }  
   
-  drawFinishLine() {
+  drawFinishLine(scene) {
     if(this.fSprite)
       this.fSprite.destroy();
     const spline = new Phaser.Curves.Spline(this.points);
     let startingPoints = spline.getDistancePoints(this.starterGap);
     let sp0 = this.points[0];
     let angle = Phaser.Math.Angle.BetweenPoints(sp0, startingPoints[1]);
-    this.fSprite = this.scene.add.sprite(sp0.x, sp0.y, 'finish');
+    this.fSprite = scene.add.sprite(sp0.x, sp0.y, 'finish');
     this.fSprite.depth = 14;
     this.fSprite.rotation = angle;
     this.fSprite.angle -= 90;      
@@ -59,8 +79,11 @@ class Track {
       });
   }
   
-  drawStartingPositions() {
-    this.startPositionSprites.clear(true, true);
+  drawStartingPositions(scene) {
+    if(!this.startPositionSprites )
+      this.startPositionSprites = scene.add.group();
+    else
+      this.startPositionSprites.clear(true, true);
     this.gridPositions = [];
     const spline = new Phaser.Curves.Spline(this.points);
     let startingPoints = spline.getDistancePoints(this.starterGap);
@@ -68,7 +91,7 @@ class Track {
       startingPoints = startingPoints.reverse();
     for(let i = 2; i < this.pitBoxCount; i++) {
       const p = startingPoints[i];
-      const spSprite = this.scene.add.sprite(p.x, p.y, 'start');
+      const spSprite = scene.add.sprite(p.x, p.y, 'start');
       spSprite.depth = 20;
       const angle = Phaser.Math.Angle.BetweenPoints(p, startingPoints[i + 1]);
       spSprite.rotation = angle;

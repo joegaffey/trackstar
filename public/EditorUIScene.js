@@ -8,7 +8,7 @@ class EditorUIScene extends Phaser.Scene {
   }
 
   create () {    
-    this.editorScene = this.game.scene.scenes[0];
+    this.editorScene = this.scene.get('TrackBuilderScene');
     this.addControlPointsButton(0);
     this.addCloseLoopButton(1);
     this.addRaceButton(2);
@@ -55,8 +55,10 @@ class EditorUIScene extends Phaser.Scene {
         alert('Not enough points! Click on the background.');
       else if(this.editorScene.track.isOpen)
         alert('Can\'t race on an open circuit.');
-      else
+      else {
+        sendTrack();
         alert('Coming soon :)');
+      }
     });
   }
 }
