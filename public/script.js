@@ -143,6 +143,37 @@ function updateCar() {
   // console.log(car.x + ' ' + car.y)
 }
 
+
+const track = new Track({
+  isReverse: false,
+  isOpen: false,
+  points: [],
+  width: 200,
+  borderWidth: 20,
+  pitBoxCount: 20,
+  starterGap: 80,
+  bgTexture: 'map',
+  physicsTexture: 'physics',
+  bgSize: [0, 0],
+  bgIsTiled: false,
+  gridPositions: [{
+    x: -334,
+    y: 1148,
+    angle: -1.6        
+  }],
+  shapes: [],
+  textures: {
+    map: {
+      regular: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg',
+      small: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg'
+    },
+    physics: {
+      regular: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics.png',
+      small: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics_small.png'
+    }
+  }
+});
+
 const config = {
   type: Phaser.WEBGL,
   width: window.innerWidth,

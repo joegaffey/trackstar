@@ -2,24 +2,29 @@ class MainScene extends Phaser.Scene {
   
   constructor() {
     super({key: 'MainScene', active: true});
-    this.mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg?v=1616936163121';
-    this.physicsUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics.png?v=1617832435552';
+    
+    this.mapKey = track.bgTexture;
+    this.physicsKey = track.physicsTexture;    
+    this.mapUrl = track.textures[this.mapKey].regular;
+    this.physicsUrl = track.textures[this.physicsKey].regular;
   }
 
   preload () {
     isMobile = !game.device.os.desktop && game.device.input.touch;
     if(isMobile) {
-      this.mapUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg?v=1617031366035';
-      this.physicUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics_small.png?v=1617820109964';
+      this.mapUrl = track.textures[this.mapKey].small;
+      this.physicUrl = track.textures[this.physicsKey].small;
       mapScale = 4;
       carScale = 1;
     }
+    
+    const baseUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2F';    
     this.load.image('map', this.mapUrl);
     this.load.image('physics', this.physicsUrl);
-    this.load.image('car', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fpitstop_car_5.png?v=1616942278883');
-    this.load.image('tyres', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Ftyres.png?v=1617785089157');
-    this.load.image('dust', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fdust.png?v=1617615529526');
-    this.load.audio('engine', ['https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fengine.wav?v=1616964690904']);
+    this.load.image('car', baseUrl + 'pitstop_car_5.png');
+    this.load.image('tyres', baseUrl + 'tyres.png');
+    this.load.image('dust', baseUrl + 'dust.png');
+    this.load.audio('engine', [baseUrl + 'engine.wav']);
   }
 
   create () {    

@@ -1,43 +1,30 @@
 class TrackBuilderScene extends Phaser.Scene {
   
-  constructor () {
-    super();
+  constructor() {
+    super('TrackBuilderScene');
     this.showControls = true;
     this.margin = 1024;
     this.cpSize = 50;
   }
 
-  preload () {
-    const cdnUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2F';
-    this.load.image('grass', `${cdnUrl}grass.jpg`);
-    this.load.image('track', `${cdnUrl}track.png`);
+  preload() {
+    const baseUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2F';
+    this.load.image('grass', `${baseUrl}grass.jpg`);
+    this.load.image('track', `${baseUrl}track.png`);
     for(let i = 1; i < 20; i++) {
-      this.load.image('car' + i, `${cdnUrl}pitstop_car_${i}.png`);  
+      this.load.image('car' + i, `${baseUrl}pitstop_car_${i}.png`);  
     }
   }
 
-  create () {
-    this.track = new Track({
-      isReverse: false,
-      isOpen: true,
-      points: [],
-      width: 200,
-      borderWidth: 20,
-      pitBoxCount: 20,
-      starterGap: 80,
-      bgTexture: 'grass',
-      trackTexture: 'track',
-      bgSize: [2048, 2048],
-      bgIsTiled: true,
-      gridPositions: [],
-      shapes: []
-    }, this);
-    
+  create() {
+    this.graphics = this.add.graphics();
+
+    this.track = track;
+        
     this.editorUIScene = this.game.scene.scenes[1];
     
     this.generateTextures();
-    this.graphics = this.add.graphics();
-    
+        
     this.splinePointSprites = this.add.group();    
     this.carSprites = this.add.group();
     
@@ -206,7 +193,7 @@ class TrackBuilderScene extends Phaser.Scene {
     if(this.track.isOpen) 
       this.drawSpline();
     else {
-      this.track.draw();
+      this.track.draw(this);
       this.drawCars();
     }
     if(this.showControls)
