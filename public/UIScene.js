@@ -10,8 +10,7 @@ class UIScene extends Phaser.Scene {
     this.load.image('arrow', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Farrow.png?v=1617402036719');
   }
 
-  create () {
-    
+  create () {    
     this.gamepad = {};    
     this.input.gamepad.once('down', function (pad, button, index) {
       console.log('Playing with ' + pad.id);
@@ -58,8 +57,7 @@ class UIScene extends Phaser.Scene {
     });
   }
   
-  update() {
-    
+  update() {    
     this.uiSpeed.setText(Math.round(car.velocity * 15));
     if (isMobile) {
       this.hideBanner();
@@ -81,12 +79,12 @@ class UIScene extends Phaser.Scene {
       }
       // console.log(touches);
     }
-    joyLeft = (this.gamepad.leftStick && this.gamepad.leftStick.x < 0) || this.gamepad.left || this.wasdKeys.left.isDown || this.arrowKeys.left.isDown || this.touches.left;
-    joyRight = (this.gamepad.leftStick && this.gamepad.leftStick.x > 0) ||this.gamepad.right || this.wasdKeys.right.isDown || this.arrowKeys.right.isDown || this.touches.right;
-    joyUp = this.gamepad.A || this.gamepad.R2 || this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
-    joyDown = this.gamepad.B || this.gamepad.L2 || this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
+    controls.joyLeft = (this.gamepad.leftStick && this.gamepad.leftStick.x < 0) || this.gamepad.left || this.wasdKeys.left.isDown || this.arrowKeys.left.isDown || this.touches.left;
+    controls.joyRight = (this.gamepad.leftStick && this.gamepad.leftStick.x > 0) ||this.gamepad.right || this.wasdKeys.right.isDown || this.arrowKeys.right.isDown || this.touches.right;
+    controls.joyUp = this.gamepad.A || this.gamepad.R2 || this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
+    controls.joyDown = this.gamepad.B || this.gamepad.L2 || this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
     
-    if(this.banner && joyUp) {
+    if(this.banner && controls.joyUp) {
       this.hideBanner();
     }      
   }  
