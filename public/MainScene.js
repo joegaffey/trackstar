@@ -47,13 +47,14 @@ class MainScene extends Phaser.Scene {
     this.carSprite.flipY = true;
     this.carSprite.depth = 10;
     
-    engine = this.sound.add('engine');
-    engine.rate = minEngineSpeed;
-    engine.play({loop: true, volume: 0.1});
+    this.engineSound = this.sound.add('engine');
+    this.engineSoundFactor = 1000;
+    this.engineSound.rate = car.minEngineSpeed / this.engineSoundFactor;
+    console.log(this.engineSound.rate)
+    this.engineSound.play({loop: true, volume: 0.1});
 
     this.cameras.main.startFollow(this.carSprite);    
     this.cameras.main.zoom = 1;
-    mainCamera = this.cameras.main;
     
     this.carEmitter = this.getCarEmitter();
     this.carEmitter.startFollow(this.carSprite);
@@ -62,30 +63,32 @@ class MainScene extends Phaser.Scene {
   }
 
   update () {    
+    this.engineSound.rate = car.engineSpeed / this.engineSoundFactor;
+    
     // Fix for mobile needed
     const surfacePhysicsPixel = this.textures.getPixel(this.carSprite.x + (this.map.width / 2), this.carSprite.y + (this.map.height / 2), 'physics');
     this.surfaceGraphicsPixel = this.textures.getPixel(this.carSprite.x + (this.map.width / 2), this.carSprite.y + (this.map.height / 2), 'map');
     
     if(!isMobile && surfacePhysicsPixel) {
       if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
-        car.surface = tarmac;
+        car.surface = Physics.tarmac;
       else if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 0)
-        car.surface = sand;
+        car.surface = Physics.sand;
       else if(surfacePhysicsPixel.r == 0 &&  surfacePhysicsPixel.g == 0 && surfacePhysicsPixel.b == 0)
         car.crash();
       else
-        car.surface = grass;
+        car.surface = Physics.grass;
     }
     else 
-      car.surface = tarmac;
-    updateCar();
+      car.surface = Physics.tarmac;
+    car.update();
     
     const curveSkid = car.angularVelocity < -0.015 || car.angularVelocity > 0.015;
     const powerSkid = car.isThrottling && (car.power > 0.02 && car.velocity < 2);
     const brakeSkid = car.reverse > 0.02 && (car.velocity > 3);
     
     this.tyresSprite.tint = 0x000000;
-    if(car.surface.type !== surface.TARMAC) {    
+    if(car.surface.type !== Physics.surface.TARMAC) {    
       this.tyresSprite.alpha = 0.2;
       this.tyresSprite.tint = car.surface.skidMarkColor;
     } 
@@ -121,7 +124,7 @@ class MainScene extends Phaser.Scene {
       },
       alpha: {
         onEmit: function (particle, key, t, value) {
-          if(car.surface.type === surface.TARMAC && car.isSkidding)  
+          if(car.surface.type === Physics.surface.TARMAC && car.isSkidding)  
             return 20 / car.surface.particleAlpha;
           else
             return 200 / car.surface.particleAlpha;  
