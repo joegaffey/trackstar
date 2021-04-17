@@ -8,12 +8,6 @@ Try it out [here](http://trackstar.glitch.me/). Use a gamepad, touch, arrows or 
 
 Also check out the WIP track editor [here](http://trackstar.glitch.me/editor)!
 
-## Credits
-
-Borrowing physics code from [pakastins](https://github.com/pakastin) amazing [car.js.org](https://car.js.org/), TrackStar is being developed online via [Glitch](https://glitch.com/) and is built using modern [Web Standards](https://www.w3.org/standards/) based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
-
-Thanks to [loonetbits](https://opengameart.org/users/looneybits) for the excellent [car graphics](https://opengameart.org/content/2d-race-cars).
-
 ## Track Editor User Guide
 
 Click on the background to create track control points.
@@ -34,91 +28,8 @@ Use WASD and arrow keys to move the map.
 
 Use mouse wheel or + and - keys to zoom in and out.
 
-## Game Backlog
+## Credits
 
-* ~~Basic graphics~~
-* ~~Basic physics~~
-* ~~Basic audio~~
-* ~~Keyboard controls~~
-* ~~Touch controls~~
-* ~~Basic HUD UI (speed)~~
-* ~~Basic help banner~~
-* ~~Skidmarks~~
-* ~~Particle effects for dirt and smoke~~
-* ~~Camera zoom controls (desktop)~~
-* ~~Surface dependent physics - tarmac~~
-* ~~Surface dependent physics - grass~~
-* ~~Basic (digital) controller support~~
-* ~~Surface dependent physics - sand~~ 
-* ~~Basic fixed barrier physics~~
-* Pause and menu
-* Performance profiles and settings
-* Surface dependent physics - kerbs
-* Split map into tiles
-* PWA support for fullscreen mobile and offline use
-* Handle screen resize
-* Analogue controller support
-* Externalize config data
-* Masks for bridges and other track overlays
-* Track markers (start/finsh, sectors, corners)
-* Lap & sector times
-* Camera zoom controls (mobile)
-* User settings with persistence
-* Collision physics
-* AI drivers
-* Flag rules (AI race director)
-* Driver leaderboards
-* Race weekend (practice, quali, race)
-* AI Engineer
-* Damage model
-* Tyre model
-* Tyre selection
-* More tracks and cars
-* HUD UIs (damage, tyres, RPM, lap/sector times)
-* Customizable HUD
-* Manual gearbox
-* Human engineer (player)
-* Human race director (player)
-* Mouse steering
-* Dirt track physics
-* Trackside objects and movable barriers
-* Telemetry recording and replays
-* Driver names
-* Championships
-* Rubber build up on track impacts grip
-* Wet track conditions
-* Snow/icy track conditions
-* Better lighting/shadows
-* Night races
-* Pitstops
-* Online multiplayer
-* Safety car
-* Real world telemetry playback
-* Force feedback 🤯
+Borrowing physics code from [pakastins](https://github.com/pakastin) amazing [car.js.org](https://car.js.org/), TrackStar is being developed online via [Glitch](https://glitch.com/) and is built using modern [Web Standards](https://www.w3.org/standards/) based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
 
-## Editor Backlog
-
-* ~~Basic track editor~~
-* ~~Start finish line~~
-* ~~Starting positions~~
-* ~~Close circuit button~~
-* Add a new control point in track editor
-* Background image support
-* Rendering options
-* Phisics image rendering
-* Restart/clear button
-* Integrate into game
-* Import/export
-* Mobile friendly control points
-* Undo/redo
-* Kerbs in track editor
-* Turns and sectors
-* Barriers in track editor
-* Buildings in track editor
-* Sand runoffs
-* Tarmac runnoffs
-* Pitlane
-* Service roads
-* Varying track width
-* Car graphics editor
-* Car physics editor
+Thanks to [loonetbits](https://opengameart.org/users/looneybits) for the excellent [car graphics](https://opengameart.org/content/2d-race-cars).
