@@ -29,12 +29,12 @@ const track = new Track({
   shapes: [],
   textures: {
     map: {
-      regular: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park.jpg', //'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg',
-      small: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg'
+      regular: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park.jpg', 
+      small: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park_small.jpg'
     },
     physics: {
-      regular: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park_physics.png', //https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics.png',
-      small: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics_small.png'
+      regular: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park_physics.png',
+      small: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park_physics_small.png'
     }
   }
 });

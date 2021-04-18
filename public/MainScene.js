@@ -15,7 +15,7 @@ class MainScene extends Phaser.Scene {
       this.mapUrl = track.textures[this.mapKey].small;
       this.physicUrl = track.textures[this.physicsKey].small;
       mapScale = 4;
-      carScale = 1;
+      carScale = 0.75;
     }
     
     const baseUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2F';    
