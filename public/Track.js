@@ -44,6 +44,31 @@ class Track {
     this.drawStartingPositions(scene);
   }
   
+  drawPhysicsTexture(scene, key, margin) {
+    const graphicsGen = scene.make.graphics({x: 0, y: 0, add: false});
+    const spline = new Phaser.Curves.Spline(this.points);
+    const bounds = spline.getBounds();
+    
+    const bg = {
+      x: bounds.x - margin,
+      y: bounds.y - margin,
+      width: bounds.width + (margin * 2),
+      height: bounds.height + (margin * 2)
+    }
+    
+    graphicsGen.fillStyle(0x00ff00);
+    graphicsGen.fillRect(bg.x, bg.y, bg.width, bg.height);    
+    graphicsGen.fillStyle(0xffffff);
+    graphicsGen.fillCircle(this.points[this.points.length -1].x, 
+                           this.points[this.points.length -1].y, 
+                           this.width / 2);
+    graphicsGen.lineStyle(this.width * 2, 0xffffff);
+    spline.draw(graphicsGen, this.points.length * 16);
+    
+    graphicsGen.generateTexture(key, bg.width, bg.height);
+    graphicsGen.destroy();
+  }
+  
   drawRope(scene) {
     if(this.rope)
       this.rope.destroy();
