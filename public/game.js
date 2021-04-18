@@ -9,6 +9,8 @@ const controls = {
   joyRight: false
 }
 
+const baseUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2F';
+
 const track = new Track({
   isReverse: false,
   isOpen: false,
@@ -28,13 +30,13 @@ const track = new Track({
   }],
   shapes: [],
   textures: {
-    map: {
-      regular: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park.jpg', 
-      small: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park_small.jpg'
+    map: {      
+      regular: baseUrl + 'mondello_international.jpg',
+      small: baseUrl + 'mondello_international_small.jpg'
     },
     physics: {
-      regular: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park_physics.png',
-      small: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park_physics_small.png'
+      regular: baseUrl + 'mondello_international_physics.png',
+      small: baseUrl + 'mondello_international_physics_small.png'
     }
   }
 });

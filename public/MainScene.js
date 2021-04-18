@@ -18,7 +18,6 @@ class MainScene extends Phaser.Scene {
       carScale = 0.75;
     }
     
-    const baseUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2F';    
     this.load.image('map', this.mapUrl);
     this.load.image('physics', this.physicsUrl);
     this.load.image('car', baseUrl + 'pitstop_car_5.png');
