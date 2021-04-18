@@ -24,8 +24,7 @@ class Car {
     this.power = 0;
   }
 
-  update() {
-    
+  update() {   
     if(this.power * this.engineSpeedFactor < this.minEngineSpeed)
       this.engineSpeed = this.minEngineSpeed;
     else if(this.power * this.engineSpeedFactor > this.maxEngineSpeed)

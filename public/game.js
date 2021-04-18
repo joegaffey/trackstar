@@ -1,5 +1,5 @@
 let mapScale = 1;
-let carScale = 1
+let carScale = 0.75
 let isMobile = false;
 
 const controls = {
@@ -23,17 +23,17 @@ const track = new Track({
   bgIsTiled: false,
   gridPositions: [{
     x: -334,
-    y: 1148,
+    y: 1100,
     angle: -1.6        
   }],
   shapes: [],
   textures: {
     map: {
-      regular: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg',
+      regular: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park.jpg', //'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap.jpg',
       small: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fmap_small.jpg'
     },
     physics: {
-      regular: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics.png',
+      regular: 'https://cdn.glitch.com/2a3c7d39-6b2d-4395-b1a8-127d25077d3e%2Fmondello_park_physics.png', //https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics.png',
       small: 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Fphysics_small.png'
     }
   }

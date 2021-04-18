@@ -198,8 +198,12 @@ class TrackBuilderScene extends Phaser.Scene {
     }
     if(this.showControls)
       this.drawControls();
-    else
+    else {
       this.clearControls();
+      //test physics texture
+      // this.track.drawPhysicsTexture(this, 'physics', 1024);
+      // this.add.image(0, 0, 'physics').setOrigin(0, 0);
+    }
   }
     
   drawCars() {

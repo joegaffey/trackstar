@@ -54,7 +54,7 @@ class MainScene extends Phaser.Scene {
     this.engineSound.play({loop: true, volume: 0.1});
 
     this.cameras.main.startFollow(this.carSprite);    
-    this.cameras.main.zoom = 1;
+    this.cameras.main.zoom = 1.4;
     
     this.carEmitter = this.getCarEmitter();
     this.carEmitter.startFollow(this.carSprite);
@@ -100,11 +100,11 @@ class MainScene extends Phaser.Scene {
       if(powerSkid)
         this.tyresSprite.alpha = 0.1;
     }
-    this.rtTyreMarks.draw(this.tyresSprite, car.x + (this.map.width / 2), car.y + (this.map.height / 2));
+    this.rtTyreMarks.draw(this.tyresSprite, car.x * carScale + (this.map.width / 2), car.y * carScale + (this.map.height / 2));
     
     this.carSprite.rotation = this.tyresSprite.rotation = this.shadow.rotation =  car.angle;
-    this.carSprite.x = this.tyresSprite.x = this.shadow.x = car.x;
-    this.carSprite.y = this.tyresSprite.y = this.shadow.y = car.y;  
+    this.carSprite.x = this.tyresSprite.x = this.shadow.x = car.x * carScale;
+    this.carSprite.y = this.tyresSprite.y = this.shadow.y = car.y * carScale;  
   }
   
   getCarEmitter() {
