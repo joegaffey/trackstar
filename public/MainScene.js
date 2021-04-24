@@ -1,59 +1,95 @@
 class MainScene extends Phaser.Scene {
   
   constructor() {
-    super({key: 'MainScene', active: true});
-    
-    this.mapKey = track.bgTexture;
-    this.physicsKey = track.physicsTexture;    
-    this.mapUrl = track.textures[this.mapKey].regular;
-    this.physicsUrl = track.textures[this.physicsKey].regular;
+    super({key: 'MainScene', active: true});    
+    this.track = track;
+    this.car = car;
+    this.baseUrl = baseUrl;
   }
 
-  preload () {
-    isMobile = !game.device.os.desktop && game.device.input.touch;
-    if(isMobile) {
-      this.mapUrl = track.textures[this.mapKey].small;
-      this.physicUrl = track.textures[this.physicsKey].small;
-      mapScale = 4;
-      carScale = 0.75;
+  preload() {
+    this.isMobile = isMobile = !game.device.os.desktop && game.device.input.touch;
+    
+    this.mapKey = this.track.bgTexture;
+    this.physicsKey = this.track.physicsTexture;
+    
+    if(this.track.bgIsTiled) {
+      this.load.image('grass', `${this.baseUrl}grass.jpg`);
+      this.load.image('track', `${this.baseUrl}track.png`);
+      this.track.scale = 0.2;
+      this.track.drawPhysicsTexture(this, 'physics', this.track.margin, this.track.scale);
+      this.track.drawCircuitTexture(this, 'circuit', this.track.margin, this.track.scale);
+    }
+    else {
+      if(this.isMobile) {
+        this.mapUrl = this.track.textures[this.mapKey].small;
+        this.physicsUrl = this.track.textures[this.physicsKey].small;
+        this.track.scale = 4;
+        // this.car.scale = 0.75;
+      }
+      else {
+        this.mapUrl = this.track.textures[this.mapKey].regular;
+        this.physicsUrl = this.track.textures[this.physicsKey].regular;
+      }
+      this.load.image('map', this.mapUrl);
+      this.load.image('physics', this.physicsUrl);
     }
     
-    this.load.image('map', this.mapUrl);
-    this.load.image('physics', this.physicsUrl);
-    this.load.image('car', baseUrl + 'pitstop_car_5.png');
-    this.load.image('tyres', baseUrl + 'tyres.png');
-    this.load.image('dust', baseUrl + 'dust.png');
-    this.load.audio('engine', [baseUrl + 'engine.wav']);
+    this.load.image('car', this.baseUrl + 'pitstop_car_5.png');
+    this.load.image('tyres', this.baseUrl + 'tyres.png');
+    this.load.image('dust', this.baseUrl + 'dust.png');
+    this.load.audio('engine', [this.baseUrl + 'engine.wav']);
   }
 
-  create () {    
-    this.map = this.add.image(0, 0, 'map');
-    this.map.scaleX = this.map.scaleY = mapScale;    
+  create() {    
+    
+    if(this.track.bgIsTiled) {
+      // console.log(this.track.bgSize)      
+      // this.track.draw(this);
+      this.circuit = this.add.image(0, 0, 'circuit').setOrigin(0.5, 0.5);
+      this.circuit.depth = 10;
+      this.circuit.scaleX = this.circuit.scaleY = this.track.scale;
+      
+      this.map = this.add.tileSprite(0, 0, this.circuit.width, this.circuit.height, this.track.bgTexture).setOrigin(0.5, 0.5);
+      this.map.depth = 5;
+      
+      this.cameras.main.zoom = 2;
+    }    
+    else {
+      this.cameras.main.zoom = 1.4;
+      this.map = this.add.image(0, 0, 'map');
+    }
+    
+    // this.physicsDebug = this.add.image(0, 0, 'physics')
+    // this.physicsDebug.setOrigin(0.5, 0.5);
+    // this.physicsDebug.alpha = 0.5;
+    // this.physicsDebug.depth = 40;
+    // this.physicsDebug.scaleX = this.physicsDebug.scaleY = this.track.scale;
+    
+    this.map.scaleX = this.map.scaleY = this.track.scale;
 
     this.tyresSprite = this.add.sprite(0, 0, 'tyres');
-    this.tyresSprite.scaleX = this.tyresSprite.scaleY = 0.025 * carScale;
+    this.tyresSprite.scaleX = this.tyresSprite.scaleY = 0.025 * this.car.scale;
     this.tyresSprite.flipY = true;
     
     this.shadow = this.add.sprite(0, 0, 'car');
     this.shadow.setOrigin(0.8, 0.6);
-    this.shadow.scaleX = this.shadow.scaleY = 0.025 * carScale;
+    this.shadow.scaleX = this.shadow.scaleY = 0.025 * this.car.scale;
     this.shadow.flipY = true;
     this.shadow.tint = 0x000000;
     this.shadow.alpha = 0.4;
 
     this.carSprite = this.add.sprite(0, 0, 'car');
-    this.carSprite.scaleX = this.carSprite.scaleY = 0.025 * carScale;
+    this.carSprite.scaleX = this.carSprite.scaleY = 0.025 * this.car.scale;
     this.carSprite.flipY = true;
-    this.carSprite.depth = 10;
+    this.carSprite.depth = 30;
     
     this.engineSound = this.sound.add('engine');
     this.engineSoundFactor = 1000;
-    this.engineSound.rate = car.minEngineSpeed / this.engineSoundFactor;
-    console.log(this.engineSound.rate)
+    this.engineSound.rate = this.car.minEngineSpeed / this.engineSoundFactor;
     this.engineSound.play({loop: true, volume: 0.1});
 
-    this.cameras.main.startFollow(this.carSprite);    
-    this.cameras.main.zoom = 1.4;
+    this.cameras.main.startFollow(this.carSprite); 
     
     this.carEmitter = this.getCarEmitter();
     this.carEmitter.startFollow(this.carSprite);
@@ -61,49 +97,51 @@ class MainScene extends Phaser.Scene {
     this.rtTyreMarks = this.make.renderTexture({ x: this.map.width / -2, y: this.map.height / -2, width: this.map.width, height: this.map.height }).setOrigin(0, 0);  
   }
 
-  update () {    
-    this.engineSound.rate = car.engineSpeed / this.engineSoundFactor;
+  update(time, delta) {
+    // this.frameTime += delta
+    // if(this.frameTime < 16.5) 
+    //   return;
+    // else 
+    //   this.frameTime = 0;
+    this.engineSound.rate = this.car.engineSpeed / this.engineSoundFactor;
     
-    // Fix for mobile needed
-    const surfacePhysicsPixel = this.textures.getPixel(this.carSprite.x + (this.map.width / 2), this.carSprite.y + (this.map.height / 2), 'physics');
-    this.surfaceGraphicsPixel = this.textures.getPixel(this.carSprite.x + (this.map.width / 2), this.carSprite.y + (this.map.height / 2), 'map');
-    
-    if(!isMobile && surfacePhysicsPixel) {
+    const px = (this.carSprite.x / this.map.scale) + (this.map.width / 2);
+    const py = (this.carSprite.y / this.map.scale) + (this.map.height / 2);
+    const surfacePhysicsPixel = this.textures.getPixel(px, py, 'physics');
+
+    if(surfacePhysicsPixel) {
       if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
-        car.surface = Physics.tarmac;
+        this.car.surface = Physics.tarmac;
       else if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 0)
-        car.surface = Physics.sand;
+        this.car.surface = Physics.sand;
       else if(surfacePhysicsPixel.r == 0 &&  surfacePhysicsPixel.g == 0 && surfacePhysicsPixel.b == 0)
-        car.crash();
+        this.car.crash();
       else
-        car.surface = Physics.grass;
+        this.car.surface = Physics.grass;
+      // console.log(this.car.surface)
     }
     else 
-      car.surface = Physics.tarmac;
-    car.update();
-    
-    const curveSkid = car.angularVelocity < -0.015 || car.angularVelocity > 0.015;
-    const powerSkid = car.isThrottling && (car.power > 0.02 && car.velocity < 2);
-    const brakeSkid = car.reverse > 0.02 && (car.velocity > 3);
+      this.car.surface = Physics.tarmac;
+    this.car.update();
     
     this.tyresSprite.tint = 0x000000;
-    if(car.surface.type !== Physics.surface.TARMAC) {    
+    if(this.car.surface.type !== Physics.surface.TARMAC) {    
       this.tyresSprite.alpha = 0.2;
-      this.tyresSprite.tint = car.surface.skidMarkColor;
+      this.tyresSprite.tint = this.car.surface.skidMarkColor;
     } 
     else { 
       this.tyresSprite.alpha = 0.01;
-      if(curveSkid || brakeSkid) {
+      if(this.car.curveSkid || this.car.brakeSkid) {
         this.tyresSprite.alpha = 0.3;
       }
-      if(powerSkid)
+      if(this.car.powerSkid)
         this.tyresSprite.alpha = 0.1;
     }
-    this.rtTyreMarks.draw(this.tyresSprite, car.x * carScale + (this.map.width / 2), car.y * carScale + (this.map.height / 2));
+    this.rtTyreMarks.draw(this.tyresSprite, this.car.x * this.car.scale + (this.map.width / 2), this.car.y * this.car.scale + (this.map.height / 2));
     
-    this.carSprite.rotation = this.tyresSprite.rotation = this.shadow.rotation =  car.angle;
-    this.carSprite.x = this.tyresSprite.x = this.shadow.x = car.x * carScale;
-    this.carSprite.y = this.tyresSprite.y = this.shadow.y = car.y * carScale;  
+    this.carSprite.rotation = this.tyresSprite.rotation = this.shadow.rotation =  this.car.angle;
+    this.carSprite.x = this.tyresSprite.x = this.shadow.x = this.car.x * this.car.scale;
+    this.carSprite.y = this.tyresSprite.y = this.shadow.y = this.car.y * this.car.scale;  
   }
   
   getCarEmitter() {
@@ -112,26 +150,26 @@ class MainScene extends Phaser.Scene {
       frequency: 50,
       maxParticles: 40,
       speed: {
-        onEmit: function (particle, key, t, value) {
-            return car.velocity;
+        onEmit: (particle, key, t, value) => {
+            return this.car.velocity;
         }
       },
       lifespan: {
-        onEmit: function (particle, key, t, value)  {
-          return car.velocity * 100;
+        onEmit: (particle, key, t, value) => {
+          return this.car.velocity * 100;
         }
       },
       alpha: {
-        onEmit: function (particle, key, t, value) {
-          if(car.surface.type === Physics.surface.TARMAC && car.isSkidding)  
-            return 20 / car.surface.particleAlpha;
+        onEmit: (particle, key, t, value) => {
+          if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
+            return 20 / this.car.surface.particleAlpha;
           else
-            return 200 / car.surface.particleAlpha;  
+            return 200 / this.car.surface.particleAlpha;  
         }
       },
       tint: {
-        onEmit: function (particle, key, t, value)  {
-          return car.surface.particleColor;
+        onEmit: (particle, key, t, value) => {
+          return this.car.surface.particleColor;
         }
       },
       // angle: {

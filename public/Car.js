@@ -3,18 +3,22 @@ class Car {
   constructor(config) {    
     this.x = config.x;
     this.y = config.y;
-    this.xVelocity = config.xVelocity;
-    this.yVelocity = config.yVelocity;
-    this.power = config.power;
-    this.reverse = config.reverse;
     this.angle = config.angle;
     this.angularVelocity = config.angularVelocity;
-    this.isThrottling = config.isThrottling;
-    this.isReversing = config.isReversing;
     this.surface = config.surface;
     this.minEngineSpeed = config.minEngineSpeed;
     this.maxEngineSpeed = config.maxEngineSpeed;
-    this.engineSpeedFactor = config.engineSpeedFactor;    
+    this.engineSpeedFactor = config.engineSpeedFactor;
+    this.scale = config.scale;
+    
+    this.xVelocity = 0;
+    this.yVelocity = 0;
+    this.velocity = 0;
+    this.power = 0;
+    this.reverse = 0;
+    this.angularVelocity = 0;
+    this.isThrottling = false;
+    this.isReversing = false;
     this.engineSpeed = this.minEngineSpeed * this.engineSpeedFactor;
   }
 
@@ -89,5 +93,11 @@ class Car {
     this.yVelocity *= this.surface.drag;
     this.angularVelocity *= this.surface.angularDrag;    
     // console.log(this.x + ' ' + this.y)
+        
+    this.curveSkid = this.angularVelocity < -0.015 || this.angularVelocity > 0.015;
+    this.powerSkid = this.isThrottling && (this.power > 0.02 && this.velocity < 2);
+    this.brakeSkid = this.reverse > 0.02 && (this.velocity > 3);
+    // if(this.curveSkid || this.powerSkid || this.brakeSkid)
+    //   console.log('Skids: ' + this.curveSkid +  ' ' + this.powerSkid +  ' ' + this.brakeSkid)
   }
 }

@@ -8,7 +8,6 @@ class TrackBuilderScene extends Phaser.Scene {
   }
 
   preload() {
-    const baseUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2F';
     this.load.image('grass', `${baseUrl}grass.jpg`);
     this.load.image('track', `${baseUrl}track.png`);
     for(let i = 1; i < 20; i++) {
@@ -86,7 +85,8 @@ class TrackBuilderScene extends Phaser.Scene {
         this.background.x = bounds.x - this.margin;
         this.background.y = bounds.y - this.margin;
         this.background.width = bounds.width + this.margin * 2;
-        this.background.height = bounds.height + this.margin * 2;
+        this.background.height = this.track.bgHeight = bounds.height + this.margin * 2;
+        this.track.bgSize = [this.background.width, this.background.height];
       }
     });
     
@@ -140,14 +140,7 @@ class TrackBuilderScene extends Phaser.Scene {
     graphicsGen.fillStyle(0xffffff);
     graphicsGen.fillCircle(this.cpSize / 2, this.cpSize / 2, this.cpSize / 2, this.cpSize / 2); 
     graphicsGen.generateTexture('ball', this.cpSize, this.cpSize);
-    graphicsGen.clear();
-    graphicsGen.lineStyle(5, 0xffffff);
-    graphicsGen.strokeRect(0, 0, 40, 50);
-    graphicsGen.generateTexture('start', 40, 40);
-    graphicsGen.clear();
-    graphicsGen.fillStyle(0xffffff);
-    graphicsGen.fillRect(0, 0, this.track.width, 10);    
-    graphicsGen.generateTexture('finish', this.track.width, 20);
+    this.track.drawGraphicsTextures(this);    
     graphicsGen.destroy();    
   }
     

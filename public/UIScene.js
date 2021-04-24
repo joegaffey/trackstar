@@ -27,22 +27,25 @@ class UIScene extends Phaser.Scene {
     if(isMobile) {
       game.input.addPointer(1);    
       const w = window.innerWidth, h = window.innerHeight;
-      this.up = this.add.image(w - 200, h - 350, 'arrow').setOrigin(0.5, 0.5);
+      let baseline = h - 150;
+      if(baseline < h / 2)
+        baseline = (h / 2) + 100;
+      this.up = this.add.image(w - 200, baseline, 'arrow').setOrigin(0.5, 0.5);
       this.up.scaleX = this.up.scaleY = 0.2;
       this.up.alpha = 0.75;
       this.up.rotation = -1.57;
       
-      this.down = this.add.image(w - 200, h - 200, 'arrow').setOrigin(0.5, 0.5);
+      this.down = this.add.image(w - 350, baseline, 'arrow').setOrigin(0.5, 0.5);
       this.down.scaleX = this.down.scaleY = 0.2;
       this.down.alpha = 0.75;
       this.down.rotation = 1.57;
       
-      this.left = this.add.image(200, h - 250, 'arrow').setOrigin(0.5, 0.5);
+      this.left = this.add.image(200, baseline, 'arrow').setOrigin(0.5, 0.5);
       this.left.scaleX = this.left.scaleY = 0.2;
       this.left.alpha = 0.75;
       this.left.flipX = true;
       
-      this.right = this.add.image(350, h - 250, 'arrow').setOrigin(0.5, 0.5);
+      this.right = this.add.image(350, baseline, 'arrow').setOrigin(0.5, 0.5);
       this.right.scaleX = this.right.scaleY = 0.2;
       this.right.alpha = 0.75;
     }
@@ -57,9 +60,13 @@ class UIScene extends Phaser.Scene {
       if(key.code === "Minus") { this.mainCamera.zoom -= 0.1; }
       else if(key.code === "Equal") { this.mainCamera.zoom += 0.1; }
     });
+    
+    // this.text = this.add.text(10, 10, 'Debug', { font: '16px Courier', fill: '#00ff00' });
   }
   
   update() {    
+    // this.text.text = 'FPS: ' + this.game.loop.actualFps;
+
     this.uiSpeed.setText(Math.round(car.velocity * 15));
     if (isMobile) {
       this.hideBanner();
