@@ -7,6 +7,8 @@ const config = {
   scene: [TrackBuilderScene, EditorUIScene]
 };
 
+const baseUrl = 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2F';
+
 const track = new Track({
   isReverse: false,
   isOpen: true,
@@ -20,7 +22,9 @@ const track = new Track({
   bgSize: [2048, 2048],
   bgIsTiled: true,
   gridPositions: [],
-  shapes: []
+  shapes: [],
+  scale: 1,
+  margin: 1024
 });
 
 const game = new Phaser.Game(config);
@@ -29,12 +33,12 @@ const server = '.';
       
 function sendTrack() {
   fetch(`${server}/tracks`, {
-  method: 'post',
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(track.toJSON())
-}).then(res => res.json())
-  .then(res => console.log(res.id));
+    method: 'post',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(track.toJSON())
+  }).then(res => res.json())
+    .then(res => console.log(res.id));
 }

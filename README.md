@@ -34,4 +34,4 @@ Borrowing physics code from [pakastins](https://github.com/pakastin) amazing [ca
 
 Thanks to [loonetbits](https://opengameart.org/users/looneybits) for the excellent [car graphics](https://opengameart.org/content/2d-race-cars).
 
-Satellite imagery is from [Google Earth](https://www.google.com/earth/).
+Satellite imagery is courtesy of [Google Earth](https://www.google.com/earth/).

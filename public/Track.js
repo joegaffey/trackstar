@@ -16,6 +16,8 @@ class Track {
     this.gridPositions = config.gridPositions;
     this.shapes = config.shapes;
     this.textures = config.textures;
+    this.scale = config.scale;
+    this.margin = config.margin;
   }
   
   toJSON() {
@@ -34,7 +36,9 @@ class Track {
       bgIsTiled:this.bgIsTiled,
       gridPositions:this.gridPositions,
       shapes:this.shapes,
-      textures:this.textures
+      textures:this.textures,
+      scale:this.scale,
+      margin:this.margin
     }
   }
   
@@ -44,29 +48,74 @@ class Track {
     this.drawStartingPositions(scene);
   }
   
-  drawPhysicsTexture(scene, key, margin) {
+  drawPhysicsTexture(scene, key, margin, scale) {
     const graphicsGen = scene.make.graphics({x: 0, y: 0, add: false});
-    const spline = new Phaser.Curves.Spline(this.points);
+    const pList = [];
+    this.points.forEach(point => {
+      pList.push({ x: point.x * scale, y: point.y * scale });
+    });
+    const spline = new Phaser.Curves.Spline(pList);
     const bounds = spline.getBounds();
     
     const bg = {
       x: bounds.x - margin,
       y: bounds.y - margin,
-      width: bounds.width + (margin * 2),
-      height: bounds.height + (margin * 2)
+      width: bounds.width + (margin) * 2,
+      height: bounds.height + (margin) * 2
     }
     
     graphicsGen.fillStyle(0x00ff00);
     graphicsGen.fillRect(bg.x, bg.y, bg.width, bg.height);    
     graphicsGen.fillStyle(0xffffff);
-    graphicsGen.fillCircle(this.points[this.points.length -1].x, 
-                           this.points[this.points.length -1].y, 
-                           this.width / 2);
-    graphicsGen.lineStyle(this.width * 2, 0xffffff);
+    graphicsGen.fillCircle(pList[pList.length -1].x, 
+                           pList[pList.length -1].y, 
+                           this.width * scale / 2);
+    graphicsGen.lineStyle(this.width * scale, 0xffffff);
     spline.draw(graphicsGen, this.points.length * 16);
     
     graphicsGen.generateTexture(key, bg.width, bg.height);
     graphicsGen.destroy();
+  }
+  
+  drawCircuitTexture(scene, key, margin, scale) {
+    const graphicsGen = scene.make.graphics({x: 0, y: 0, add: false});
+    const pList = [];
+    this.points.forEach(point => {
+      pList.push({ x: point.x * scale, y: point.y * scale });
+    });
+    const spline = new Phaser.Curves.Spline(pList);
+    const bounds = spline.getBounds();
+    
+    const bg = {
+      x: bounds.x - margin,
+      y: bounds.y - margin,
+      width: bounds.width + (margin) * 2,
+      height: bounds.height + (margin) * 2
+    }
+    
+    graphicsGen.fillStyle(0xffffff);
+    graphicsGen.fillRect(bg.x, bg.y, bg.width, bg.height);    
+    graphicsGen.fillStyle(0x444444);
+    graphicsGen.fillCircle(pList[pList.length -1].x, 
+                           pList[pList.length -1].y, 
+                           this.width * scale / 2);
+    graphicsGen.lineStyle(this.width * scale, 0x444444);
+    spline.draw(graphicsGen, pList.length * 16);
+    
+    graphicsGen.generateTexture(key, bg.width, bg.height);
+    graphicsGen.destroy(); 
+  }
+  
+  drawGraphicsTextures(scene) {
+    const graphicsGen = scene.make.graphics({x: 0, y: 0, add: false});
+    graphicsGen.lineStyle(5, 0xffffff);
+    graphicsGen.strokeRect(0, 0, 40, 50);
+    graphicsGen.generateTexture('start', 40, 40);
+    graphicsGen.clear();
+    graphicsGen.fillStyle(0xffffff);
+    graphicsGen.fillRect(0, 0, this.width, 10);    
+    graphicsGen.generateTexture('finish', this.width, 20);
+    graphicsGen.destroy(); 
   }
   
   drawRope(scene) {
