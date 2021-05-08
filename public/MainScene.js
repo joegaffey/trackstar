@@ -16,23 +16,19 @@ class MainScene extends Phaser.Scene {
     if(this.track.bgIsTiled) {
       this.load.image('grass', `${this.baseUrl}grass.jpg`);
       this.load.image('track', `${this.baseUrl}track.png`);
-      this.track.scale = 0.2;
-      this.track.drawPhysicsTexture(this, 'physics', this.track.margin, this.track.scale);
-      this.track.drawCircuitTexture(this, 'circuit', this.track.margin, this.track.scale);
     }
     else {
       if(this.isMobile) {
         this.mapUrl = this.track.textures[this.mapKey].small;
         this.physicsUrl = this.track.textures[this.physicsKey].small;
         this.track.scale = 4;
-        // this.car.scale = 0.75;
       }
       else {
         this.mapUrl = this.track.textures[this.mapKey].regular;
         this.physicsUrl = this.track.textures[this.physicsKey].regular;
       }
       this.load.image('map', this.mapUrl);
-      this.load.image('physics', this.physicsUrl);
+      const physics = this.load.image('physics', this.physicsUrl);
     }
     
     this.load.image('car', this.baseUrl + 'pitstop_car_5.png');
@@ -42,18 +38,21 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {    
+    this.track.drawGraphicsTextures(this);      
     
     if(this.track.bgIsTiled) {
-      // console.log(this.track.bgSize)      
-      // this.track.draw(this);
-      this.circuit = this.add.image(0, 0, 'circuit').setOrigin(0.5, 0.5);
-      this.circuit.depth = 10;
-      this.circuit.scaleX = this.circuit.scaleY = this.track.scale;
+      this.car.scale = 0.08;
+      this.track.draw(this);
+      // const dims = this.track.getDimensions();      
       
-      this.map = this.add.tileSprite(0, 0, this.circuit.width, this.circuit.height, this.track.bgTexture).setOrigin(0.5, 0.5);
-      this.map.depth = 5;
-      
-      this.cameras.main.zoom = 2;
+      const dims = this.track.bounds;
+      this.map = this.add.tileSprite(0, 0, 
+                                     dims.width + this.track.margin * 2, 
+                                     dims.height + this.track.margin * 2, 
+                                     this.track.bgTexture);
+      this.map.setOrigin(0, 0);
+      this.map.depth = 5;      
+      this.cameras.main.zoom = 0.4;      
     }    
     else {
       this.cameras.main.zoom = 1.4;
@@ -101,7 +100,8 @@ class MainScene extends Phaser.Scene {
   
   debugPhysics() {
     this.physicsDebug = this.add.image(0, 0, 'physics')
-    this.physicsDebug.setOrigin(0.5, 0.5);
+    if(this.track.bgIsTiled)
+      this.physicsDebug.setOrigin(0, 0);
     this.physicsDebug.alpha = 0.5;
     this.physicsDebug.depth = 40;
     this.physicsDebug.scaleX = this.physicsDebug.scaleY = this.track.scale;
@@ -113,8 +113,14 @@ class MainScene extends Phaser.Scene {
     //   return;
     // else 
     //   this.frameTime = 0;
-    const px = (this.carSprite.x / this.map.scale) + (this.map.width / 2);
-    const py = (this.carSprite.y / this.map.scale) + (this.map.height / 2);
+    let px = (this.carSprite.x / this.map.scale);
+    let py = (this.carSprite.y / this.map.scale);
+    
+    if(!this.track.bgIsTiled) {
+      px += (this.map.width / 2);
+      py += (this.map.height / 2);
+    }
+      
     const surfacePhysicsPixel = this.textures.getPixel(px, py, 'physics');
 
     if(surfacePhysicsPixel) {

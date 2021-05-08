@@ -86,8 +86,8 @@ class Car {
 
     this.velocity = Math.abs(this.xVelocity)**2 + Math.abs(this.yVelocity)**2;
 
-    this.x += this.xVelocity;
-    this.y -= this.yVelocity;
+    this.x += this.xVelocity// / (this.scale * 50);
+    this.y -= this.yVelocity// / (this.scale * 50);
     this.angle += this.angularVelocity;
 
     this.xVelocity *= this.surface.drag;
