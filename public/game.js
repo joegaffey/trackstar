@@ -61,8 +61,8 @@ function init() {
       bgSize: [0, 0],
       bgIsTiled: false,
       gridPositions: [{
-        x: -334,
-        y: 1100,
+        x: 0,
+        y: 820,
         angle: -1.6        
       }],
       shapes: [],
@@ -87,7 +87,8 @@ function init() {
     minEngineSpeed: 3000,
     maxEngineSpeed: 12000,
     engineSpeedFactor: 60000,
-    scale: 0.75
+    engineSoundFactor: 3500,
+    scale: 0.02
   });
 
   const config = {
@@ -97,10 +98,10 @@ function init() {
     input: {
       gamepad: true
     },
-    fps: {
-      target: 60,
-      forceSetTimeOut: true
-    },
+    // fps: {
+    //   target: 60,
+    //   forceSetTimeOut: true
+    // },
     scene: [MainScene, UIScene]
   }
 

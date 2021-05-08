@@ -32,6 +32,6 @@ Use mouse wheel or + and - keys to zoom in and out.
 
 Borrowing physics code from [pakastins](https://github.com/pakastin) amazing [car.js.org](https://car.js.org/), TrackStar is being developed online via [Glitch](https://glitch.com/) and is built using modern [Web Standards](https://www.w3.org/standards/) based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
 
-Thanks to [loonetbits](https://opengameart.org/users/looneybits) for the excellent [car graphics](https://opengameart.org/content/2d-race-cars).
+Thanks to [looneybits](https://opengameart.org/users/looneybits) for the excellent [car graphics](https://opengameart.org/content/2d-race-cars).
 
 Satellite imagery is courtesy of [Google Earth](https://www.google.com/earth/).
