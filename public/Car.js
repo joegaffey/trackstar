@@ -9,6 +9,7 @@ class Car {
     this.minEngineSpeed = config.minEngineSpeed;
     this.maxEngineSpeed = config.maxEngineSpeed;
     this.engineSpeedFactor = config.engineSpeedFactor;
+    this.engineSoundFactor = config.engineSoundFactor;
     this.scale = config.scale;
     
     this.xVelocity = 0;
