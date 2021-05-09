@@ -55,7 +55,7 @@ class Car {
     if (this.isTurningRight !== turnRight) {
       this.isTurningRight = turnRight;
     }
-
+    
     if (this.isThrottling) {
       this.power += Physics.powerFactor * this.isThrottling;
     } 
@@ -83,15 +83,16 @@ class Car {
 
     this.xVelocity += Math.sin(this.angle) * (this.power - this.reverse);
     this.yVelocity += Math.cos(this.angle) * (this.power - this.reverse);
-
-    this.velocity = Math.abs(this.xVelocity)**2 + Math.abs(this.yVelocity)**2;
-
-    this.x += this.xVelocity// / (this.scale * 50);
-    this.y -= this.yVelocity// / (this.scale * 50);
+    
+    this.velocity = Math.abs(this.xVelocity)**2 + Math.abs(this.yVelocity)** 2;
+    
+    this.x += this.xVelocity;
+    this.y -= this.yVelocity;
     this.angle += this.angularVelocity;
-
+    
     this.xVelocity *= this.surface.drag;
     this.yVelocity *= this.surface.drag;
+    
     this.angularVelocity *= this.surface.angularDrag;    
     // console.log(this.x + ' ' + this.y)
         

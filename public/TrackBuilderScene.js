@@ -19,6 +19,7 @@ class TrackBuilderScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
 
     this.track = track;
+    this.track.scale = 4;
         
     this.editorUIScene = this.game.scene.scenes[1];
     
@@ -193,9 +194,6 @@ class TrackBuilderScene extends Phaser.Scene {
       this.drawControls();
     else {
       this.clearControls();
-      //test physics texture
-      // this.track.drawPhysicsTexture(this, 'physics', 1024);
-      // this.add.image(0, 0, 'physics').setOrigin(0, 0);
     }
   }
     

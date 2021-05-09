@@ -126,7 +126,7 @@ class Track {
     this.fSprite.setInteractive({ draggable: false });
       this.fSprite.on('pointerup', (pointer) => {
         this.isReverse = !this.isReverse;
-        this.drawStartingPositions();
+        this.drawStartingPositions(scene);
       });
   }
   
