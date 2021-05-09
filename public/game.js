@@ -41,43 +41,48 @@ if(trackId) {
     }
   });
 }
-else
+else 
   init();
 
-function init() {
-  if(!track) // Default track
-    track = new Track({
-      name: 'Mondello',
-      isReverse: false,
-      isOpen: false,
-      points: [],
-      scale: 1,
-      width: 200,
-      borderWidth: 20,
-      pitBoxCount: 20,
-      starterGap: 80,
-      bgTexture: 'map',
-      physicsTexture: 'physics',
-      bgSize: [0, 0],
-      bgIsTiled: false,
-      gridPositions: [{
-        x: 0,
-        y: 820,
-        angle: -1.6        
-      }],
-      shapes: [],
-      margin: 1024,
-      textures: {
-        map: {      
-          regular: baseUrl + 'mondello_international.jpg',
-          small: baseUrl + 'mondello_international_small.jpg'
-        },
-        physics: {
-          regular: baseUrl + 'mondello_international_physics.png',
-          small: baseUrl + 'mondello_international_physics_small.png'
-        }
+function getDefaultTrack() {
+  return new Track({
+    name: 'Mondello',
+    isReverse: false,
+    isOpen: false,
+    points: [],
+    scale: 1,
+    width: 200,
+    borderWidth: 20,
+    pitBoxCount: 20,
+    starterGap: 80,
+    bgTexture: 'map',
+    physicsTexture: 'physics',
+    bgSize: [0, 0],
+    bgIsTiled: false,
+    gridPositions: [{
+      x: 0,
+      y: 820,
+      angle: -1.6        
+    }],
+    shapes: [],
+    margin: 1024,
+    textures: {
+      map: {      
+        regular: baseUrl + 'mondello_international.jpg',
+        small: baseUrl + 'mondello_international_small.jpg'
+      },
+      physics: {
+        regular: baseUrl + 'mondello_international_physics.png',
+        small: baseUrl + 'mondello_international_physics_small.png'
       }
-    });
+    }
+  });
+}
+
+function init() {
+  if(!track) {
+    track = getDefaultTrack();
+  }
   
   car = new Car({
     x: track.gridPositions[0].x / track.scale,
