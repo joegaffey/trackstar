@@ -42,26 +42,30 @@ class Track {
     }
   }
   
-  draw(scene) {
+  draw(scene) {    
+    this.drawGraphicsTextures(scene);      
     this.drawRope(scene);
     this.drawFinishLine(scene);
     this.drawStartingPositions(scene);
+  }
+  
+  drawFinal(scene) {
+    let spline = new Phaser.Curves.Spline(this.points);
+    this.bounds = spline.getBounds();    
+    this.points.forEach(point => {
+      point.x -= this.bounds.x - this.margin
+      point.y -= this.bounds.y - this.margin
+    })
+    spline = new Phaser.Curves.Spline(this.points);
+    this.bounds = spline.getBounds();
+    this.draw(scene);
     this.drawPhysicsTexture(scene);
   }
-  
-  getDimensions() {
-    return new Phaser.Curves.Spline(this.points).getBounds();
-  }
-  
+    
   drawPhysicsTexture(scene) {   
-    const spline = new Phaser.Curves.Spline(this.points);
-    this.bounds = spline.getBounds();
-    
     const graphicsGen = scene.make.graphics({x: 0, y: 0, add: false});    
-    
     graphicsGen.fillStyle(0x00ff00);
-    graphicsGen.fillRect(this.bounds.x - this.margin, 
-                         this.bounds.y - this.margin, 
+    graphicsGen.fillRect(0, 0, 
                          this.bounds.width + this.margin * 2, 
                          this.bounds.height + this.margin * 2);    
     graphicsGen.fillStyle(0xffffff);
@@ -70,11 +74,12 @@ class Track {
                            this.width / 2);
     graphicsGen.lineStyle(this.width, 0xffffff);
 
+    const spline = new Phaser.Curves.Spline(this.points);
     spline.draw(graphicsGen, this.points.length * 16);
     
     graphicsGen.generateTexture('physics', 
                                 this.bounds.width + this.margin * 2, 
-                                this.bounds.height + this.margin * 2);
+                                this.bounds.height + this.margin * 2);   
     graphicsGen.destroy();
   }
     

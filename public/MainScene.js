@@ -28,7 +28,7 @@ class MainScene extends Phaser.Scene {
         this.physicsUrl = this.track.textures[this.physicsKey].regular;
       }
       this.load.image('map', this.mapUrl);
-      const physics = this.load.image('physics', this.physicsUrl);
+      this.load.image('physics', this.physicsUrl);
     }
     
     this.load.image('car', this.baseUrl + 'pitstop_car_5.png');
@@ -38,20 +38,16 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {    
-    this.track.drawGraphicsTextures(this);      
-    
     if(this.track.bgIsTiled) {
       this.car.scale = 0.08;
-      this.track.draw(this);
-      // const dims = this.track.getDimensions();      
+      this.track.drawFinal(this);
       
-      const dims = this.track.bounds;
-      this.map = this.add.tileSprite(0, 0, 
-                                     dims.width + this.track.margin * 2, 
-                                     dims.height + this.track.margin * 2, 
+      this.map = this.add.tileSprite(this.track.bounds.x - this.track.margin, 
+                                     this.track.bounds.y - this.track.margin, 
+                                     this.track.bounds.width + this.track.margin * 2, 
+                                     this.track.bounds.height + this.track.margin * 2, 
                                      this.track.bgTexture);
       this.map.setOrigin(0, 0);
-      this.map.depth = 5;      
       this.cameras.main.zoom = 0.4;      
     }    
     else {
@@ -62,6 +58,9 @@ class MainScene extends Phaser.Scene {
     // this.debugPhysics();
     
     this.map.scaleX = this.map.scaleY = this.track.scale;
+    
+    this.car.x =  this.track.gridPositions[0].x / this.track.scale,
+    this.car.y = this.track.gridPositions[0].y / this.track.scale,
 
     this.tyresSprite = this.add.sprite(0, 0, 'tyres');
     this.tyresSprite.setOrigin(0.5, 0.5);
@@ -74,6 +73,7 @@ class MainScene extends Phaser.Scene {
     this.shadow.flipY = true;
     this.shadow.tint = 0x000000;
     this.shadow.alpha = 0.4;
+    this.shadow.depth = 28;
 
     this.carSprite = this.add.sprite(0, 0, 'car');
     this.carSprite.setOrigin(0.5, 0.5);
@@ -93,7 +93,8 @@ class MainScene extends Phaser.Scene {
     this.rtTyreMarks = this.make.renderTexture({ 
       x: 0, y: 0,
       width: this.map.width, 
-      height: this.map.height
+      height: this.map.height,
+      depth: 35
     }).setOrigin(0.5, 0.5); 
     // this.rtTyreMarks.scaleX = this.rtTyreMarks.scaleY = this.track.scale;
   }
@@ -102,8 +103,8 @@ class MainScene extends Phaser.Scene {
     this.physicsDebug = this.add.image(0, 0, 'physics')
     if(this.track.bgIsTiled)
       this.physicsDebug.setOrigin(0, 0);
-    this.physicsDebug.alpha = 0.5;
-    this.physicsDebug.depth = 40;
+    this.physicsDebug.alpha = 0.4;
+    this.physicsDebug.depth = 45;
     this.physicsDebug.scaleX = this.physicsDebug.scaleY = this.track.scale;
   }
 
@@ -167,6 +168,7 @@ class MainScene extends Phaser.Scene {
   
   getCarEmitter() {
     const particles = this.add.particles('dust');
+    particles.setDepth(35);
     return particles.createEmitter({
       frequency: 50,
       maxParticles: 40,
