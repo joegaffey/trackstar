@@ -224,7 +224,7 @@ const track_1 = {
         }
     ],
     "shapes": [],
-    "scale": 1,
+    "scale": 4,
     "margin": 1024
 }
 

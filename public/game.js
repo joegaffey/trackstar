@@ -62,7 +62,7 @@ function getDefaultTrack() {
     gridPositions: [{
       x: 0,
       y: 820,
-      angle: -1.6        
+      angle: -90
     }],
     shapes: [],
     margin: 1024,
@@ -85,9 +85,6 @@ function init() {
   }
   
   car = new Car({
-    x: track.gridPositions[0].x / track.scale,
-    y: track.gridPositions[0].y / track.scale,
-    angle: track.gridPositions[0].angle,
     surface: Physics.tarmac,
     minEngineSpeed: 3000,
     maxEngineSpeed: 12000,

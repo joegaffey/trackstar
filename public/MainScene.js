@@ -55,13 +55,12 @@ class MainScene extends Phaser.Scene {
       this.map = this.add.image(0, 0, 'map');
     }
     
-    // this.debugPhysics();
+    // this.debugPhysics(); 
+        
+    this.car.x = this.track.gridPositions[0].x / this.track.scale;
+    this.car.y = this.track.gridPositions[0].y / this.track.scale;
+    this.car.angle = this.track.gridPositions[0].angle * Math.PI / 180;
     
-    this.map.scaleX = this.map.scaleY = this.track.scale;
-    
-    this.car.x =  this.track.gridPositions[0].x / this.track.scale,
-    this.car.y = this.track.gridPositions[0].y / this.track.scale,
-
     this.tyresSprite = this.add.sprite(0, 0, 'tyres');
     this.tyresSprite.setOrigin(0.5, 0.5);
     this.tyresSprite.scaleX = this.tyresSprite.scaleY = this.car.scale;
@@ -79,12 +78,12 @@ class MainScene extends Phaser.Scene {
     this.carSprite.setOrigin(0.5, 0.5);
     this.carSprite.scaleX = this.carSprite.scaleY = this.car.scale;
     this.carSprite.flipY = true;
-    this.carSprite.depth = 30;
+    this.carSprite.depth = 30;    
     
     this.engineSound = this.sound.add('engine');
     this.engineSound.rate = this.car.minEngineSpeed / this.car.engineSoundFactor;
     this.engineSound.play({loop: true, volume: 0.1});
-
+    
     this.cameras.main.startFollow(this.carSprite); 
     
     this.carEmitter = this.getCarEmitter();
@@ -94,9 +93,12 @@ class MainScene extends Phaser.Scene {
       x: 0, y: 0,
       width: this.map.width, 
       height: this.map.height,
-      depth: 35
-    }).setOrigin(0.5, 0.5); 
-    // this.rtTyreMarks.scaleX = this.rtTyreMarks.scaleY = this.track.scale;
+      depth: 25
+    })
+    if(this.track.bgIsTiled)
+      this.rtTyreMarks.setOrigin(0, 0);
+    else
+      this.rtTyreMarks.setOrigin(0.5, 0.5);
   }
   
   debugPhysics() {
@@ -114,6 +116,7 @@ class MainScene extends Phaser.Scene {
     //   return;
     // else 
     //   this.frameTime = 0;
+    
     let px = (this.carSprite.x / this.map.scale);
     let py = (this.carSprite.y / this.map.scale);
     
@@ -155,15 +158,24 @@ class MainScene extends Phaser.Scene {
       if(this.car.powerSkid)
         this.tyresSprite.alpha = 0.1;
     }
-    this.rtTyreMarks.draw(
-      this.tyresSprite, 
-      this.car.x + (this.map.width / 2), 
-      this.car.y + (this.map.height / 2)
-    );
+    if(this.track.bgIsTiled) {
+      this.rtTyreMarks.draw(
+        this.tyresSprite, 
+        this.car.x * this.track.scale,
+        this.car.y * this.track.scale
+      );
+    }
+    else {
+      this.rtTyreMarks.draw(
+        this.tyresSprite, 
+        this.car.x + (this.map.width / 2),
+        this.car.y + (this.map.width / 2)
+      );
+    }
     
     this.carSprite.rotation = this.tyresSprite.rotation = this.shadow.rotation =  this.car.angle;
-    this.carSprite.x = this.tyresSprite.x = this.shadow.x = this.car.x;
-    this.carSprite.y = this.tyresSprite.y = this.shadow.y = this.car.y;  
+    this.carSprite.x = this.tyresSprite.x = this.shadow.x = this.car.x * this.track.scale;
+    this.carSprite.y = this.tyresSprite.y = this.shadow.y = this.car.y * this.track.scale;  
   }
   
   getCarEmitter() {
@@ -200,7 +212,7 @@ class MainScene extends Phaser.Scene {
       //     return Math.sin(car.angle)  * 360;
       //   }
       // },
-      scale: { start: 0.1, end: 1.0 },
+      scale: { start: 0.1 * this.track.scale, end: 1.0 * this.track.scale },
       blendMode: 'NORMAL'
     });
   }

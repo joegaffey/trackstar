@@ -40,5 +40,9 @@ function sendTrack() {
     },
     body: JSON.stringify(track.toJSON())
   }).then(res => res.json())
-    .then(res => console.log('Track uploaded to server with id: ' + res.id));
+    .then(res => {
+    console.log('Track uploaded to server with id: ' + res.id);
+    window.location.replace('./#' +  res.id);
+    // alert('Coming soon :)');
+  });
 }

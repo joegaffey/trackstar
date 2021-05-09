@@ -45,7 +45,7 @@ class EditorUIScene extends Phaser.Scene {
     });
   }
   
-   addRaceButton(position) {
+  addRaceButton(position) {
     const box = this.add.rectangle(position * 130 + 20, 20, 125, 50, 0x000000).setOrigin(0,0);
     box.alpha = 0.6;
     const closeLoopText = this.add.text(position * 130 + 35, 35, 'Go Race!', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);;
@@ -57,7 +57,6 @@ class EditorUIScene extends Phaser.Scene {
         alert('Can\'t race on an open circuit.');
       else {
         sendTrack();
-        alert('Coming soon :)');
       }
     });
   }
