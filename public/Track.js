@@ -44,6 +44,7 @@ class Track {
   
   draw(scene) {    
     this.drawGraphicsTextures(scene);      
+    this.drawKerbs(scene);
     this.drawRope(scene);
     this.drawFinishLine(scene);
     this.drawStartingPositions(scene);
@@ -90,8 +91,8 @@ class Track {
     graphicsGen.generateTexture('start', 40, 40);
     graphicsGen.clear();
     graphicsGen.fillStyle(0xffffff);
-    graphicsGen.fillRect(0, 0, this.width, 10);    
-    graphicsGen.generateTexture('finish', this.width, 20);
+    graphicsGen.fillRect(0, 0, this.width, 50);    
+    graphicsGen.generateTexture('finish', this.width, 50);
     graphicsGen.destroy(); 
   }
   
@@ -111,6 +112,26 @@ class Track {
     this.rope.depth = 14;
   }  
   
+  drawKerbs(scene) {
+    if(this.kerbGraphics)
+      this.kerbGraphics.clear();
+    else 
+      this.kerbGraphics = scene.add.graphics();
+    this.kerbGraphics.depth = 12;
+    let spline = new Phaser.Curves.Spline(this.points);
+    let kerbEdges = spline.getDistancePoints(30);
+    
+    kerbEdges.forEach((edge, i) => {
+      if(i % 2 == 0)
+        this.kerbGraphics.lineStyle(this.width + 20, 0xff0000);
+      else
+        this.kerbGraphics.lineStyle(this.width + 20, 0xffffff);
+      if(i < kerbEdges.length - 1) {
+        this.kerbGraphics.lineBetween(kerbEdges[i].x, kerbEdges[i].y, kerbEdges[i + 1].x, kerbEdges[i + 1].y);
+      }
+    })
+  }
+  
   drawFinishLine(scene) {
     if(this.fSprite)
       this.fSprite.destroy();
@@ -122,7 +143,8 @@ class Track {
     this.fSprite.depth = 14;
     this.fSprite.rotation = angle;
     this.fSprite.angle -= 90;      
-    this.fSprite.alpha = 0.5;      
+    this.fSprite.alpha = 1;      
+    this.fSprite.tint = 0x888888;
     this.fSprite.setInteractive({ draggable: false });
       this.fSprite.on('pointerup', (pointer) => {
         this.isReverse = !this.isReverse;
