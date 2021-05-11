@@ -18,6 +18,7 @@ class Track {
     this.textures = config.textures;
     this.scale = config.scale;
     this.margin = config.margin;    
+    this.trees = config.trees;
   }
   
   toJSON() {
@@ -38,7 +39,8 @@ class Track {
       shapes:this.shapes,
       textures:this.textures,
       scale:this.scale,
-      margin:this.margin
+      margin:this.margin,
+      trees:this.trees
     }
   }
   
@@ -48,6 +50,7 @@ class Track {
     this.drawRope(scene);
     this.drawFinishLine(scene);
     this.drawStartingPositions(scene);
+    this.drawTrees(scene);
   }
   
   drawFinal(scene) {
@@ -56,6 +59,10 @@ class Track {
     this.points.forEach(point => {
       point.x -= this.bounds.x - this.margin
       point.y -= this.bounds.y - this.margin
+    })
+    this.trees.forEach(tree => {
+      tree.x -= this.bounds.x - this.margin
+      tree.y -= this.bounds.y - this.margin
     })
     spline = new Phaser.Curves.Spline(this.points);
     this.bounds = spline.getBounds();
@@ -141,6 +148,20 @@ class Track {
         this.kerbGraphics.lineBetween(kerbEdges[i].x, kerbEdges[i].y, kerbEdges[i + 1].x, kerbEdges[i + 1].y);
       }
     })
+  }
+  
+  drawTrees(scene) {
+    if(!this.dryads )
+      this.dryads = scene.add.group();
+    else
+      this.dryads.clear(true, true);
+    this.trees.forEach(tree => {
+      const dryad = scene.add.sprite(tree.x, tree.y, 'tree' + tree.i);
+      dryad.setScale(3);
+      dryad.angle = Math.ceil(tree.angle);
+      dryad.depth = 60;
+      this.dryads.add(dryad);
+    });
   }
   
   drawFinishLine(scene) {

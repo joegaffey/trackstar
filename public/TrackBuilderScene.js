@@ -5,6 +5,10 @@ class TrackBuilderScene extends Phaser.Scene {
     this.showControls = true;
     this.margin = 1024;
     this.cpSize = 50;
+    
+    this.TRACK_MODE = 0;
+    this.TREE_MODE = 1;  
+    this.mode = this.TRACK_MODE;
   }
 
   preload() {
@@ -12,6 +16,9 @@ class TrackBuilderScene extends Phaser.Scene {
     this.load.image('track', `${baseUrl}track.png`);
     for(let i = 1; i < 20; i++) {
       this.load.image('car' + i, `${baseUrl}pitstop_car_${i}.png`);  
+    }
+    for(let i = 1; i < 14; i++) {
+      this.load.image('tree' + i, `${baseUrl}tree${i}.png`);  
     }
   }
 
@@ -71,12 +78,21 @@ class TrackBuilderScene extends Phaser.Scene {
 //     });       
     
     this.input.on('pointerup', (pointer) => {     
-      if(this.track.isOpen && !this.dragOn)
-        this.track.points.push(new Phaser.Math.Vector2(pointer.worldX, pointer.worldY));
-      else if(this.shapePoints) {
-        this.graphics.fillStyle(0xffffff, 1);
-        this.graphics.fillPoints(this.shapePoints);
-        this.shapePoints = null;
+      
+      if(this.mode === this.TRACK_MODE) {
+        if(this.track.isOpen && !this.dragOn)
+          this.track.points.push(new Phaser.Math.Vector2(pointer.worldX, pointer.worldY));
+        else if(this.shapePoints) {
+          this.graphics.fillStyle(0xffffff, 1);
+          this.graphics.fillPoints(this.shapePoints);
+          this.shapePoints = null;
+        }
+      }
+      else if(this.mode === this.TREE_MODE) {
+        const tree = new Phaser.Math.Vector2(pointer.worldX, pointer.worldY);
+        tree.angle = Math.random() * 180;
+        tree.i = Math.ceil(Math.random() * 13);
+        this.track.trees.push(tree);
       }
       
       this.drawTrack();
@@ -195,6 +211,7 @@ class TrackBuilderScene extends Phaser.Scene {
     else {
       this.clearControls();
     }
+    this.track.drawTrees(this);
   }
     
   drawCars() {

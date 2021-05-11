@@ -34,6 +34,9 @@ class MainScene extends Phaser.Scene {
     this.load.image('car', this.baseUrl + 'pitstop_car_5.png');
     this.load.image('tyres', this.baseUrl + 'tyres.png');
     this.load.image('dust', this.baseUrl + 'dust.png');
+    for(let i = 1; i < 14; i++) {
+      this.load.image('tree' + i, `${this.baseUrl}tree${i}.png`);  
+    }
     this.load.audio('engine', [this.baseUrl + 'engine.mp3']);
   }
 
