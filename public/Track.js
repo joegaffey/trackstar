@@ -90,9 +90,20 @@ class Track {
     graphicsGen.strokeRect(0, 0, 40, 50);
     graphicsGen.generateTexture('start', 40, 40);
     graphicsGen.clear();
-    graphicsGen.fillStyle(0xffffff);
-    graphicsGen.fillRect(0, 0, this.width, 50);    
-    graphicsGen.generateTexture('finish', this.width, 50);
+    graphicsGen.fillStyle(0xcccccc);
+    graphicsGen.fillRect(0, 0, this.width + 25, 45);    
+    graphicsGen.fillStyle(0x333333);
+    const boxSize = 15;
+    let drawBox = true;
+    for(let i = 0; i < 30; i++) {
+      drawBox = !drawBox;
+      for(let j = 0; j <= 3; j++) {
+        if(drawBox)
+          graphicsGen.fillRect(i * boxSize, j * boxSize, boxSize, boxSize);    
+        drawBox = !drawBox;
+      }
+    }
+    graphicsGen.generateTexture('finish', this.width + 25, 45);
     graphicsGen.destroy(); 
   }
   
@@ -144,7 +155,6 @@ class Track {
     this.fSprite.rotation = angle;
     this.fSprite.angle -= 90;      
     this.fSprite.alpha = 1;      
-    this.fSprite.tint = 0x888888;
     this.fSprite.setInteractive({ draggable: false });
       this.fSprite.on('pointerup', (pointer) => {
         this.isReverse = !this.isReverse;
