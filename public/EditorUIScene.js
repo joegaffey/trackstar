@@ -10,8 +10,9 @@ class EditorUIScene extends Phaser.Scene {
   create () {    
     this.editorScene = this.scene.get('TrackBuilderScene');
     this.addControlPointsButton(0);
-    this.addCloseLoopButton(1);
-    this.addRaceButton(2);
+    this.addModeButton(1);
+    this.addCloseLoopButton(2);
+    this.addRaceButton(3);
   }
   
   update() {    
@@ -20,7 +21,7 @@ class EditorUIScene extends Phaser.Scene {
   addControlPointsButton(position) {
     const box = this.add.rectangle(position * 130 + 20, 20, 125, 50, 0x000000).setOrigin(0,0);
     box.alpha = 0.6;
-    this.controlsOnText = this.add.text(position * 130 + 35, 35, 'Controls Off', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);;
+    this.controlsOnText = this.add.text(position * 130 + 35, 35, 'Controls Off', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);
     box.setInteractive({ draggable: false });
     box.on('pointerup', (pointer) => {
       this.editorScene.showControls = !this.editorScene.showControls;
@@ -32,10 +33,27 @@ class EditorUIScene extends Phaser.Scene {
     });
   }
   
+  addModeButton(position) {
+    const box = this.add.rectangle(position * 130 + 20, 20, 125, 50, 0x000000).setOrigin(0,0);
+    box.alpha = 0.6;
+    this.modeText = this.add.text(position * 130 + 35, 35, 'Tree Mode', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);
+    box.setInteractive({ draggable: false });
+    box.on('pointerup', (pointer) => {      
+      if(this.editorScene.mode === this.editorScene.TREE_MODE) {
+        this.modeText.setText('Tree Mode');
+        this.editorScene.mode = this.editorScene.TRACK_MODE;
+      }
+      else {
+        this.modeText.setText('Track Mode');
+        this.editorScene.mode = this.editorScene.TREE_MODE;
+      }
+    });
+  }
+  
   addCloseLoopButton(position) {
     const box = this.add.rectangle(position * 130 + 20, 20, 125, 50, 0x000000).setOrigin(0,0);
     box.alpha = 0.6;
-    const closeLoopText = this.add.text(position * 130 + 35, 35, 'Close Loop', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);;
+    const closeLoopText = this.add.text(position * 130 + 35, 35, 'Close Loop', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);
     box.setInteractive({ draggable: false });
     box.on('pointerup', (pointer) => {
       if(this.editorScene.track.points.length > 4)
@@ -48,7 +66,7 @@ class EditorUIScene extends Phaser.Scene {
   addRaceButton(position) {
     const box = this.add.rectangle(position * 130 + 20, 20, 125, 50, 0x000000).setOrigin(0,0);
     box.alpha = 0.6;
-    const closeLoopText = this.add.text(position * 130 + 35, 35, 'Go Race!', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);;
+    const closeLoopText = this.add.text(position * 130 + 35, 35, 'Go Race!', { font: '16px Helvetica', fill: '#aaaaaa' }).setOrigin(0,0);
     box.setInteractive({ draggable: false });
     box.on('pointerup', (pointer) => {
       if(this.editorScene.track.points.length < 5)

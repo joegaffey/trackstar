@@ -24,7 +24,8 @@ const track = new Track({
   gridPositions: [],
   shapes: [],
   scale: 1,
-  margin: 1024
+  margin: 2048,
+  trees:[]
 });
 
 const game = new Phaser.Game(config);
