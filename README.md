@@ -6,7 +6,7 @@ Inspired by top down racers like [Circuit Superstars](https://store.steampowered
 
 Try it out [here](http://trackstar.glitch.me/). Use a gamepad, touch, arrows or WASD keys to drive. Enjoy!
 
-Also check out the WIP track editor [here](http://trackstar.glitch.me/editor)!
+Also check out the track editor [here](http://trackstar.glitch.me/editor)!
 
 ## Track Editor User Guide
 
@@ -32,6 +32,6 @@ Use mouse wheel or + and - keys to zoom in and out.
 
 Borrowing physics code from [pakastins](https://github.com/pakastin) amazing [car.js.org](https://car.js.org/), TrackStar is being developed online via [Glitch](https://glitch.com/) and is built using modern [Web Standards](https://www.w3.org/standards/) based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
 
-Thanks to [looneybits](https://opengameart.org/users/looneybits) for the excellent [car graphics](https://opengameart.org/content/2d-race-cars).
+Thanks to [looneybits](https://opengameart.org/users/looneybits), [Prime_8](https://opengameart.org/users/prime8) and [qubodup](https://opengameart.org/users/qubodup) over at [OpenGameArt.com](https://opengameart.org/) for the excellent graphics and audio work.
 
 Satellite imagery is courtesy of [Google Earth](https://www.google.com/earth/).
