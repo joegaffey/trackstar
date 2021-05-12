@@ -151,16 +151,16 @@ class Track {
   }
   
   drawTrees(scene) {
-    if(!this.dryads )
-      this.dryads = scene.add.group();
+    if(!this.treeImageGroup)
+      this.treeImageGroup = scene.add.group();
     else
-      this.dryads.clear(true, true);
+      this.treeImageGroup.clear(true, true);
     this.trees.forEach(tree => {
-      const dryad = scene.add.sprite(tree.x, tree.y, 'tree' + tree.i);
-      dryad.setScale(3);
-      dryad.angle = Math.ceil(tree.angle);
-      dryad.depth = 60;
-      this.dryads.add(dryad);
+      const treeImage = scene.add.image(tree.x, tree.y, 'tree' + tree.i);
+      treeImage.setScale(3);
+      treeImage.angle = Math.ceil(tree.angle);
+      treeImage.depth = 60;
+      this.treeImageGroup.add(treeImage);
     });
   }
   
