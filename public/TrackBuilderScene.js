@@ -8,18 +8,21 @@ class TrackBuilderScene extends Phaser.Scene {
     
     this.TRACK_MODE = 0;
     this.TREE_MODE = 1;  
+    this.SHAPE_MODE = 2;
+    this.BUILDING_MODE = 3;
+    this.KERB_MODE = 4;
     this.mode = this.TRACK_MODE;
   }
 
   preload() {
-    this.load.image('grass', `${baseUrl}grass.jpg`);
-    this.load.image('track', `${baseUrl}track.png`);
-    for(let i = 1; i < 20; i++) {
-      this.load.image('car' + i, `${baseUrl}pitstop_car_${i}.png`);  
-    }
-    for(let i = 1; i < 14; i++) {
-      this.load.image('tree' + i, `${baseUrl}tree${i}.png`);  
-    }
+    // this.load.image('grass', `${baseUrl}grass.jpg`);
+    // this.load.image('track', `${baseUrl}track.png`);
+    // for(let i = 1; i < 20; i++) {
+    //   this.load.image('car' + i, `${baseUrl}pitstop_car_${i}.png`);  
+    // }
+    // for(let i = 1; i < 14; i++) {
+    //   this.load.image('tree' + i, `${baseUrl}tree${i}.png`);  
+    // }
   }
 
   create() {
@@ -40,8 +43,6 @@ class TrackBuilderScene extends Phaser.Scene {
             
     this.scale.on('resize', this.resize, this);    
     this.shift = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);     
-    
-    this.background = this.add.tileSprite(0, 0, 2048, 2048, this.track.bgTexture).setOrigin(0, 0);
     
     this.input.keyboard.on('keydown', (key) =>  { 
       if(key.code === "Minus") { this.cameras.main.zoom -= 0.1; }
@@ -77,49 +78,37 @@ class TrackBuilderScene extends Phaser.Scene {
 //       this.cameras.main.y = pointer.worldY;
 //     });       
     
+    this.shapePoints = [];
+    
     this.input.on('pointerup', (pointer) => {     
       
       if(this.mode === this.TRACK_MODE) {
         if(this.track.isOpen && !this.dragOn)
           this.track.points.push(new Phaser.Math.Vector2(pointer.worldX, pointer.worldY));
-        else if(this.shapePoints) {
-          this.graphics.fillStyle(0xffffff, 1);
-          this.graphics.fillPoints(this.shapePoints);
-          this.shapePoints = null;
-        }
       }
       else if(this.mode === this.TREE_MODE) {
         const tree = new Phaser.Math.Vector2(pointer.worldX, pointer.worldY);
         tree.angle = Math.random() * 180;
         tree.i = Math.ceil(Math.random() * 13);
         this.track.trees.push(tree);
+      } 
+      else if(this.mode === this.SHAPE_MODE) {
+        if(!this.currentShape) {
+          this.currentShape = { points: [] };
+        }
+        this.currentShape.points.push(pointer.position);
+        this.graphics.fillStyle(0xffffff, 1);
+        this.graphics.fillCircle(pointer.worldX, pointer.worldY, 20);
+        this.graphics.fillStyle(0xffffff, 1);
+        this.graphics.fillPoints(this.currentShape.points);
       }
       
       this.drawTrack();
       if(this.track.points.length > 1) {
         const spline = new Phaser.Curves.Spline(this.track.points);
         const bounds = spline.getBounds();
-        this.background.x = bounds.x - this.margin;
-        this.background.y = bounds.y - this.margin;
-        this.background.width = bounds.width + this.margin * 2;
-        this.background.height = this.track.bgHeight = bounds.height + this.margin * 2;
-        this.track.bgSize = [this.background.width, this.background.height];
       }
-    });
-    
-    this.input.on('pointerdown', (pointer) => {      
-      if(this.shapeMode)
-        this.shapePoints = [];
-    });
-    
-    this.input.on('pointermove', (pointer) => {      
-      if(this.shapePoints) {
-        this.shapePoints.push(pointer.position);
-        this.graphics.fillStyle(0xffffff, 1);
-        this.graphics.fillCircle(pointer.worldX, pointer.worldY, 2 / this.cameras.main.zoom, 2 / this.cameras.main.zoom);
-      }
-    });
-    
+    });      
     
     // @TODO draw bitmaps for sand etc
 //     var rt = this.make.renderTexture({ 
@@ -146,6 +135,16 @@ class TrackBuilderScene extends Phaser.Scene {
   update () {
   }
   
+  reverse() {
+    this.track.isReverse = !this.track.isReverse;
+    this.drawTrack();
+  }
+  
+  setMode(mode) {
+    this.mode = mode;
+    this.drawTrack();
+  }
+  
   resize (gameSize, baseSize, displaySize, resolution) {
     var width = gameSize.width;
     var height = gameSize.height;
@@ -157,12 +156,15 @@ class TrackBuilderScene extends Phaser.Scene {
     graphicsGen.fillStyle(0xffffff);
     graphicsGen.fillCircle(this.cpSize / 2, this.cpSize / 2, this.cpSize / 2, this.cpSize / 2); 
     graphicsGen.generateTexture('ball', this.cpSize, this.cpSize);
-    this.track.drawGraphicsTextures(this);    
+    // graphicsGen.clear();
+    // graphicsGen.fillStyle(0xffffff);
+    // graphicsGen.fillRectangle(0, 0, 50, 50); 
+    // graphicsGen.generateTexture('arrow', 50, 50);
     graphicsGen.destroy();    
   }
     
   drawSpline() {
-    this.graphics.depth = 10;
+    // this.graphics.depth = 10;
     if(this.track.points.length > 0) {
       this.graphics.fillStyle(0xaaaaaa, 1);
       this.graphics.fillCircle(this.track.points[0].x, this.track.points[0].y, this.track.width / 2 + this.track.borderWidth / 2);
@@ -200,33 +202,29 @@ class TrackBuilderScene extends Phaser.Scene {
   drawTrack() {
     this.graphics.clear();
     this.splinePointSprites.clear(true, true);
-    if(this.track.isOpen) 
-      this.drawSpline();
-    else {
-      this.track.draw(this);
-      this.drawCars();
-    }
-    if(this.showControls)
+    this.drawShapes();
+    this.drawSpline();
+    this.drawTrees();
+    this.drawControls();
+    if(this.mode === this.TRACK_MODE)
       this.drawControls();
     else {
       this.clearControls();
     }
-    this.track.drawTrees(this);
   }
     
-  drawCars() {
-    let i = 0;
-    this.carSprites.clear(true, true);
-      
-    this.track.gridPositions.forEach(sp => {
-      const carSprite = this.add.sprite(sp.x, sp.y, 'car' + ++i);
-      carSprite.scale = 0.08;
-      carSprite.angle = sp.angle;
-      carSprite.flipY = true;
-      carSprite.depth = 25;
-      this.carSprites.add(carSprite);
-    });
-  }
+//   drawCars() {
+//     let i = 0;
+//     this.carSprites.clear(true, true);      
+//     this.track.gridPositions.forEach(sp => {
+//       const carSprite = this.add.sprite(sp.x, sp.y, 'car' + ++i);
+//       carSprite.scale = 0.08;
+//       carSprite.angle = sp.angle;
+//       carSprite.flipY = true;
+//       carSprite.depth = 25;
+//       this.carSprites.add(carSprite);
+//     });
+//   }
   
   clearControls() {
     if(this.controlGraphics)
@@ -237,6 +235,9 @@ class TrackBuilderScene extends Phaser.Scene {
   drawControls() {
     if(!this.controlGraphics)
       this.controlGraphics = this.add.graphics({x: 0, y: 0});
+    if(!this.arrows)
+      this.arrows = this.add.group();
+    this.arrows.clear(true, true);
     this.controlGraphics.clear();
     this.controlGraphics.depth = 16;
     this.splinePointSprites.clear(true, true);
@@ -245,8 +246,42 @@ class TrackBuilderScene extends Phaser.Scene {
       this.addControlPoint(point, i);
     });
     this.controlGraphics.lineStyle(4, 0xffffff, 1);
-    spline.draw(this.controlGraphics, this.track.points.length * 16);
+    if(this.track.points.length > 0) {
+      spline.draw(this.controlGraphics, this.track.points.length * 16);
+      const arrowPoints = spline.getPoints(this.track.points.length * 16);
+      arrowPoints.forEach((point, i) => {
+        if(this.track.points.length > 1 && i + 1 < arrowPoints.length && i % 10 === 0) {
+          let rotation = Phaser.Math.Angle.BetweenPoints(arrowPoints[i], arrowPoints[i + 1]);
+          if(this.track.isReverse)
+            rotation += Math.PI; 
+          const data = [ 0,20, 84,20, 84,0, 120,50, 84,100, 84,80, 0,80 ];
+          const arrow = this.add.polygon(arrowPoints[i].x, arrowPoints[i].y, data, 0xffffff);
+          arrow.rotation = rotation;
+          this.arrows.add(arrow);
+        }
+      });
+    }
   }
+  
+  drawShapes() {
+    this.track.shapes.forEach(shape => {
+      shape.points.forEach(point => {
+        this.graphics.fillStyle(0xffffff, 1);
+        this.graphics.fillCircle(point.x, point.y, 20);
+        this.graphics.fillStyle(0xffffff, 1);
+        this.graphics.fillPoints(shape.points);
+      });
+    });    
+  }
+  
+  drawTrees() {
+    this.track.trees.forEach(tree => {
+      this.graphics.fillStyle(0x888888, 1);
+      this.graphics.fillCircle(tree.x, tree.y, 120);
+      this.graphics.fillStyle(0x008800, 1);
+      this.graphics.fillCircle(tree.x, tree.y, 100);
+    });    
+  }  
   
   addControlPoint(point, i) {
     let cpSprite = this.add.sprite(point.x, point.y, 'ball');
@@ -276,7 +311,7 @@ class TrackBuilderScene extends Phaser.Scene {
 
     cpSprite.setInteractive({ draggable: true });
     cpSprite.on('drag', (pointer, dragX, dragY) => {
-        cpSprite.setPosition(dragX, dragY);
+      cpSprite.setPosition(dragX, dragY);
     });
     cpSprite.on('dragend', (pointer, dragX, dragY) => {
         this.track.points[cpSprite.i].x = cpSprite.x = pointer.worldX
