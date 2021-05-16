@@ -4,7 +4,7 @@ Get out on that track and show them what you can do!
 
 Inspired by top down racers like [Circuit Superstars](https://store.steampowered.com/app/1097130/Circuit_Superstars/), [Real World Racing](https://steamcommunity.com/sharedfiles/filedetails/?id=94564971) and [Ultimate Racing 2D](https://store.steampowered.com/app/808080/Ultimate_Racing_2D/), TrackStar is an attempt to create a semi-realistic car racing simulator that runs in the browser so anyone can hop into a virtual car anywhere they have access to an internet connection (or even offline via upcoming PWA support).
 
-Try it out [here](http://trackstar.glitch.me/). Use a gamepad, touch, arrows or WASD keys to drive. Enjoy!
+Try it out [here](http://trackstar.glitch.me/).  Use a gamepad, touch, arrows or WASD keys to drive.  Enjoy!
 
 Also check out the track editor [here](http://trackstar.glitch.me/editor)!
 
@@ -30,8 +30,12 @@ Use mouse wheel or + and - keys to zoom in and out.
 
 ## Credits
 
-Borrowing physics code from [pakastins](https://github.com/pakastin) amazing [car.js.org](https://car.js.org/), TrackStar is being developed online via [Glitch](https://glitch.com/) and is built using modern [Web Standards](https://www.w3.org/standards/) based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
+Borrowing initial physics code from [pakastins](https://github.com/pakastin) amazing [car.js.org](https://car.js.org/), TrackStar is being developed online at [Glitch.com](https://glitch.com/) using modern [Web Standards](https://www.w3.org/standards/) based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
 
-Thanks to [looneybits](https://opengameart.org/users/looneybits), [Prime_8](https://opengameart.org/users/prime8) and [qubodup](https://opengameart.org/users/qubodup) over at [OpenGameArt.com](https://opengameart.org/) for the excellent graphics and audio work.
+Thanks to the following [OpenGameArt.com](https://opengameart.org/) contributors for the excellent graphics and audio assets.
+* [looneybits](https://opengameart.org/users/looneybits)
+* [Prime_8](https://opengameart.org/users/prime8)
+* [davis123](https://opengameart.org/users/davis123) 
+* [qubodup](https://opengameart.org/users/qubodup) 
 
 Satellite imagery is courtesy of [Google Earth](https://www.google.com/earth/).
