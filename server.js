@@ -13,6 +13,10 @@ app.get("/editor", (request, response) => {
   response.sendFile(__dirname + "/views/editor.html");
 });
 
+app.get("/intro", (request, response) => {
+  response.sendFile(__dirname + "/views/intro.html");
+});
+
 app.post("/tracks", (request, response) => {
   const track = request.body;
   track.id = Date.now();
