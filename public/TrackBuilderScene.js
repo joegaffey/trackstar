@@ -248,9 +248,9 @@ class TrackBuilderScene extends Phaser.Scene {
     this.controlGraphics.lineStyle(4, 0xffffff, 1);
     if(this.track.points.length > 0) {
       spline.draw(this.controlGraphics, this.track.points.length * 16);
-      const arrowPoints = spline.getPoints(this.track.points.length * 16);
+      const arrowPoints = spline.getDistancePoints(50);
       arrowPoints.forEach((point, i) => {
-        if(this.track.points.length > 1 && i + 1 < arrowPoints.length && i % 10 === 0) {
+        if(i > 1 && this.track.points.length > 1 && i + 1 < arrowPoints.length && i % 10 === 0) {
           let rotation = Phaser.Math.Angle.BetweenPoints(arrowPoints[i], arrowPoints[i + 1]);
           if(this.track.isReverse)
             rotation += Math.PI; 
