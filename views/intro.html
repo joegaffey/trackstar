@@ -13,7 +13,7 @@ body {
   margin:0; 
   background-color: #010101; 
 	color: #f2f2f2;
-  min-width: 400px;
+  min-width: 300px;
 }
 
 .quote {
@@ -62,7 +62,7 @@ body {
 .text {  
   font-size: 15px;
   padding: 50px;
-  height: 40px;
+  padding-bottom: 10px;
   text-align: center;
   font-style: oblique;
 }
@@ -96,7 +96,7 @@ body {
 
 .attributed {
   font-size: 12px;
-  padding: 30px;
+  padding: 10px;
   height: 20px;
   text-align: center;
   font-weight: bold;
@@ -167,13 +167,7 @@ body {
   <a class="next" onclick="advanceQuotes(1)">&#10095;</a>
 </div>
 
-<div style="text-align:center">
-  <span class="dot" onclick="currentQuote(1)"></span> 
-  <span class="dot" onclick="currentQuote(2)"></span> 
-  <span class="dot" onclick="currentQuote(3)"></span> 
-  <span class="dot" onclick="currentQuote(4)"></span> 
-  <span class="dot" onclick="currentQuote(5)"></span> 
-</div>
+<div class="dots" style="text-align:center"></div>
   
 <div class="links fade">
   <a href="./">Mondello</a>
@@ -183,8 +177,10 @@ body {
 
 <script>
 var quoteIndex = 1;
+  
+addDots();
 showQuotes(quoteIndex);
-
+  
 function advanceQuotes(n) {
   showQuotes(quoteIndex += n);
 }
@@ -192,6 +188,14 @@ function advanceQuotes(n) {
 function currentQuote(n) {
   showQuotes(quoteIndex = n);
 }
+  
+function addDots() {
+  const quotes = document.querySelectorAll('.quote');
+  const dots = document.querySelector('.dots');
+  for (i = 0; i < quotes.length; i++) {
+    dots.innerHTML += `<span class="dot" onclick="currentQuote(${i})"></span>`;
+  }
+}  
 
 function showQuotes(n) {
   let i;
