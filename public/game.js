@@ -98,6 +98,7 @@ function init() {
     type: Phaser.WEBGL,
     width: window.innerWidth,
     height: window.innerHeight,
+    multiTexture: true,
     input: {
       gamepad: true
     },

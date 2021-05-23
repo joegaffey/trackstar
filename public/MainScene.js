@@ -68,13 +68,14 @@ class MainScene extends Phaser.Scene {
     this.setupCar(this.car, 0);
     
     this.aiCars = [];        
-    // this.addAICars(2);        
+    // this.addAICars(12);        
         
     this.engineSound = this.sound.add('engine');
     this.engineSound.rate = this.car.minEngineSpeed / this.car.engineSoundFactor;
     this.engineSound.play({loop: true, volume: 0.1});
     
     this.cameras.main.startFollow(this.car.carSprite); 
+    this.camFollow = -1;
     // this.cameras.main.startFollow(this.aiCars[1].carSprite); 
     
     this.carEmitter = this.getCarEmitter();
@@ -113,7 +114,7 @@ class MainScene extends Phaser.Scene {
     car.tyresSprite.scaleX = car.tyresSprite.scaleY = car.scale;
     car.tyresSprite.flipY = true;
     
-    car.shadow = this.add.sprite(0, 0, 'car');
+    car.shadow = this.add.sprite(0, 0, 'car1');
     car.shadow.setOrigin(0.8, 0.6);
     car.shadow.scaleX = car.shadow.scaleY = car.scale;
     car.shadow.flipY = true;
@@ -184,6 +185,27 @@ class MainScene extends Phaser.Scene {
   getCarEmitter() {
     const particles = this.add.particles('dust');
     particles.setDepth(35);
+    
+    // let alphaConfig = {
+    //   onEmit: (particle, key, t, value) => {
+    //     if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
+    //       return { start: 20 / this.car.surface.particleAlpha, end: 0, ease: 'Linear' };  
+    //     else
+    //       return { start: 200 / this.car.surface.particleAlpha, end: 0, ease: 'Linear' };  
+    //   }
+    // };
+    
+    let alphaConfig ={
+      onEmit: (particle, key, t, value) => {
+        if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
+          return 20 / this.car.surface.particleAlpha;
+        else
+          return 200 / this.car.surface.particleAlpha;  
+      }
+    };
+    
+    // let alphaConfig = { start: 1, end: 0, ease: 'Linear' };
+    
     return particles.createEmitter({
       frequency: 50,
       maxParticles: 40,
@@ -197,27 +219,37 @@ class MainScene extends Phaser.Scene {
           return this.car.velocity * 100;
         }
       },
-      alpha: {
-        onEmit: (particle, key, t, value) => {
-          if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
-            return 20 / this.car.surface.particleAlpha;
-          else
-            return 200 / this.car.surface.particleAlpha;  
-        }
-      },
+      alpha: alphaConfig,
       tint: {
         onEmit: (particle, key, t, value) => {
           return this.car.surface.particleColor;
         }
       },
-      // angle: {
-      //   onEmit: function (particle, key, t, value)  {
-      //     return Math.sin(car.angle)  * 360;
-      //   }
-      // },
-      scale: { start: 0.1 * this.track.scale, end: 1.0 * this.track.scale },
+      scale: { start: 0.1 * this.track.scale, end: 0.5 * this.track.scale },
       blendMode: 'NORMAL'
     });
+  }
+  
+  camNext() {
+    this.camFollow++;
+    if(this.camFollow < this.aiCars.length)
+      this.cameras.main.startFollow(this.aiCars[this.camFollow].carSprite); 
+    else {
+      this.camFollow = -1;
+      this.cameras.main.startFollow(this.car.carSprite); 
+    }
+  }
+  
+  camPrev() {
+    this.camFollow--;
+    if(this.camFollow === -1)
+      this.cameras.main.startFollow(this.car.carSprite);
+    else if(this.camFollow >= 0)
+      this.cameras.main.startFollow(this.aiCars[this.camFollow].carSprite); 
+    else {
+      this.camFollow = this.aiCars.length -1;
+      this.cameras.main.startFollow(this.aiCars[this.camFollow].carSprite); 
+    }
   }
   
 /////////////////////////////////////////////////////////////////// Main loop ///////////////////////////////////////////////////////////////////////////////
@@ -228,6 +260,9 @@ class MainScene extends Phaser.Scene {
     //   return;
     // else 
     //   this.frameTime = 0;
+    
+    if(this.paused)
+      return;
         
     this.car.brake(controls.joyDown);
     this.car.throttle(controls.joyUp);
@@ -250,24 +285,49 @@ class MainScene extends Phaser.Scene {
         this.updateCar(car, recalc);
       });
     }
+    
+    //Performance fix needed
+    if(!this.aiCars.length > 0) {
+      this.rtTyreMarks.beginDraw();
+      this.drawSkidmarks(this.car);   
+      this.aiCars.forEach(car => {
+        this.drawSkidmarks(car);   
+      });
+      this.rtTyreMarks.endDraw();
+    }
+  }
+  
+  pause() {
+    if(this.paused)
+      this.paused = false;
+    else
+      this.paused = true;
   }
   
   drive(car) {
     let wp = this.wayPoints[car.nextWP];
     const dist = Phaser.Math.Distance.Between(car.x * this.track.scale, car.y * this.track.scale, wp.x, wp.y);
-    const angleToWP = Phaser.Math.Angle.Normalize(Phaser.Math.Angle.Between(car.x * this.track.scale, car.y * this.track.scale, wp.x, wp.y));
-    const angleCar = Phaser.Math.Angle.Normalize(car.angle - Math.PI / 2);
     
-    const angleDelta = this.diff(angleToWP, angleCar);
-    const steerNeeded = Math.abs(angleDelta) > 0.05;
+    if(dist < 500) {
+      car.nextWP++;
+      if(car.nextWP >= this.wayPoints.length)
+        car.nextWP = 0;
+    }
     
-    // console.log(angleDelta + ' ' + car.angularVelocity)
+    let angleToWP = Phaser.Math.Angle.CounterClockwise(Phaser.Math.Angle.Between(car.x * this.track.scale, car.y * this.track.scale, wp.x, wp.y));
+    const angleCar = Phaser.Math.Angle.CounterClockwise(car.angle - Math.PI / 2);
     
-    if(steerNeeded && angleToWP < angleCar) {
+    let diff = Math.abs(angleToWP - angleCar);
+    if(diff > 3)
+      return;
+    
+    let steerNeeded = diff > 0.1;
+    
+    if(steerNeeded && angleToWP > angleCar) {
       car.steerLeft(true);
       car.steerRight(false);
     }
-    else if(steerNeeded && angleToWP > angleCar) {
+    else if(steerNeeded && angleToWP < angleCar) {
       car.steerLeft(false);
       car.steerRight(true);
     }
@@ -277,7 +337,6 @@ class MainScene extends Phaser.Scene {
     }
     
     if(Math.abs(car.angularVelocity) > 0.02 && car.velocity > 0) {
-      console.log('brake')
       car.throttle(false);
       car.brake(true);      
     }
@@ -288,13 +347,6 @@ class MainScene extends Phaser.Scene {
     else {
       car.throttle(false);
       car.brake(false);
-    }
-    
-    if(dist < 500) {
-      car.nextWP++;
-      if(car.nextWP > this.wayPoints.length)
-        car.nextWP = 0;
-      console.log(car.nextWP)
     }
   }
   
@@ -310,8 +362,8 @@ class MainScene extends Phaser.Scene {
     if(recalc)
       this.setSurface(car, px, py);     
     car.update(recalc);    
-    this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;        
-    this.drawSkidmarks(car);    
+    this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;      
+    
     this.updateCarSprite(car);    
   }
   
@@ -336,14 +388,14 @@ class MainScene extends Phaser.Scene {
         car.tyresSprite.alpha = 0.1;
     }
     if(this.track.bgIsTiled) {
-      this.rtTyreMarks.draw(
+      this.rtTyreMarks.batchDraw(
         car.tyresSprite, 
         car.x * this.track.scale,
         car.y * this.track.scale
       );
     }
     else {
-      this.rtTyreMarks.draw(
+      this.rtTyreMarks.batchDraw(
         car.tyresSprite, 
         car.x + (this.map.width / 2),
         car.y + (this.map.width / 2)

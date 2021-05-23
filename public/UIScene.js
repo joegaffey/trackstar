@@ -17,7 +17,8 @@ class UIScene extends Phaser.Scene {
       this.gamepad = pad;      
     }, this);     
     
-    this.mainCamera = this.scene.get('MainScene').cameras.main;
+    this.gameScene = this.scene.get('MainScene')
+    this.mainCamera = this.gameScene.cameras.main;
     
     const box = this.add.rectangle(80, 80, 100, 100, 0x000000);
     box.alpha = 0.6;
@@ -59,6 +60,9 @@ class UIScene extends Phaser.Scene {
     this.input.keyboard.on('keydown', (key) =>  { 
       if(key.code === "Minus") { this.mainCamera.zoom -= 0.1; }
       else if(key.code === "Equal") { this.mainCamera.zoom += 0.1; }
+      else if(key.code === "Enter") { this.gameScene.pause(); }
+      else if(key.code === "BracketRight") { this.gameScene.camNext(); }
+      else if(key.code === "BracketLeft") { this.gameScene.camPrev(); }
     });
     
     // this.text = this.add.text(10, 10, 'Debug', { font: '16px Courier', fill: '#00ff00' });
