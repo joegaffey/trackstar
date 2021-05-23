@@ -74,8 +74,8 @@ class Car {
     // if(this.brakeSkid)
     //   this.angularVelocity /= 1.01;  
     
-    this.x += this.xVelocity;
-    this.y -= this.yVelocity;
+    this.x += this.xVelocity * this.trackScale;
+    this.y -= this.yVelocity * this.trackScale;
     this.angle += this.angularVelocity;    
      
     // console.log(this.x + ' ' + this.y)
