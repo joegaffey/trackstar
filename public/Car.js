@@ -33,15 +33,17 @@ class Car {
   }
   
   steerLeft(input) {
-    if(this.canTurn) {
+    if(this.canTurn)
       this.isTurningLeft = input;
-    }
+    else
+      this.isTurningLeft = false;
   }
   
   steerRight(input) {
-    if(this.canTurn) {
+    if(this.canTurn) 
       this.isTurningRight = input;
-    }
+    else
+      this.isTurningRight = false;
   }
 
   crash() {
@@ -51,54 +53,13 @@ class Car {
   }
 
   update() {   
-    if(this.power * this.engineSpeedFactor < this.minEngineSpeed)
-      this.engineSpeed = this.minEngineSpeed;
-    else if(this.power * this.engineSpeedFactor > this.maxEngineSpeed)
-      this.engineSpeed = this.maxEngineSpeed;
-    else
-      this.engineSpeed = this.power * this.engineSpeedFactor;
+    this.updateEngine();
     
-    this.canTurn = this.power > 0.0025 || this.reverse;    
+    this.updatePower();
+    this.canTurn = this.power > 0.005 || this.reverse > 0.005; 
     
-    if(this.isThrottling) {
-      this.power += Physics.powerFactor * this.isThrottling;
-    } 
-    else {
-      this.power -= Physics.engineBrakingFactor;
-    }
-    if(this.isReversing) {
-      this.reverse += Physics.reverseFactor;
-    } 
-    else {
-      this.reverse -= Physics.engineBrakingFactor;
-    }
-
-    this.power = Math.max(0, Math.min(Physics.maxPower, this.power));
-    this.reverse = Math.max(0, Math.min(Physics.maxReverse, this.reverse));
-
-    const direction = this.power > this.reverse ? 1 : -1;
-
-    if (this.isTurningLeft) {
-      this.angularVelocity -= direction * Physics.turnSpeed * this.isTurningLeft;
-    }
-    if (this.isTurningRight) {
-      this.angularVelocity += direction * Physics.turnSpeed * this.isTurningRight;
-    }
-
-    this.xVelocity += Math.sin(this.angle) * (this.power - this.reverse);
-    this.yVelocity += Math.cos(this.angle) * (this.power - this.reverse);
-    
-    this.velocity = Math.abs(this.xVelocity)**2 + Math.abs(this.yVelocity)** 2;
-    
-    this.x += this.xVelocity;
-    this.y -= this.yVelocity;
-    this.angle += this.angularVelocity;
-    
-    this.xVelocity *= this.surface.drag;
-    this.yVelocity *= this.surface.drag;
-    
-    this.angularVelocity *= this.surface.angularDrag;    
-    // console.log(this.x + ' ' + this.y)
+    this.updateAngularVelocity();
+    this.updateVelocity();
         
     this.curveSkid = this.angularVelocity < -0.015 || this.angularVelocity > 0.015;
     this.powerSkid = this.isThrottling && (this.power > 0.02 && this.velocity < 2);
@@ -112,5 +73,47 @@ class Car {
     //   this.angularVelocity *= 1.05;  
     // if(this.brakeSkid)
     //   this.angularVelocity /= 1.01;  
+    
+    this.x += this.xVelocity;
+    this.y -= this.yVelocity;
+    this.angle += this.angularVelocity;    
+     
+    // console.log(this.x + ' ' + this.y)
+  }
+  
+  updateEngine() {
+    if(this.power * this.engineSpeedFactor < this.minEngineSpeed)
+      this.engineSpeed = this.minEngineSpeed;
+    else if(this.power * this.engineSpeedFactor > this.maxEngineSpeed)
+      this.engineSpeed = this.maxEngineSpeed;
+    else
+      this.engineSpeed = this.power * this.engineSpeedFactor;
+  }
+  
+  updatePower() {
+    this.isThrottling ? this.power += Physics.powerFactor * this.isThrottling : this.power -= Physics.engineBrakingFactor;
+    this.isReversing ? this.reverse += Physics.reverseFactor : this.reverse -= Physics.engineBrakingFactor;
+
+    this.power = Math.max(0, Math.min(Physics.maxPower, this.power));
+    this.reverse = Math.max(0, Math.min(Physics.maxReverse, this.reverse));
+  }
+  
+  updateAngularVelocity() {
+    const direction = this.power > this.reverse ? 1 : -1;
+    if (this.isTurningLeft) {
+      this.angularVelocity -= direction * Physics.turnSpeed * this.isTurningLeft;
+    }
+    if (this.isTurningRight) {
+      this.angularVelocity += direction * Physics.turnSpeed * this.isTurningRight;
+    }
+    this.angularVelocity *= this.surface.angularDrag; 
+  }
+  
+  updateVelocity() {
+    this.xVelocity += Math.sin(this.angle) * (this.power - this.reverse);
+    this.yVelocity += Math.cos(this.angle) * (this.power - this.reverse);
+    this.xVelocity *= this.surface.drag;
+    this.yVelocity *= this.surface.drag;
+    this.velocity = Math.abs(this.xVelocity)**2 + Math.abs(this.yVelocity)**2;
   }
 }
