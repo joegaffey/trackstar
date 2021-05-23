@@ -68,7 +68,6 @@ class MainScene extends Phaser.Scene {
     this.setupCar(this.car, 0);
     
     this.aiCars = [];        
-    // this.addAICars(12);        
         
     this.engineSound = this.sound.add('engine');
     this.engineSound.rate = this.car.minEngineSpeed / this.car.engineSoundFactor;
@@ -76,7 +75,6 @@ class MainScene extends Phaser.Scene {
     
     this.cameras.main.startFollow(this.car.carSprite); 
     this.camFollow = -1;
-    // this.cameras.main.startFollow(this.aiCars[1].carSprite); 
     
     this.carEmitter = this.getCarEmitter();
     this.carEmitter.startFollow(this.car.carSprite);
@@ -92,41 +90,47 @@ class MainScene extends Phaser.Scene {
     else
       this.rtTyreMarks.setOrigin(0.5, 0.5);
     
-    if(this.track.points.length > 0)
-      this.startRace();
-    
     this.frameSkip = 0;
     this.frameCount = 0;    
   }
   
   addAICars(count) {
-    for(let i = 1; i <= count; i++)
-      this.aiCars.push(this.setupCar(this.getCar(i), i));        
+    for(let i = 1; i <= count; i++) {
+      if(this.track.gridPositions.length > this.aiCars.length + 1)
+        this.aiCars.push(this.setupCar(this.getCar(this.aiCars.length + 1), this.aiCars.length + 1));        
+      else
+        alert('No free pit boxes');
+    }
   }
   
   setupCar(car, i) {
-    car.x = this.track.gridPositions[i].x / this.track.scale;
-    car.y = this.track.gridPositions[i].y / this.track.scale;
+    car.x = this.track.gridPositions[i].x;
+    car.y = this.track.gridPositions[i].y;
     car.angle = this.track.gridPositions[i].angle * Math.PI / 180;
     
-    car.tyresSprite = this.add.sprite(0, 0, 'tyres');
+    car.tyresSprite = this.add.sprite(car.x, car.y, 'tyres');
     car.tyresSprite.setOrigin(0.5, 0.5);
     car.tyresSprite.scaleX = car.tyresSprite.scaleY = car.scale;
     car.tyresSprite.flipY = true;
+    car.tyresSprite.rotation = car.angle;
     
-    car.shadow = this.add.sprite(0, 0, 'car1');
+    car.shadow = this.add.sprite(car.x, car.y, 'car1');
     car.shadow.setOrigin(0.8, 0.6);
     car.shadow.scaleX = car.shadow.scaleY = car.scale;
     car.shadow.flipY = true;
     car.shadow.tint = 0x000000;
     car.shadow.alpha = 0.4;
     car.shadow.depth = 28;
+    car.shadow.rotation = car.angle;
 
-    car.carSprite = this.add.sprite(0, 0, car.texture);
+    car.carSprite = this.add.sprite(car.x, car.y, car.texture);
     car.carSprite.setOrigin(0.5, 0.5);
     car.carSprite.scaleX = car.carSprite.scaleY = car.scale;
     car.carSprite.flipY = true;
     car.carSprite.depth = 30; 
+    car.carSprite.rotation = car.angle;
+    
+    car.trackScale = this.track.scale;
     return car;
   }
   
@@ -152,6 +156,9 @@ class MainScene extends Phaser.Scene {
   }
   
   startRace() {
+    if(!this.track.points.length > 0)
+      return;
+    
     let spline = new Phaser.Curves.Spline(this.track.points);
     this.bounds = spline.getBounds();    
     this.track.points.forEach(point => {
@@ -269,20 +276,12 @@ class MainScene extends Phaser.Scene {
     this.car.steerLeft(controls.joyLeft);
     this.car.steerRight(controls.joyRight);
     
-    let recalc = false;
-    this.frameCount++;
-    if(this.frameCount >= this.frameSkip) {
-      recalc = true;
-      this.frameCount = 0;
-    }
-    
-    this.updateCar(this.car, recalc);
+    this.updateCar(this.car);
         
     if(this.racing) {
       this.aiCars.forEach(car => {
-        if(recalc)
-          this.drive(car);
-        this.updateCar(car, recalc);
+        this.drive(car);
+        this.updateCar(car);
       });
     }
     
@@ -306,7 +305,8 @@ class MainScene extends Phaser.Scene {
   
   drive(car) {
     let wp = this.wayPoints[car.nextWP];
-    const dist = Phaser.Math.Distance.Between(car.x * this.track.scale, car.y * this.track.scale, wp.x, wp.y);
+    const dist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
+
     
     if(dist < 500) {
       car.nextWP++;
@@ -314,7 +314,7 @@ class MainScene extends Phaser.Scene {
         car.nextWP = 0;
     }
     
-    let angleToWP = Phaser.Math.Angle.CounterClockwise(Phaser.Math.Angle.Between(car.x * this.track.scale, car.y * this.track.scale, wp.x, wp.y));
+    const angleToWP = Phaser.Math.Angle.CounterClockwise(Phaser.Math.Angle.Between(car.x, car.y, wp.x, wp.y));
     const angleCar = Phaser.Math.Angle.CounterClockwise(car.angle - Math.PI / 2);
     
     let diff = Math.abs(angleToWP - angleCar);
@@ -350,7 +350,7 @@ class MainScene extends Phaser.Scene {
     }
   }
   
-  updateCar(car, recalc) {
+  updateCar(car) {
     let px = (car.carSprite.x / this.map.scale);
     let py = (car.carSprite.y / this.map.scale);
     
@@ -359,9 +359,8 @@ class MainScene extends Phaser.Scene {
       py += (this.map.height / 2);
     }
       
-    if(recalc)
-      this.setSurface(car, px, py);     
-    car.update(recalc);    
+    this.setSurface(car, px, py);     
+    car.update();    
     this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;      
     
     this.updateCarSprite(car);    
@@ -369,8 +368,8 @@ class MainScene extends Phaser.Scene {
   
   updateCarSprite(car) {
     car.carSprite.rotation = car.tyresSprite.rotation = car.shadow.rotation =  car.angle;
-    car.carSprite.x = car.tyresSprite.x = car.shadow.x = car.x * this.track.scale;
-    car.carSprite.y = car.tyresSprite.y = car.shadow.y = car.y * this.track.scale;  
+    car.carSprite.x = car.tyresSprite.x = car.shadow.x = car.x;
+    car.carSprite.y = car.tyresSprite.y = car.shadow.y = car.y;  
   }
   
   drawSkidmarks(car) {
@@ -390,8 +389,8 @@ class MainScene extends Phaser.Scene {
     if(this.track.bgIsTiled) {
       this.rtTyreMarks.batchDraw(
         car.tyresSprite, 
-        car.x * this.track.scale,
-        car.y * this.track.scale
+        car.x,
+        car.y
       );
     }
     else {

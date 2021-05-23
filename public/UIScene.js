@@ -58,11 +58,14 @@ class UIScene extends Phaser.Scene {
       right : Phaser.Input.Keyboard.KeyCodes.D
     });
     this.input.keyboard.on('keydown', (key) =>  { 
+      // console.log(key);
       if(key.code === "Minus") { this.mainCamera.zoom -= 0.1; }
       else if(key.code === "Equal") { this.mainCamera.zoom += 0.1; }
       else if(key.code === "Enter") { this.gameScene.pause(); }
       else if(key.code === "BracketRight") { this.gameScene.camNext(); }
       else if(key.code === "BracketLeft") { this.gameScene.camPrev(); }
+      else if(key.code === "KeyO") { this.gameScene.addAICars(1); }
+      else if(key.code === "KeyP") { this.gameScene.startRace(); }
     });
     
     // this.text = this.add.text(10, 10, 'Debug', { font: '16px Courier', fill: '#00ff00' });
