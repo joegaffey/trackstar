@@ -11,6 +11,7 @@ class Car {
     this.engineSpeedFactor = config.engineSpeedFactor;
     this.engineSoundFactor = config.engineSoundFactor;
     this.scale = config.scale;
+    this.texture = config.texture;
     
     this.xVelocity = 0;
     this.yVelocity = 0;
@@ -21,6 +22,26 @@ class Car {
     this.isThrottling = false;
     this.isReversing = false;
     this.engineSpeed = this.minEngineSpeed * this.engineSpeedFactor;
+  }
+  
+  throttle(input) {
+    this.isThrottling = input;
+  }
+  
+  brake(input) {
+    this.isReversing = input;
+  }
+  
+  steerLeft(input) {
+    if(this.canTurn) {
+      this.isTurningLeft = input;
+    }
+  }
+  
+  steerRight(input) {
+    if(this.canTurn) {
+      this.isTurningRight = input;
+    }
   }
 
   crash() {
@@ -37,32 +58,15 @@ class Car {
     else
       this.engineSpeed = this.power * this.engineSpeedFactor;
     
-    const canTurn = this.power > 0.0025 || this.reverse;
-    const pressingUp = controls.joyUp;
-    const pressingDown = controls.joyDown;
-
-    if (this.isThrottling !== pressingUp || this.isReversing !== pressingDown) {
-      this.isThrottling = pressingUp;
-      this.isReversing = pressingDown;
-    }
-
-    const turnLeft = canTurn && controls.joyLeft;
-    const turnRight = canTurn && controls.joyRight;
-
-    if (this.isTurningLeft !== turnLeft) {
-      this.isTurningLeft = turnLeft;
-    }
-    if (this.isTurningRight !== turnRight) {
-      this.isTurningRight = turnRight;
-    }
+    this.canTurn = this.power > 0.0025 || this.reverse;    
     
-    if (this.isThrottling) {
+    if(this.isThrottling) {
       this.power += Physics.powerFactor * this.isThrottling;
     } 
     else {
       this.power -= Physics.engineBrakingFactor;
     }
-    if (this.isReversing) {
+    if(this.isReversing) {
       this.reverse += Physics.reverseFactor;
     } 
     else {
@@ -101,5 +105,12 @@ class Car {
     this.brakeSkid = this.reverse > 0.02 && (this.velocity > 3);
     // if(this.curveSkid || this.powerSkid || this.brakeSkid)
     //   console.log('Skids: ' + this.curveSkid +  ' ' + this.powerSkid +  ' ' + this.brakeSkid)
+    
+    // if(this.powerSkid)
+    //   this.angularVelocity *= 1.03;  
+    // if(this.curveSkid)
+    //   this.angularVelocity *= 1.05;  
+    // if(this.brakeSkid)
+    //   this.angularVelocity /= 1.01;  
   }
 }
