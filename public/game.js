@@ -90,6 +90,7 @@ function init() {
     maxEngineSpeed: 12000,
     engineSpeedFactor: 60000,
     engineSoundFactor: 3500,
+    texture: 'car5',
     scale: 0.02
   });
 

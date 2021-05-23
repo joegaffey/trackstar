@@ -31,11 +31,16 @@ class MainScene extends Phaser.Scene {
       this.load.image('physics', this.physicsUrl);
     }
     
-    this.load.image('car', this.baseUrl + 'pitstop_car_5.png');
     this.load.image('tyres', this.baseUrl + 'tyres.png');
     this.load.image('dust', this.baseUrl + 'dust.png');
     for(let i = 1; i < 14; i++) {
       this.load.image('tree' + i, `${this.baseUrl}tree${i}.png`);  
+    }
+    for(let i = 1; i < 14; i++) {
+      this.load.image('tree' + i, `${this.baseUrl}tree${i}.png`);  
+    }
+    for(let i = 1; i < 20; i++) {
+      this.load.image('car' + i, `${this.baseUrl}pitstop_car_${i}.png`);  
     }
     this.load.audio('engine', [this.baseUrl + 'engine.mp3']);
   }
@@ -59,38 +64,21 @@ class MainScene extends Phaser.Scene {
     }
     
     // this.debugPhysics(); 
+    
+    this.setupCar(this.car, 0);
+    
+    this.aiCars = [];        
+    // this.addAICars(3);        
         
-    this.car.x = this.track.gridPositions[0].x / this.track.scale;
-    this.car.y = this.track.gridPositions[0].y / this.track.scale;
-    this.car.angle = this.track.gridPositions[0].angle * Math.PI / 180;
-    
-    this.tyresSprite = this.add.sprite(0, 0, 'tyres');
-    this.tyresSprite.setOrigin(0.5, 0.5);
-    this.tyresSprite.scaleX = this.tyresSprite.scaleY = this.car.scale;
-    this.tyresSprite.flipY = true;
-    
-    this.shadow = this.add.sprite(0, 0, 'car');
-    this.shadow.setOrigin(0.8, 0.6);
-    this.shadow.scaleX = this.shadow.scaleY = this.car.scale;
-    this.shadow.flipY = true;
-    this.shadow.tint = 0x000000;
-    this.shadow.alpha = 0.4;
-    this.shadow.depth = 28;
-
-    this.carSprite = this.add.sprite(0, 0, 'car');
-    this.carSprite.setOrigin(0.5, 0.5);
-    this.carSprite.scaleX = this.carSprite.scaleY = this.car.scale;
-    this.carSprite.flipY = true;
-    this.carSprite.depth = 30;    
-    
     this.engineSound = this.sound.add('engine');
     this.engineSound.rate = this.car.minEngineSpeed / this.car.engineSoundFactor;
     this.engineSound.play({loop: true, volume: 0.1});
     
-    this.cameras.main.startFollow(this.carSprite); 
+    this.cameras.main.startFollow(this.car.carSprite); 
+    // this.cameras.main.startFollow(this.aiCars[1].carSprite); 
     
     this.carEmitter = this.getCarEmitter();
-    this.carEmitter.startFollow(this.carSprite);
+    this.carEmitter.startFollow(this.car.carSprite);
     
     this.rtTyreMarks = this.make.renderTexture({ 
       x: 0, y: 0,
@@ -102,6 +90,52 @@ class MainScene extends Phaser.Scene {
       this.rtTyreMarks.setOrigin(0, 0);
     else
       this.rtTyreMarks.setOrigin(0.5, 0.5);
+    
+    if(this.track.points.length > 0)
+      this.startRace();
+  }
+  
+  addAICars(count) {
+    for(let i = 1; i <= count; i++)
+      this.aiCars.push(this.setupCar(this.getCar(i), i));        
+  }
+  
+  setupCar(car, i) {
+    car.x = this.track.gridPositions[i].x / this.track.scale;
+    car.y = this.track.gridPositions[i].y / this.track.scale;
+    car.angle = this.track.gridPositions[i].angle * Math.PI / 180;
+    
+    car.tyresSprite = this.add.sprite(0, 0, 'tyres');
+    car.tyresSprite.setOrigin(0.5, 0.5);
+    car.tyresSprite.scaleX = car.tyresSprite.scaleY = car.scale;
+    car.tyresSprite.flipY = true;
+    
+    car.shadow = this.add.sprite(0, 0, 'car');
+    car.shadow.setOrigin(0.8, 0.6);
+    car.shadow.scaleX = car.shadow.scaleY = car.scale;
+    car.shadow.flipY = true;
+    car.shadow.tint = 0x000000;
+    car.shadow.alpha = 0.4;
+    car.shadow.depth = 28;
+
+    car.carSprite = this.add.sprite(0, 0, car.texture);
+    car.carSprite.setOrigin(0.5, 0.5);
+    car.carSprite.scaleX = car.carSprite.scaleY = car.scale;
+    car.carSprite.flipY = true;
+    car.carSprite.depth = 30; 
+    return car;
+  }
+  
+  getCar(index) {
+    return new Car({
+      surface: Physics.tarmac,
+      minEngineSpeed: 3000,
+      maxEngineSpeed: 12000,
+      engineSpeedFactor: 60000,
+      engineSoundFactor: 3500,
+      texture: 'car' + index,
+      scale: this.car.scale
+    });
   }
   
   debugPhysics() {
@@ -112,6 +146,30 @@ class MainScene extends Phaser.Scene {
     this.physicsDebug.depth = 45;
     this.physicsDebug.scaleX = this.physicsDebug.scaleY = this.track.scale;
   }
+  
+  startRace() {
+    let spline = new Phaser.Curves.Spline(this.track.points);
+    this.bounds = spline.getBounds();    
+    this.track.points.forEach(point => {
+      point.x -= this.bounds.x - this.track.margin;
+      point.y -= this.bounds.y - this.track.margin;
+    })
+    
+    spline = new Phaser.Curves.Spline(this.track.points);
+    this.wayPoints = spline.getDistancePoints(200);
+    this.aiCars.forEach(car => car.nextWP = 0); 
+    this.racing = true;
+    // this.debugRacingLine();
+  }
+  
+  debugRacingLine() {
+    const graphics = this.add.graphics();   
+    this.wayPoints.forEach(wp => { 
+      graphics.fillStyle(0xffffff, 1);
+      graphics.fillCircle(wp.x, wp.y, 20);
+    });    
+    graphics.depth = 60;
+  }
 
   update(time, delta) {
     // this.frameTime += delta
@@ -119,66 +177,143 @@ class MainScene extends Phaser.Scene {
     //   return;
     // else 
     //   this.frameTime = 0;
+        
+    this.car.brake(controls.joyDown);
+    this.car.throttle(controls.joyUp);
+    this.car.steerLeft(controls.joyLeft);
+    this.car.steerRight(controls.joyRight);
     
-    let px = (this.carSprite.x / this.map.scale);
-    let py = (this.carSprite.y / this.map.scale);
+    this.updateCar(this.car);
+    
+    if(this.racing) {
+      this.aiCars.forEach(car => {
+        this.drive(car);
+        this.updateCar(car);
+      });
+    }
+  }
+  
+  diff(num1, num2) {
+    if (num1 > num2)
+      return num1 - num2
+    else 
+      return num2 - num1
+  }
+  
+  drive(car) {
+    let wp = this.wayPoints[car.nextWP];
+    const dist = Phaser.Math.Distance.Between(car.x * this.track.scale, car.y * this.track.scale, wp.x, wp.y);
+    const angleToWP = Phaser.Math.Angle.Normalize(Phaser.Math.Angle.Between(car.x * this.track.scale, car.y * this.track.scale, wp.x, wp.y));
+    const angleCar = Phaser.Math.Angle.Normalize(car.angle - Math.PI / 2);
+    
+    const angleDelta = this.diff(angleToWP, angleCar);
+    const steerNeeded = Math.abs(angleDelta) > 0.05;
+    
+    // console.log(angleDelta + ' ' + car.angularVelocity)
+    
+    if(steerNeeded && angleToWP < angleCar) {
+      car.steerLeft(true);
+      car.steerRight(false);
+    }
+    else if(steerNeeded && angleToWP > angleCar) {
+      car.steerLeft(false);
+      car.steerRight(true);
+    }
+    else {
+      car.steerLeft(false);
+      car.steerRight(false);      
+    }
+    
+    if(Math.abs(car.angularVelocity) > 0.02 && car.velocity > 0) {
+      console.log('brake')
+      car.throttle(false);
+      car.brake(true);      
+    }
+    else if(Math.abs(car.angularVelocity) < 0.01) {
+      car.throttle(true);
+      car.brake(false);
+    }
+    else {
+      car.throttle(false);
+      car.brake(false);
+    }
+    
+    if(dist < 500) {
+      car.nextWP++;
+      if(car.nextWP > this.wayPoints.length)
+        car.nextWP = 0;
+      console.log(car.nextWP)
+    }
+  }
+  
+  updateCar(car) {
+    let px = (car.carSprite.x / this.map.scale);
+    let py = (car.carSprite.y / this.map.scale);
     
     if(!this.track.bgIsTiled) {
       px += (this.map.width / 2);
       py += (this.map.height / 2);
     }
       
-    const surfacePhysicsPixel = this.textures.getPixel(px, py, 'physics');
-
-    if(surfacePhysicsPixel) {
-      if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
-        this.car.surface = Physics.tarmac;
-      else if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 0)
-        this.car.surface = Physics.sand;
-      else if(surfacePhysicsPixel.r == 0 &&  surfacePhysicsPixel.g == 0 && surfacePhysicsPixel.b == 0)
-        this.car.crash();
-      else
-        this.car.surface = Physics.grass;
-      // console.log(this.car.surface)
-    }
-    else 
-      this.car.surface = Physics.tarmac;
-    
-    this.car.update();
-    
-    this.engineSound.rate = this.car.engineSpeed / this.car.engineSoundFactor;
-        
-    this.tyresSprite.tint = 0x000000;
-    if(this.car.surface.type !== Physics.surface.TARMAC) {    
-      this.tyresSprite.alpha = 0.2;
-      this.tyresSprite.tint = this.car.surface.skidMarkColor;
+    this.setSurface(car, px, py);     
+    car.update();    
+    this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;        
+    this.drawSkidmarks(car);    
+    this.updateCarSprite(car);    
+  }
+  
+  updateCarSprite(car) {
+    car.carSprite.rotation = car.tyresSprite.rotation = car.shadow.rotation =  car.angle;
+    car.carSprite.x = car.tyresSprite.x = car.shadow.x = car.x * this.track.scale;
+    car.carSprite.y = car.tyresSprite.y = car.shadow.y = car.y * this.track.scale;  
+  }
+  
+  drawSkidmarks(car) {
+    car.tyresSprite.tint = 0x000000;
+    if(car.surface.type !== Physics.surface.TARMAC) {    
+      car.tyresSprite.alpha = 0.2;
+      car.tyresSprite.tint = car.surface.skidMarkColor;
     } 
     else { 
-      this.tyresSprite.alpha = 0.01;
-      if(this.car.curveSkid || this.car.brakeSkid) {
-        this.tyresSprite.alpha = 0.3;
+      car.tyresSprite.alpha = 0.01;
+      if(car.curveSkid || car.brakeSkid) {
+        car.tyresSprite.alpha = 0.3;
       }
-      if(this.car.powerSkid)
-        this.tyresSprite.alpha = 0.1;
+      if(car.powerSkid)
+        car.tyresSprite.alpha = 0.1;
     }
     if(this.track.bgIsTiled) {
       this.rtTyreMarks.draw(
-        this.tyresSprite, 
-        this.car.x * this.track.scale,
-        this.car.y * this.track.scale
+        car.tyresSprite, 
+        car.x * this.track.scale,
+        car.y * this.track.scale
       );
     }
     else {
       this.rtTyreMarks.draw(
-        this.tyresSprite, 
-        this.car.x + (this.map.width / 2),
-        this.car.y + (this.map.width / 2)
+        car.tyresSprite, 
+        car.x + (this.map.width / 2),
+        car.y + (this.map.width / 2)
       );
     }
-    
-    this.carSprite.rotation = this.tyresSprite.rotation = this.shadow.rotation =  this.car.angle;
-    this.carSprite.x = this.tyresSprite.x = this.shadow.x = this.car.x * this.track.scale;
-    this.carSprite.y = this.tyresSprite.y = this.shadow.y = this.car.y * this.track.scale;  
+  }
+  
+  setSurface(car, px, py) {
+    const surfacePhysicsPixel = this.textures.getPixel(px, py, 'physics');
+
+    if(surfacePhysicsPixel) {
+      if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
+        car.surface = Physics.tarmac;
+      else if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 0)
+        car.surface = Physics.sand;
+      else if(surfacePhysicsPixel.r == 0 &&  surfacePhysicsPixel.g == 0 && surfacePhysicsPixel.b == 0)
+        car.crash();
+      else
+        car.surface = Physics.grass;
+      // console.log(car.surface)
+    }
+    else 
+      car.surface = Physics.tarmac;
   }
   
   getCarEmitter() {
