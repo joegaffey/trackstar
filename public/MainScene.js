@@ -68,7 +68,7 @@ class MainScene extends Phaser.Scene {
     this.setupCar(this.car, 0);
     
     this.aiCars = [];        
-    // this.addAICars(3);        
+    // this.addAICars(2);        
         
     this.engineSound = this.sound.add('engine');
     this.engineSound.rate = this.car.minEngineSpeed / this.car.engineSoundFactor;
@@ -93,6 +93,9 @@ class MainScene extends Phaser.Scene {
     
     if(this.track.points.length > 0)
       this.startRace();
+    
+    this.frameSkip = 0;
+    this.frameCount = 0;    
   }
   
   addAICars(count) {
@@ -170,7 +173,55 @@ class MainScene extends Phaser.Scene {
     });    
     graphics.depth = 60;
   }
-
+  
+  diff(num1, num2) {
+    if (num1 > num2)
+      return num1 - num2
+    else 
+      return num2 - num1
+  }
+  
+  getCarEmitter() {
+    const particles = this.add.particles('dust');
+    particles.setDepth(35);
+    return particles.createEmitter({
+      frequency: 50,
+      maxParticles: 40,
+      speed: {
+        onEmit: (particle, key, t, value) => {
+            return this.car.velocity;
+        }
+      },
+      lifespan: {
+        onEmit: (particle, key, t, value) => {
+          return this.car.velocity * 100;
+        }
+      },
+      alpha: {
+        onEmit: (particle, key, t, value) => {
+          if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
+            return 20 / this.car.surface.particleAlpha;
+          else
+            return 200 / this.car.surface.particleAlpha;  
+        }
+      },
+      tint: {
+        onEmit: (particle, key, t, value) => {
+          return this.car.surface.particleColor;
+        }
+      },
+      // angle: {
+      //   onEmit: function (particle, key, t, value)  {
+      //     return Math.sin(car.angle)  * 360;
+      //   }
+      // },
+      scale: { start: 0.1 * this.track.scale, end: 1.0 * this.track.scale },
+      blendMode: 'NORMAL'
+    });
+  }
+  
+/////////////////////////////////////////////////////////////////// Main loop ///////////////////////////////////////////////////////////////////////////////
+  
   update(time, delta) {
     // this.frameTime += delta
     // if(this.frameTime < 16.5) 
@@ -183,21 +234,22 @@ class MainScene extends Phaser.Scene {
     this.car.steerLeft(controls.joyLeft);
     this.car.steerRight(controls.joyRight);
     
-    this.updateCar(this.car);
+    let recalc = false;
+    this.frameCount++;
+    if(this.frameCount >= this.frameSkip) {
+      recalc = true;
+      this.frameCount = 0;
+    }
     
+    this.updateCar(this.car, recalc);
+        
     if(this.racing) {
       this.aiCars.forEach(car => {
-        this.drive(car);
-        this.updateCar(car);
+        if(recalc)
+          this.drive(car);
+        this.updateCar(car, recalc);
       });
     }
-  }
-  
-  diff(num1, num2) {
-    if (num1 > num2)
-      return num1 - num2
-    else 
-      return num2 - num1
   }
   
   drive(car) {
@@ -246,7 +298,7 @@ class MainScene extends Phaser.Scene {
     }
   }
   
-  updateCar(car) {
+  updateCar(car, recalc) {
     let px = (car.carSprite.x / this.map.scale);
     let py = (car.carSprite.y / this.map.scale);
     
@@ -255,8 +307,9 @@ class MainScene extends Phaser.Scene {
       py += (this.map.height / 2);
     }
       
-    this.setSurface(car, px, py);     
-    car.update();    
+    if(recalc)
+      this.setSurface(car, px, py);     
+    car.update(recalc);    
     this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;        
     this.drawSkidmarks(car);    
     this.updateCarSprite(car);    
@@ -314,44 +367,5 @@ class MainScene extends Phaser.Scene {
     }
     else 
       car.surface = Physics.tarmac;
-  }
-  
-  getCarEmitter() {
-    const particles = this.add.particles('dust');
-    particles.setDepth(35);
-    return particles.createEmitter({
-      frequency: 50,
-      maxParticles: 40,
-      speed: {
-        onEmit: (particle, key, t, value) => {
-            return this.car.velocity;
-        }
-      },
-      lifespan: {
-        onEmit: (particle, key, t, value) => {
-          return this.car.velocity * 100;
-        }
-      },
-      alpha: {
-        onEmit: (particle, key, t, value) => {
-          if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
-            return 20 / this.car.surface.particleAlpha;
-          else
-            return 200 / this.car.surface.particleAlpha;  
-        }
-      },
-      tint: {
-        onEmit: (particle, key, t, value) => {
-          return this.car.surface.particleColor;
-        }
-      },
-      // angle: {
-      //   onEmit: function (particle, key, t, value)  {
-      //     return Math.sin(car.angle)  * 360;
-      //   }
-      // },
-      scale: { start: 0.1 * this.track.scale, end: 1.0 * this.track.scale },
-      blendMode: 'NORMAL'
-    });
   }
 }
