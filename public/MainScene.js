@@ -65,8 +65,8 @@ class MainScene extends Phaser.Scene {
     
     // this.debugPhysics(); 
     
+    this.emittters = [];
     this.setupCar(this.car, 0);
-    
     this.aiCars = [];        
         
     this.engineSound = this.sound.add('engine');
@@ -75,9 +75,6 @@ class MainScene extends Phaser.Scene {
     
     this.cameras.main.startFollow(this.car.carSprite); 
     this.camFollow = -1;
-    
-    this.carEmitter = this.getCarEmitter();
-    this.carEmitter.startFollow(this.car.carSprite);
     
     this.rtTyreMarks = this.make.renderTexture({ 
       x: 0, y: 0,
@@ -131,6 +128,10 @@ class MainScene extends Phaser.Scene {
     car.carSprite.depth = 30; 
     car.carSprite.rotation = car.angle;
     
+    car.carEmitter = this.getCarEmitter(car);
+    car.carEmitter.startFollow(car.carSprite);
+    this.emittters.push(car.carEmitter);
+        
     car.trackScale = this.track.scale;
     return car;
   }
@@ -190,8 +191,9 @@ class MainScene extends Phaser.Scene {
       return num2 - num1
   }
   
-  getCarEmitter() {
+  getCarEmitter(car) {
     const particles = this.add.particles('dust');
+    particles.car = car;
     particles.setDepth(35);
     
     // let alphaConfig = {
@@ -205,10 +207,10 @@ class MainScene extends Phaser.Scene {
     
     let alphaConfig ={
       onEmit: (particle, key, t, value) => {
-        if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
-          return 20 / this.car.surface.particleAlpha;
+        if(particles.car.surface.type === Physics.surface.TARMAC && particles.car.isSkidding)  
+          return 20 / particles.car.surface.particleAlpha;
         else
-          return 200 / this.car.surface.particleAlpha;  
+          return 200 / particles.car.surface.particleAlpha;  
       }
     };
     
@@ -219,18 +221,18 @@ class MainScene extends Phaser.Scene {
       maxParticles: 40,
       speed: {
         onEmit: (particle, key, t, value) => {
-            return this.car.velocity;
+            return particles.car.velocity;
         }
       },
       lifespan: {
         onEmit: (particle, key, t, value) => {
-          return this.car.velocity * 100;
+          return particles.car.velocity * 100;
         }
       },
       alpha: alphaConfig,
       tint: {
         onEmit: (particle, key, t, value) => {
-          return this.car.surface.particleColor;
+          return particles.car.surface.particleColor;
         }
       },
       scale: { start: 0.1 * this.track.scale, end: 0.5 * this.track.scale },
@@ -320,12 +322,22 @@ class MainScene extends Phaser.Scene {
   pause() {
     if(this.paused) {
       this.paused = false;
+      this.resumeEmitters();
       this.engineSound.resume();
     }
     else {
       this.paused = true; 
+      this.pauseEmitters();
       this.engineSound.pause();
     }
+  }
+  
+  resumeEmitters() {
+    this.emittters.forEach(emitter => { emitter.resume(); });
+  }
+  
+  pauseEmitters() {
+    this.emittters.forEach(emitter => { emitter.pause(); });
   }
   
   drive(car) {

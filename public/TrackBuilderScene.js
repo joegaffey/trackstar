@@ -156,10 +156,6 @@ class TrackBuilderScene extends Phaser.Scene {
     graphicsGen.fillStyle(0xffffff);
     graphicsGen.fillCircle(this.cpSize / 2, this.cpSize / 2, this.cpSize / 2, this.cpSize / 2); 
     graphicsGen.generateTexture('ball', this.cpSize, this.cpSize);
-    // graphicsGen.clear();
-    // graphicsGen.fillStyle(0xffffff);
-    // graphicsGen.fillRectangle(0, 0, 50, 50); 
-    // graphicsGen.generateTexture('arrow', 50, 50);
     graphicsGen.destroy();    
   }
     
