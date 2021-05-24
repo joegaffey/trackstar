@@ -297,10 +297,14 @@ class MainScene extends Phaser.Scene {
   }
   
   pause() {
-    if(this.paused)
+    if(this.paused) {
       this.paused = false;
-    else
-      this.paused = true;
+      this.engineSound.resume();
+    }
+    else {
+      this.paused = true; 
+      this.engineSound.pause();
+    }
   }
   
   drive(car) {
