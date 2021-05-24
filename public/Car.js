@@ -52,7 +52,7 @@ class Car {
     this.power = 0;
   }
 
-  update() {   
+  update() {
     this.updateEngine();
     
     this.updatePower();

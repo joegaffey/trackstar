@@ -104,6 +104,7 @@ class MainScene extends Phaser.Scene {
   }
   
   setupCar(car, i) {
+    car.index = i;
     car.x = this.track.gridPositions[i].x;
     car.y = this.track.gridPositions[i].y;
     car.angle = this.track.gridPositions[i].angle * Math.PI / 180;
@@ -249,10 +250,12 @@ class MainScene extends Phaser.Scene {
   
   camPrev() {
     this.camFollow--;
-    if(this.camFollow === -1)
+    if(this.camFollow === -1) {
       this.cameras.main.startFollow(this.car.carSprite);
-    else if(this.camFollow >= 0)
+    }
+    else if(this.camFollow >= 0) {
       this.cameras.main.startFollow(this.aiCars[this.camFollow].carSprite); 
+    }
     else {
       this.camFollow = this.aiCars.length -1;
       this.cameras.main.startFollow(this.aiCars[this.camFollow].carSprite); 
@@ -262,6 +265,7 @@ class MainScene extends Phaser.Scene {
 /////////////////////////////////////////////////////////////////// Main loop ///////////////////////////////////////////////////////////////////////////////
   
   update(time, delta) {
+    
     // this.frameTime += delta
     // if(this.frameTime < 16.5) 
     //   return;
@@ -269,7 +273,24 @@ class MainScene extends Phaser.Scene {
     //   this.frameTime = 0;
     
     if(this.paused)
-      return;
+      return;    
+    
+    this.aiCars.forEach(car1 => {
+      car1.warning = false;
+      this.aiCars.forEach(car2 => {
+        if(car1 !== car2 && car1.nextWP && car2.nextWP && car1.nextWP === car2.nextWP) {
+          const dist1 = Phaser.Math.Distance.Between(car1.x, car1.y, car2.x, car2.y);
+          const dist2 = Phaser.Math.Distance.Between(car1.x, car1.y,  this.wayPoints[car1.nextWP].x,  this.wayPoints[car1.nextWP].y);
+          const dist3 = Phaser.Math.Distance.Between(car2.x, car2.y,  this.wayPoints[car1.nextWP].x,  this.wayPoints[car1.nextWP].y);
+          if(dist1 < 100) {
+            if(dist2 > dist3)
+              car1.warning = true;     
+            else
+              car2.warning = true;
+          }
+        }          
+      });  
+    });    
         
     this.car.brake(controls.joyDown);
     this.car.throttle(controls.joyUp);
@@ -344,7 +365,7 @@ class MainScene extends Phaser.Scene {
       car.throttle(false);
       car.brake(true);      
     }
-    else if(Math.abs(car.angularVelocity) < 0.01) {
+    else if(!car.warning && Math.abs(car.angularVelocity) < 0.01) {
       car.throttle(true);
       car.brake(false);
     }
@@ -365,13 +386,14 @@ class MainScene extends Phaser.Scene {
       
     this.setSurface(car, px, py);     
     car.update();    
-    this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;      
+    if(this.camFollow === car.index - 1)
+      this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;      
     
     this.updateCarSprite(car);    
   }
   
   updateCarSprite(car) {
-    car.carSprite.rotation = car.tyresSprite.rotation = car.shadow.rotation =  car.angle;
+    car.carSprite.rotation = car.tyresSprite.rotation = car.shadow.rotation = car.angle;
     car.carSprite.x = car.tyresSprite.x = car.shadow.x = car.x;
     car.carSprite.y = car.tyresSprite.y = car.shadow.y = car.y;  
   }
