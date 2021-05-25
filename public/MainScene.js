@@ -99,8 +99,11 @@ class MainScene extends Phaser.Scene {
     else
       this.tyreMarks.texture.setOrigin(0.5, 0.5);
     
-    this.frameSkip = 0;
-    this.frameCount = 0;    
+    this.hideSpinner();
+  }
+  
+  hideSpinner() {
+    document.querySelector('.spinner').style.display = 'none';
   }
   
   addAICars(count) {
