@@ -5,6 +5,19 @@ class MainScene extends Phaser.Scene {
     this.track = track;
     this.car = car;
     this.baseUrl = baseUrl;
+    
+    this.particles = {};
+    this.particles.NONE = 0;
+    this.particles.USER = 1;
+    this.particles.ALL = 2;
+    this.particles.mode = this.particles.ALL; //All cars by default
+    this.particles.emitters = [];
+    
+    this.tyreMarks = {};
+    this.tyreMarks.NONE = 0;
+    this.tyreMarks.USER = 1;
+    this.tyreMarks.ALL = 2;
+    this.tyreMarks.mode = this.tyreMarks.USER; //User car only by default
   }
 
   preload() {
@@ -65,7 +78,6 @@ class MainScene extends Phaser.Scene {
     
     // this.debugPhysics(); 
     
-    this.emittters = [];
     this.setupCar(this.car, 0);
     this.aiCars = [];        
         
@@ -76,16 +88,16 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.car.carSprite); 
     this.camFollow = -1;
     
-    this.rtTyreMarks = this.make.renderTexture({ 
+    this.tyreMarks.texture = this.make.renderTexture({ 
       x: 0, y: 0,
       width: this.map.width, 
       height: this.map.height,
       depth: 25
     })
     if(this.track.bgIsTiled)
-      this.rtTyreMarks.setOrigin(0, 0);
+      this.tyreMarks.texture.setOrigin(0, 0);
     else
-      this.rtTyreMarks.setOrigin(0.5, 0.5);
+      this.tyreMarks.texture.setOrigin(0.5, 0.5);
     
     this.frameSkip = 0;
     this.frameCount = 0;    
@@ -128,12 +140,16 @@ class MainScene extends Phaser.Scene {
     car.carSprite.depth = 30; 
     car.carSprite.rotation = car.angle;
     
-    car.carEmitter = this.getCarEmitter(car);
-    car.carEmitter.startFollow(car.carSprite);
-    this.emittters.push(car.carEmitter);
-        
+    this.addEmitter(car);
+    
     car.trackScale = this.track.scale;
     return car;
+  }
+  
+  addEmitter(car) {
+    car.emitter = this.getCarEmitter(car);
+    car.emitter.startFollow(car.carSprite);
+    this.particles.emitters.push(car.emitter);
   }
   
   getCar(index) {
@@ -308,38 +324,21 @@ class MainScene extends Phaser.Scene {
       });
     }
     
-    //Performance fix needed
-    if(!this.aiCars.length > 0) {
-      this.rtTyreMarks.beginDraw();
-      this.drawSkidmarks(this.car);   
-      this.aiCars.forEach(car => {
-        this.drawSkidmarks(car);   
-      });
-      this.rtTyreMarks.endDraw();
+    if(this.tyreMarks.mode !== this.tyreMarks.NONE) {
+      this.tyreMarks.texture.beginDraw();
+      if(this.tyreMarks.mode === this.tyreMarks.ALL || 
+         this.tyreMarks.mode === this.tyreMarks.USER) {
+        this.drawSkidmarks(this.car);   
+      }
+      if(this.tyreMarks.mode === this.tyreMarks.ALL) {
+        this.aiCars.forEach(car => {
+          this.drawSkidmarks(car);   
+        });
+      }
+      this.tyreMarks.texture.endDraw();
     }
   }
-  
-  pause() {
-    if(this.paused) {
-      this.paused = false;
-      this.resumeEmitters();
-      this.engineSound.resume();
-    }
-    else {
-      this.paused = true; 
-      this.pauseEmitters();
-      this.engineSound.pause();
-    }
-  }
-  
-  resumeEmitters() {
-    this.emittters.forEach(emitter => { emitter.resume(); });
-  }
-  
-  pauseEmitters() {
-    this.emittters.forEach(emitter => { emitter.pause(); });
-  }
-  
+    
   drive(car) {
     let wp = this.wayPoints[car.nextWP];
     const dist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
@@ -425,14 +424,14 @@ class MainScene extends Phaser.Scene {
         car.tyresSprite.alpha = 0.1;
     }
     if(this.track.bgIsTiled) {
-      this.rtTyreMarks.batchDraw(
+      this.tyreMarks.texture.batchDraw(
         car.tyresSprite, 
         car.x,
         car.y
       );
     }
     else {
-      this.rtTyreMarks.batchDraw(
+      this.tyreMarks.texture.batchDraw(
         car.tyresSprite, 
         car.x + (this.map.width / 2),
         car.y + (this.map.width / 2)
@@ -456,5 +455,44 @@ class MainScene extends Phaser.Scene {
     }
     else 
       car.surface = Physics.tarmac;
+  }
+
+//////////////////////////////////////////// Toggles ////////////////////////////////////////////
+  
+  pause() {
+    if(this.paused) {
+      this.paused = false;
+      this.particles.emitters.forEach(emitter => { emitter.resume(); });
+      this.engineSound.resume();
+    }
+    else {
+      this.paused = true; 
+      this.particles.emitters.forEach(emitter => { emitter.pause(); });
+      this.engineSound.pause();
+    }
+  }
+  
+  toggleTyreMarks() {
+    this.tyreMarks.mode++;
+    if(this.tyreMarks.mode > this.tyreMarks.ALL)
+      this.tyreMarks.mode = this.tyreMarks.NONE;
+  }
+  
+  toggleParticles() {
+    this.particles.mode++;
+    if(this.particles.mode > this.particles.ALL)
+      this.particles.mode = this.particles.NONE;
+    if(this.particles.mode === this.particles.NONE) {
+      this.car.emitter.stop();
+      this.aiCars.forEach(car => { car.emitter.stop(); });
+    }
+    else if(this.particles.mode === this.particles.USER) {
+      this.car.emitter.start();
+      this.aiCars.forEach(car => { car.emitter.stop(); });
+    }
+    else if(this.particles.mode === this.particles.ALL) {
+      this.car.emitter.start();
+      this.aiCars.forEach(car => { car.emitter.start(); });
+    }
   }
 }

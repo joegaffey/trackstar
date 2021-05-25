@@ -64,8 +64,10 @@ class UIScene extends Phaser.Scene {
       else if(key.code === "Enter") { this.gameScene.pause(); }
       else if(key.code === "BracketRight") { this.gameScene.camNext(); }
       else if(key.code === "BracketLeft") { this.gameScene.camPrev(); }
-      else if(key.code === "KeyO") { this.gameScene.addAICars(1); }
-      else if(key.code === "KeyP") { this.gameScene.startRace(); }
+      else if(key.code === "KeyI") { this.gameScene.addAICars(1); }
+      else if(key.code === "KeyO") { this.gameScene.startRace(); }
+      else if(key.code === "KeyP") { this.gameScene.toggleParticles(); }
+      else if(key.code === "KeyT") { this.gameScene.toggleTyreMarks(); }
     });
     
     // this.text = this.add.text(10, 10, 'Debug', { font: '16px Courier', fill: '#00ff00' });
