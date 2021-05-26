@@ -111,7 +111,7 @@ class MainScene extends Phaser.Scene {
       if(this.track.gridPositions.length > this.aiCars.length + 1)
         this.aiCars.push(this.setupCar(this.getCar(this.aiCars.length + 1), this.aiCars.length + 1));        
       else
-        alert('No free pit boxes');
+        this.toast('No free pit boxes');
     }
   }
   
@@ -192,6 +192,17 @@ class MainScene extends Phaser.Scene {
     this.aiCars.forEach(car => car.nextWP = 0); 
     this.racing = true;
     // this.debugRacingLine();
+    
+    this.toast('Go!!!');
+  }
+  
+  toast(text) {
+    const el = document.querySelector('#toast');
+    el.innerText = text;
+    el.classList.add("active");
+    setTimeout(() => { 
+      el.classList.remove("active");
+    }, 3000);
   }
   
   debugRacingLine() {
@@ -472,6 +483,7 @@ class MainScene extends Phaser.Scene {
       this.paused = true; 
       this.particles.emitters.forEach(emitter => { emitter.pause(); });
       this.engineSound.pause();
+      this.toast('Paused');
     }
   }
   
@@ -479,23 +491,32 @@ class MainScene extends Phaser.Scene {
     this.tyreMarks.mode++;
     if(this.tyreMarks.mode > this.tyreMarks.ALL)
       this.tyreMarks.mode = this.tyreMarks.NONE;
+    if(this.tyreMarks.mode === this.tyreMarks.NONE)
+      this.toast('Tyre marks off');
+    else if(this.tyreMarks.mode === this.tyreMarks.USER)
+      this.toast('Tyre marks on - player');
+    else if(this.tyreMarks.mode === this.tyreMarks.ALL)
+      this.toast('Tyre marks on - all');
   }
   
   toggleParticles() {
     this.particles.mode++;
-    if(this.particles.mode > this.particles.ALL)
+    if(this.particles.mode > this.particles.ALL) 
       this.particles.mode = this.particles.NONE;
     if(this.particles.mode === this.particles.NONE) {
       this.car.emitter.stop();
       this.aiCars.forEach(car => { car.emitter.stop(); });
+      this.toast('Particles off');
     }
     else if(this.particles.mode === this.particles.USER) {
       this.car.emitter.start();
       this.aiCars.forEach(car => { car.emitter.stop(); });
+      this.toast('Particles on - player');
     }
     else if(this.particles.mode === this.particles.ALL) {
       this.car.emitter.start();
       this.aiCars.forEach(car => { car.emitter.start(); });
+      this.toast('Particles on - all');
     }
   }
 }

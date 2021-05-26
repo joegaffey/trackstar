@@ -1,7 +1,7 @@
 class UIScene extends Phaser.Scene {
   
   constructor ()  {
-    super({ key: 'UIScene', active: true });
+    super({ key: 'UIScene', active: true, visible: false });
     this.touches = { left: false, right: false, up: false, down: false };
     this.banner = true;
   }
@@ -11,6 +11,7 @@ class UIScene extends Phaser.Scene {
   }
 
   create () {    
+    this.scene.setVisible(false);
     this.gamepad = {};    
     this.input.gamepad.once('down', function (pad, button, index) {
       console.log('Playing with ' + pad.id);
@@ -108,6 +109,7 @@ class UIScene extends Phaser.Scene {
   }  
   
   hideBanner() {
+    this.scene.setVisible(true);
     document.querySelector('.banner').classList.remove('initial');
     this.banner = false;
   }

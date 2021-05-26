@@ -80,3 +80,25 @@ body {
 .spinner span:nth-child(3) { animation-delay: .4s; }
 .spinner span:nth-child(4) { animation-delay: .6s; }
 .spinner span:nth-child(5) { animation-delay: .8s; }
+
+#toast {
+  font-family: helvetica;
+  text-align: center;
+  position: fixed;
+  top: -100px;
+  min-width: 250px;
+  margin-left: -125px;
+  left: 50%;
+  background-color: #111;
+  color: #aaa;
+  font-size: 16px;
+  border-radius: 2px;
+  padding: 16px;
+  transition: top 500ms;
+  user-select: none;
+}
+
+#toast.active {
+  top: 40px;
+  opacity: 1;
+}
