@@ -68,6 +68,7 @@ class MainScene extends Phaser.Scene {
                                      this.track.bounds.width + this.track.margin * 2, 
                                      this.track.bounds.height + this.track.margin * 2, 
                                      this.track.bgTexture);
+      this.map.setTileScale(2);
       this.map.setOrigin(0, 0);
       this.cameras.main.zoom = 0.4;      
     }    
