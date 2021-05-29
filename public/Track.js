@@ -155,9 +155,9 @@ class Track {
     
     edges.forEach((edge, i) => {
       if(i % 2 == 0)
-        graphics.lineStyle(this.width + 20, 0xff0000);
+        graphics.lineStyle(this.width + 20, 0xcc0000);
       else
-        graphics.lineStyle(this.width + 20, 0xffffff);
+        graphics.lineStyle(this.width + 20, 0xcccccc);
       if(i < edges.length - 1) {
         graphics.lineBetween(edges[i].x, edges[i].y, edges[i + 1].x, edges[i + 1].y);
       }
