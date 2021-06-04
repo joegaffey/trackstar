@@ -50,7 +50,6 @@ function getDefaultTrack() {
     isReverse: false,
     isOpen: false,
     points: [],
-    scale: 1,
     width: 200,
     borderWidth: 20,
     pitBoxCount: 20,
@@ -61,12 +60,24 @@ function getDefaultTrack() {
     bgIsTiled: false,
     gridPositions: [{
       x: 0,
-      y: 820,
+      y: 4950,
       angle: -90
     }],
     shapes: [],
     margin: 1024,
     textures: {
+      // small: {
+      //   scale: 3,
+      //   map: baseUrl + 'mondello_international_small.jpg',
+      //   physics: baseUrl + 'mondello_international_physics_small.png'
+      // },
+      // regular: {
+      //   scale: 6,
+      //   map: baseUrl + 'mondello_international.jpg',
+      //   physics: baseUrl + 'mondello_international_physics.png'
+      // },
+      smallScale: 3,
+      regularScale: 6,
       map: {      
         regular: baseUrl + 'mondello_international.jpg',
         small: baseUrl + 'mondello_international_small.jpg'
@@ -91,7 +102,7 @@ function init() {
     engineSpeedFactor: 60000,
     engineSoundFactor: 3500,
     texture: 'car5',
-    scale: 0.02
+    scale: 0.08
   });
 
   const config = {
@@ -106,7 +117,7 @@ function init() {
     //   target: 60,
     //   forceSetTimeOut: true
     // },
-    scene: [MainScene, UIScene]
+    scene: [MainScene, UIScene]    
   }
 
   game = new Phaser.Game(config);

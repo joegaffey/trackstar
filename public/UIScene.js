@@ -18,8 +18,7 @@ class UIScene extends Phaser.Scene {
       this.gamepad = pad;      
     }, this);     
     
-    this.gameScene = this.scene.get('MainScene')
-    this.mainCamera = this.gameScene.cameras.main;
+    this.gameScene = this.scene.get('MainScene');
     
     const box = this.add.rectangle(80, 80, 100, 100, 0x000000);
     box.alpha = 0.6;
@@ -60,11 +59,11 @@ class UIScene extends Phaser.Scene {
     });
     this.input.keyboard.on('keydown', (key) =>  { 
       // console.log(key);
-      if(key.code === "Minus") { this.mainCamera.zoom -= 0.1; }
-      else if(key.code === "Equal") { this.mainCamera.zoom += 0.1; }
+      if(key.code === "Minus") { this.gameScene.camera.zoomOut(); }
+      else if(key.code === "Equal") { this.gameScene.camera.zoomIn(); }
       else if(key.code === "Enter") { this.gameScene.pause(); }
-      else if(key.code === "BracketRight") { this.gameScene.camNext(); }
-      else if(key.code === "BracketLeft") { this.gameScene.camPrev(); }
+      else if(key.code === "BracketRight") { this.gameScene.camera.nextCar(); }
+      else if(key.code === "BracketLeft") { this.gameScene.camera.previousCar(); }
       else if(key.code === "KeyI") { this.gameScene.addAICars(1); }
       else if(key.code === "KeyO") { this.gameScene.startRace(); }
       else if(key.code === "KeyP") { this.gameScene.toggleParticles(); }

@@ -22,6 +22,8 @@ class Car {
     this.isThrottling = false;
     this.isReversing = false;
     this.engineSpeed = this.minEngineSpeed * this.engineSpeedFactor;
+    
+    this.renderScale = 1;
   }
   
   throttle(input) {
@@ -74,8 +76,8 @@ class Car {
     // if(this.brakeSkid)
     //   this.angularVelocity /= 1.01;  
     
-    this.x += this.xVelocity * this.trackScale;
-    this.y -= this.yVelocity * this.trackScale;
+    this.x += this.xVelocity * this.renderScale * 4;
+    this.y -= this.yVelocity * this.renderScale * 4;
     this.angle += this.angularVelocity;    
      
     // console.log(this.x + ' ' + this.y)
