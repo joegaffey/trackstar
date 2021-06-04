@@ -173,16 +173,16 @@ class MainScene extends Phaser.Scene {
     if(this.paused)
       return;    
     
-    this.AI.updateCars();
-        
-    this.car.brake(controls.joyDown);
-    this.car.throttle(controls.joyUp);
-    this.car.steerLeft(controls.joyLeft);
-    this.car.steerRight(controls.joyRight);
-    
-    this.updateCar(this.car);
+    if(!this.car.isAI) {
+      this.car.brake(controls.joyDown);
+      this.car.throttle(controls.joyUp);
+      this.car.steerLeft(controls.joyLeft);
+      this.car.steerRight(controls.joyRight);
+      this.updateCar(this.car);
+    }    
         
     if(this.racing) {
+      this.AI.updateCars();
       this.AI.cars.forEach(car => {
         this.AI.drive(car);
         this.updateCar(car);
@@ -258,8 +258,11 @@ class MainScene extends Phaser.Scene {
   
   addAICars(count) {
     for(let i = 1; i <= count; i++) {
-      if(this.track.gridPositions.length > this.AI.cars.length + 1) {
-        const car = this.setupCar(this.makeCar(this.AI.cars.length + 1), this.AI.cars.length + 1);  
+      let len = this.AI.cars.length + 1;
+      if(this.car.isAI)
+        len--;
+      if(this.track.gridPositions.length > len) {
+        const car = this.setupCar(this.makeCar(len), len);  
         if(this.particles.mode === this.particles.ALL)
           this.car.emitter.start();
         this.AI.cars.push(car);        
@@ -311,5 +314,19 @@ class MainScene extends Phaser.Scene {
   
   hideSpinner() {
     document.querySelector('.spinner').style.display = 'none';
+  }
+  
+  toggleAiDriver() {
+    if(!this.car.isAI) {
+      this.toast('AI is in control of player car');
+      this.car.isAI = true;
+      this.AI.cars.push(this.car);    
+    }
+    else {
+      this.toast('Player is in control of car');
+      this.car.isAI = false;
+      this.AI.cars.push(this.car);
+      this.AI.cars = this.AI.cars.filter(car => car !== this.car)
+    }
   }
 }

@@ -6,6 +6,9 @@ class AI {
   }
   
   drive(car) {
+    if(!car.nextWP)
+      car.nextWP = 0;
+    
     let wp = this.wayPoints[car.nextWP];
     const dist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
     
