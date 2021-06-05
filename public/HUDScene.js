@@ -1,9 +1,8 @@
-class UIScene extends Phaser.Scene {
+class HUDScene extends Phaser.Scene {
   
   constructor ()  {
     super({ key: 'UIScene', active: true, visible: false });
     this.touches = { left: false, right: false, up: false, down: false };
-    this.banner = true;
   }
   
   preload() {
@@ -61,7 +60,7 @@ class UIScene extends Phaser.Scene {
       // console.log(key);
       if(key.code === "Minus") { this.gameScene.camera.zoomOut(); }
       else if(key.code === "Equal") { this.gameScene.camera.zoomIn(); }
-      else if(key.code === "Enter") { this.gameScene.pause(); }
+      else if(key.code === "Enter" || key.code === "Space") { this.gameScene.pause(); }
       else if(key.code === "BracketRight") { this.gameScene.camera.nextCar(); }
       else if(key.code === "BracketLeft") { this.gameScene.camera.previousCar(); }
       else if(key.code === "KeyI") { this.gameScene.addAICars(1); }
@@ -69,6 +68,8 @@ class UIScene extends Phaser.Scene {
       else if(key.code === "KeyP") { this.gameScene.toggleParticles(); }
       else if(key.code === "KeyT") { this.gameScene.toggleTyreMarks(); }
       else if(key.code === "KeyU") { this.gameScene.toggleAiDriver(); }
+      else if(key.code === "KeyR") { this.gameScene.reset(); }
+      else if(key.code === "KeyM") { this.gameScene.UI.mainMenu(); }
     });
     
     // this.text = this.add.text(10, 10, 'Debug', { font: '16px Courier', fill: '#00ff00' });
@@ -79,7 +80,6 @@ class UIScene extends Phaser.Scene {
 
     this.uiSpeed.setText(Math.round(car.velocity * 15));
     if (isMobile) {
-      this.hideBanner();
       this.touches = { left: false, right: false, up: false, down: false };    
     
       if(this.input.pointer1.isDown) {
@@ -102,15 +102,5 @@ class UIScene extends Phaser.Scene {
     controls.joyRight = (this.gamepad.leftStick && this.gamepad.leftStick.x > 0) ||this.gamepad.right || this.wasdKeys.right.isDown || this.arrowKeys.right.isDown || this.touches.right;
     controls.joyUp = this.gamepad.A || this.gamepad.R2 || this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
     controls.joyDown = this.gamepad.B || this.gamepad.L2 || this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
-    
-    if(this.banner && controls.joyUp) {
-      this.hideBanner();
-    }      
   }  
-  
-  hideBanner() {
-    this.scene.setVisible(true);
-    document.querySelector('.banner').classList.remove('initial');
-    this.banner = false;
-  }
 }

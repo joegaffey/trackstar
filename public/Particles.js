@@ -7,12 +7,27 @@ class Particles {
     this.ALL = 2;
     this.mode = this.ALL; //On for All cars by default
     this.emitters = [];    
+    this.particles = [];    
+  }
+  
+  reset() {
+    this.emitters.forEach(em => {
+      em.killAll();      
+      em.remove();      
+    });
+    this.emitters = [];
+      this.particles.forEach(pa => {
+      pa.destroy();   
+    });
+    this.particles = [];
   }
   
   addEmitter(car) {
     const particles = this.scene.add.particles('dust');
     particles.car = car;
     particles.setDepth(35);
+    this.particles.push(particles);
+    
     car.emitter = particles.createEmitter(this.getConfig(particles));
     car.emitter.startFollow(car.carSprite);
     this.emitters.push(car.emitter);
@@ -33,17 +48,17 @@ class Particles {
     if(this.mode === this.NONE) {
       this.scene.car.emitter.stop();
       this.scene.AI.cars.forEach(car => { car.emitter.stop(); });
-      this.scene.toast('Particles off');
+      this.scene.UI.toast('Particles off');
     }
     else if(this.mode === this.USER) {
       this.scene.car.emitter.start();
       this.scene.AI.cars.forEach(car => { car.emitter.stop(); });
-      this.scene.toast('Particles on - player');
+      this.scene.UI.toast('Particles on - player');
     }
     else if(this.mode === this.ALL) {
       this.scene.car.emitter.start();
       this.scene.AI.cars.forEach(car => { car.emitter.start(); });
-      this.scene.toast('Particles on - all');
+      this.scene.UI.toast('Particles on - all');
     }
   }
   

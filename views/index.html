@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   
   <link rel="stylesheet" href="/style.css">
+  
   <script src="//cdn.jsdelivr.net/npm/phaser@3.54.0/dist/phaser.min.js"></script>
 
   <script src="Physics.js"></script>
@@ -17,14 +18,12 @@
   <script src="TyreMarks.js"></script>
   <script src="Camera.js"></script>
   <script src="Debug.js"></script>
+  <script src="UI.js"></script>
   <script src="MainScene.js"></script>
-  <script src="UIScene.js"></script>
+  <script src="HUDScene.js"></script>
   <script src="game.js"></script>
 </head>
 <body>
-  <div class="bannerTrigger">
-    <div class="banner initial">Use a gamepad, arrows keys or WASD keys to drive. '+' and '-' to zoom in and out</div>
-  </div>
   <div class="spinner" style="text-align:center">
     <span class="dot"></span>
     <span class="dot"></span>
@@ -32,6 +31,66 @@
     <span class="dot"></span>
     <span class="dot"></span>
   </div>
-  <div id="toast"></div>
+  <div id="toast" class="ui"></div>
+  <div id="pauseMenu" class="ui">
+    <div class="button" id="resumeButton">Resume</div>
+    <div class="button" id="restartButton">Restart</div>
+    <div class="button" id="menuButton">Menu</div>
+  </div>
+  <div id="mainMenu" class="ui">
+    <div class="tabs">
+      <span class="button" id="hideMenuButton">Back</span>
+      <span class="button" id="controlsButton">Controls</span>
+      <span class="button" id="settingsButton">Settings</span>
+    </div>    
+    <div id="controls" class="menuContent active">
+      <p>Use a gamepad, arrow or WASD keys to drive</p>
+      <p>Additional keys:</p>
+      <ul>
+        <li>'I' to add an AI driver</li>
+        <li>'O' to start a race</li>
+        <li>'R' to reset the grid</li>
+        <li>'U' to toggle the AI driver</li>
+        <li>'Enter or Space' to pause/resume</li>
+        <li>'M' for main menu</li>
+        <li>'P' to change particles settings</li>
+        <li>'T' to change tyre marks setting</li>
+        <li>'+' and '-' to zoom in and out</li>
+        <li>'+' and '-' to zoom in and out</li>
+        <li>'[' and ']' to change camera</li>
+      </ul>
+    </div>
+    <div id="settings" class="menuContent">
+      <p>Coming soon:</p>
+      <ul>
+        <li>
+          <p>Tyre marks</p>
+          <input type="radio" id="tOff" name="tyres" value="none" disabled>
+          <label for="off">Off</label><br>
+          <input type="radio" id="tPlayer" name="tyres" value="player">
+          <label for="player">Player car only</label><br>
+          <input type="radio" id="tAll" name="tyres" value="all">
+          <label for="all">All cars</label>
+        </li>
+        <li>
+          <p>Particles</p>
+          <input type="radio" id="pOff" name="particles" value="none" disabled>
+          <label for="off">Off</label><br>
+          <input type="radio" id="pPlayer" name="particles" value="player">
+          <label for="player">Player car only</label><br>
+          <input type="radio" id="pAll" name="particles" value="all">
+          <label for="all">All cars</label>
+        </li>
+        <li>
+          <p>Render scale</p>
+          <input type="range" min="20" max="200" value="120" step="10" disabled>
+        </li>
+        <li>
+          <p>Effects volume</p>
+          <input type="range" min="0" max="100" value="20" step="10" disabled>
+        </li>
+      </ul>
+    </div>
+  </div>
 </body>
 </html>

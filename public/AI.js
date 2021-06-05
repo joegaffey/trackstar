@@ -6,8 +6,13 @@ class AI {
   }
   
   drive(car) {
+    if(car.collisionTimer > 0) {
+      car.collisionTimer--;
+      return;
+    }
+    
     if(!car.nextWP)
-      car.nextWP = 0;
+      car.nextWP = this.closestWP(car) || 0;
     
     let wp = this.wayPoints[car.nextWP];
     const dist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
@@ -54,6 +59,35 @@ class AI {
     }
   }
   
+  closestWP(car) {
+    let dist = 99999;
+    let closestWP = 0;
+    this.wayPoints.forEach((wp, i) => {
+      let newDist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
+      if(newDist < dist) {
+        dist = newDist;   
+        closestWP = i + 2; // Look ahead a couple of points
+      }
+    });
+    if(closestWP >= this.wayPoints.length)
+      closestWP = 0;
+    return closestWP;
+  }
+  
+  reset() {
+    this.cars.forEach(car => {
+      if(car.isPlayer) 
+        car.isAI = false;
+      else {
+        car.carSprite.destroy();
+        car.shadow.destroy();
+        car.tyresSprite.destroy();
+        car = null;
+      }
+    });
+    this.cars = [];
+  }  
+  
   updateCars() {
     this.cars.forEach(car1 => {
       car1.warning = false;
@@ -68,6 +102,12 @@ class AI {
             else
               car2.warning = true;
           }
+          // if(dist1 < 50) {
+          //   if(dist2 >= dist3)
+          //     car1.collideCar(car2);     
+          //   else
+          //     car2.collideCar(car1);            
+          // }
         }          
       });  
     });    
