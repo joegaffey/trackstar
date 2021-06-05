@@ -30,20 +30,20 @@ class UI {
     };    
     
     const controlsButton = document.querySelector('#controlsButton');
-    controlsButton.onclick = () => { 
-      Array.from(document.querySelectorAll('.menuContent')).forEach(el => {
-        el.classList.remove('active');
-      });
-      document.querySelector('#controls').classList.add('active');
-    };   
+    controlsButton.onclick = () => { this.switchMenuContent('controls'); };
     
     const settingsButton = document.querySelector('#settingsButton');
-    settingsButton.onclick = () => { 
-      Array.from(document.querySelectorAll('.menuContent')).forEach(el => {
-        el.classList.remove('active');
-      });
-      document.querySelector('#settings').classList.add('active');
-    };    
+    settingsButton.onclick = () => { this.switchMenuContent('settings'); };
+    
+    const raceButton = document.querySelector('#raceButton');
+    raceButton.onclick = () => { this.switchMenuContent('race'); };  
+  }
+  
+  switchMenuContent(content) {
+    Array.from(document.querySelectorAll('.menuContent')).forEach(el => {
+      el.classList.remove('active');
+    });
+    document.querySelector('#' + content).classList.add('active');
   }
   
   toast(text) {

@@ -89,6 +89,8 @@ class MainScene extends Phaser.Scene {
          
     this.UI.hideSpinner();
     
+    this.scene.get('HUDScene').scene.setVisible(true);
+    
     // this.debug.tyreMarks();
     // this.debug.physics(); 
   }
