@@ -40,6 +40,7 @@
   <div id="mainMenu" class="ui">
     <div class="tabs">
       <span class="button" id="hideMenuButton">Back</span>
+      <span class="button" id="raceButton">Race</span>
       <span class="button" id="controlsButton">Controls</span>
       <span class="button" id="settingsButton">Settings</span>
     </div>    
@@ -61,7 +62,7 @@
       </ul>
     </div>
     <div id="settings" class="menuContent">
-      <p>Coming soon:</p>
+      <p>Coming soon (use keys for now)</p>
       <ul>
         <li>
           <p>Tyre marks</p>
@@ -89,7 +90,25 @@
           <p>Effects volume</p>
           <input type="range" min="0" max="100" value="20" step="10" disabled>
         </li>
+        <li>
+          <p>Camera zoom</p>
+          <input type="range" min="0.2" max="2" value="1" step="0.1" disabled>
+        </li>
       </ul>
+    </div>
+    <div id="race" class="menuContent">
+      <p>Coming soon (use keys for now)</p>
+      <ul>
+        <li>
+          <p>AI Drivers</p>
+          <input type="range" min="0" max="20" value="10" step="1" disabled>
+        </li>
+        <li>
+          <p>Number of laps</p>
+          <input type="range" min="1" max="100" value="5" step="1" disabled>
+        </li>
+      </ul>
+      <div id="goButton" class="button" disabled>Go!!!</div>
     </div>
   </div>
 </body>

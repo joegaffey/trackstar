@@ -1,7 +1,7 @@
 class HUDScene extends Phaser.Scene {
   
   constructor ()  {
-    super({ key: 'UIScene', active: true, visible: false });
+    super({ key: 'HUDScene', active: true, visible: false });
     this.touches = { left: false, right: false, up: false, down: false };
   }
   
