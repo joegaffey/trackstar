@@ -81,13 +81,11 @@ body {
 .spinner span:nth-child(4) { animation-delay: .6s; }
 .spinner span:nth-child(5) { animation-delay: .8s; }
 
-#toast {
+
+.ui {
   font-family: helvetica;
   text-align: center;
   position: fixed;
-  top: -100px;
-  min-width: 250px;
-  margin-left: -125px;
   left: 50%;
   background-color: #111;
   color: #aaa;
@@ -96,9 +94,67 @@ body {
   padding: 16px;
   transition: top 500ms;
   user-select: none;
+  opacity: 0.9;
+}
+
+#pauseMenu {
+  top: -150px;
+  min-width: 150px;
+  margin-left: -75px;  
+}
+
+#pauseMenu.active {
+  top: 40px;
+}
+
+#mainMenu {
+  top: -1000px;
+  min-width: 400px;
+  margin-left: -200px;  
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+#mainMenu.active {
+  top: 40px;
+}
+
+.menuContent {
+  display: none;
+}
+
+.menuContent.active {
+  display: block;
+}
+
+#toast {
+  top: -100px;
+  min-width: 250px;
+  margin-left: -125px;  
 }
 
 #toast.active {
   top: 40px;
   opacity: 1;
+}
+
+.button {
+  padding: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: auto;
+  margin-bottom: 4px;
+  margin-top: 4px;
+  width: 100px;
+  border-color: #888;
+  border-width: 1px;
+  border-style: solid;
+}
+
+ul {
+  list-style-type: none;
+}
+
+li {
+  text-align: left;
 }

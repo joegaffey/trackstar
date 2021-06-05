@@ -48,17 +48,17 @@ class Particles {
     if(this.mode === this.NONE) {
       this.scene.car.emitter.stop();
       this.scene.AI.cars.forEach(car => { car.emitter.stop(); });
-      this.scene.toast('Particles off');
+      this.scene.UI.toast('Particles off');
     }
     else if(this.mode === this.USER) {
       this.scene.car.emitter.start();
       this.scene.AI.cars.forEach(car => { car.emitter.stop(); });
-      this.scene.toast('Particles on - player');
+      this.scene.UI.toast('Particles on - player');
     }
     else if(this.mode === this.ALL) {
       this.scene.car.emitter.start();
       this.scene.AI.cars.forEach(car => { car.emitter.start(); });
-      this.scene.toast('Particles on - all');
+      this.scene.UI.toast('Particles on - all');
     }
   }
   

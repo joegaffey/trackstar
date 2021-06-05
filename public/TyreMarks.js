@@ -4,7 +4,7 @@ class TyreMarks {
     this.NONE = 0;
     this.USER = 1;
     this.ALL = 2;
-    this.mode = this.USER; //User car only by default
+    this.mode = this.ALL; //On for all car by default
     this.scene = scene;
   } 
   
@@ -29,11 +29,11 @@ class TyreMarks {
     if(this.mode > this.ALL)
       this.mode = this.NONE;
     if(this.mode === this.NONE)
-      this.scene.toast('Tyre marks off');
+      this.scene.UI.toast('Tyre marks off');
     else if(this.mode === this.USER)
-      this.scene.toast('Tyre marks on - player');
+      this.scene.UI.toast('Tyre marks on - player');
     else if(this.mode === this.ALL)
-      this.scene.toast('Tyre marks on - all');
+      this.scene.UI.toast('Tyre marks on - all');
   }
   
   draw() {

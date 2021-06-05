@@ -117,7 +117,7 @@ function init() {
     //   target: 60,
     //   forceSetTimeOut: true
     // },
-    scene: [MainScene, UIScene]    
+    scene: [MainScene, HUDScene]    
   }
 
   game = new Phaser.Game(config);
