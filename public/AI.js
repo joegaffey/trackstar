@@ -7,7 +7,7 @@ class AI {
   
   drive(car) {
     if(!car.nextWP)
-      car.nextWP = 0;
+      car.nextWP = this.closestWP(car) || 0;
     
     let wp = this.wayPoints[car.nextWP];
     const dist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
@@ -52,6 +52,21 @@ class AI {
       car.throttle(false);
       car.brake(false);
     }
+  }
+  
+  closestWP(car) {
+    let dist = 99999;
+    let closestWP = 0;
+    this.wayPoints.forEach((wp, i) => {
+      let newDist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
+      if(newDist < dist) {
+        dist = newDist;   
+        closestWP = i + 2; // Look ahead a couple of points
+      }
+    });
+    if(closestWP >= this.wayPoints.length)
+      closestWP = 0;
+    return closestWP;
   }
   
   updateCars() {

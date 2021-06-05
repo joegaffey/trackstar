@@ -320,6 +320,7 @@ class MainScene extends Phaser.Scene {
     if(!this.car.isAI) {
       this.toast('AI is in control of player car');
       this.car.isAI = true;
+      this.car.nextWP = null;
       this.AI.cars.push(this.car);    
     }
     else {
