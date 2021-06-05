@@ -6,6 +6,11 @@ class AI {
   }
   
   drive(car) {
+    if(car.collisionTimer > 0) {
+      car.collisionTimer--;
+      return;
+    }
+    
     if(!car.nextWP)
       car.nextWP = this.closestWP(car) || 0;
     
@@ -69,6 +74,20 @@ class AI {
     return closestWP;
   }
   
+  reset() {
+    this.cars.forEach(car => {
+      if(car.isPlayer) 
+        car.isAI = false;
+      else {
+        car.carSprite.destroy();
+        car.shadow.destroy();
+        car.tyresSprite.destroy();
+        car = null;
+      }
+    });
+    this.cars = [];
+  }  
+  
   updateCars() {
     this.cars.forEach(car1 => {
       car1.warning = false;
@@ -83,6 +102,12 @@ class AI {
             else
               car2.warning = true;
           }
+          // if(dist1 < 50) {
+          //   if(dist2 >= dist3)
+          //     car1.collideCar(car2);     
+          //   else
+          //     car2.collideCar(car1);            
+          // }
         }          
       });  
     });    

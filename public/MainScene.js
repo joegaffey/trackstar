@@ -5,6 +5,7 @@ class MainScene extends Phaser.Scene {
     
     this.track = track;
     this.car = car;
+    this.car.isPlayer = true;
     this.baseUrl = baseUrl;
     this.renderScale = 1;
     
@@ -285,7 +286,10 @@ class MainScene extends Phaser.Scene {
   }
   
   startRace() {
-    if(!this.track.points.length > 0) return;
+    if(!this.track.points.length > 0) {
+      this.toast('Insuffient track data');
+      return;
+    }
     
     let spline = new Phaser.Curves.Spline(this.track.points);
     this.bounds = spline.getBounds();    
@@ -301,6 +305,21 @@ class MainScene extends Phaser.Scene {
     // this.debug.racingLine();
     
     this.toast('Go!!!');
+  }
+  
+  reset() {
+    this.racing = false;
+    let len = this.AI.cars.length;
+    if(this.car.isAI)
+      len--;
+    this.particles.reset();
+    this.AI.reset();
+    this.car.reset(this.track.gridPositions[0].x * this.renderScale,
+                  this.track.gridPositions[0].y * this.renderScale,
+                  this.track.gridPositions[0].angle * Math.PI / 180);
+    
+    this.particles.addEmitter(this.car);
+    this.addAICars(len);
   }
   
   toast(text) {

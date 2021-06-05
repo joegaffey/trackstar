@@ -26,6 +26,15 @@ class Car {
     this.renderScale = 1;
   }
   
+  reset(x, y, angle) {
+    this.x = x;
+    this.y = y;
+    this.angle = angle;
+    this.angularVelocity = this.xVelocity = this.yVelocity = 0;
+    this.power = 0;
+    this.power = 0;
+  }
+  
   throttle(input) {
     this.isThrottling = input;
   }
@@ -52,6 +61,18 @@ class Car {
     this.xVelocity *= -1.1;
     this.yVelocity *= -1.1;
     this.power = 0;
+  }
+  
+  collideCar(car) {
+    this.xVelocity -= car.xVelocity / 2;
+    this.yVelocity -= car.yVelocity / 2;
+    this.collisionTimer = 30;
+    this.throttle(false);
+    // this.angle -= car.angle / 2;
+    
+    car.xVelocity += this.xVelocity / 2;
+    car.yVelocity += this.yVelocity / 2;
+    // car.angle *= this.angle;    
   }
 
   update() {

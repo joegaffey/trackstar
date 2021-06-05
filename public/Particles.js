@@ -7,12 +7,27 @@ class Particles {
     this.ALL = 2;
     this.mode = this.ALL; //On for All cars by default
     this.emitters = [];    
+    this.particles = [];    
+  }
+  
+  reset() {
+    this.emitters.forEach(em => {
+      em.killAll();      
+      em.remove();      
+    });
+    this.emitters = [];
+      this.particles.forEach(pa => {
+      pa.destroy();   
+    });
+    this.particles = [];
   }
   
   addEmitter(car) {
     const particles = this.scene.add.particles('dust');
     particles.car = car;
     particles.setDepth(35);
+    this.particles.push(particles);
+    
     car.emitter = particles.createEmitter(this.getConfig(particles));
     car.emitter.startFollow(car.carSprite);
     this.emitters.push(car.emitter);
