@@ -89,7 +89,8 @@ class MainScene extends Phaser.Scene {
          
     this.UI.hideSpinner();
     
-    this.scene.get('HUDScene').scene.setVisible(true);
+    this.HUD = this.scene.get('HUDScene');
+    this.HUD.scene.setVisible(true);
     
     // this.debug.tyreMarks();
     // this.debug.physics(); 
@@ -293,8 +294,12 @@ class MainScene extends Phaser.Scene {
     if(!this.track.points.length > 0) {
       this.UI.toast('Insuffient track data');
       return;
-    }
-    
+    }    
+    this.setupRacingLine();
+    this.HUD.startlightsSequence();
+  }
+  
+  setupRacingLine() {
     let spline = new Phaser.Curves.Spline(this.track.points);
     this.bounds = spline.getBounds();    
     this.track.points.forEach(point => {
@@ -305,10 +310,7 @@ class MainScene extends Phaser.Scene {
     spline = new Phaser.Curves.Spline(this.track.points);
     this.AI.wayPoints = spline.getDistancePoints(200);
     this.AI.cars.forEach(car => car.nextWP = 0); 
-    this.racing = true;
     // this.debug.racingLine();
-    
-    this.UI.toast('Go!!!');
   }
   
   reset() {
