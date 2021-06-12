@@ -11,8 +11,9 @@ class HUDScene extends Phaser.Scene {
 
   create () {    
     this.scene.setVisible(false);
+    
     this.gamepad = {};    
-    this.input.gamepad.once('down', function (pad, button, index) {
+        this.input.gamepad.once('down', function (pad, button, index) {
       console.log('Playing with ' + pad.id);
       this.gamepad = pad;      
     }, this);     
@@ -103,4 +104,28 @@ class HUDScene extends Phaser.Scene {
     controls.joyUp = this.gamepad.A || this.gamepad.R2 || this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
     controls.joyDown = this.gamepad.B || this.gamepad.L2 || this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
   }  
+  
+  
+  startlightsSequence() {
+    this.lights = this.add.group();
+    this.addLightColumn(0);    
+  }
+  
+  endLightsSequence() {
+    this.gameScene.racing = true;
+    this.lights.destroy(true);
+  }
+  
+  addLightColumn(i) {
+    const x = this.scale.width / 2 - 80;
+    const y = 100;
+    setTimeout(() => {
+      this.lights.add(this.add.circle(x + 40 * i, y, 18, 0xff0000));
+      this.lights.add(this.add.circle(x + 40 * i, y + 40, 18, 0xff0000));
+      if(i < 4)
+        this.addLightColumn(i + 1);
+      else
+        setTimeout(() => { this.endLightsSequence(); }, 2000);
+    }, 2000);
+  }
 }
