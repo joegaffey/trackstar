@@ -4,8 +4,7 @@ class UI {
     this.scene = scene;
     this.banner = true;
     this.init();
-  }
-  
+  }  
   
   init() {
     const resumeButton = document.querySelector('#resumeButton');
@@ -15,6 +14,9 @@ class UI {
     restartButton.onclick = () => { 
       this.scene.reset();
       this.scene.pause(); 
+      this.scene.startRace();
+      if(!this.scene.race.inProgress)
+        restartButton.innerText = 'Restart';
     };
     
     const menuButton = document.querySelector('#menuButton');
@@ -37,6 +39,9 @@ class UI {
     
     const raceButton = document.querySelector('#raceButton');
     raceButton.onclick = () => { this.switchMenuContent('race'); };  
+    
+    const closeResultsButton = document.querySelector('#closeResults');
+    closeResultsButton.onclick = () => { this.hideLeaderboard('race'); };  
   }
   
   switchMenuContent(content) {
@@ -55,6 +60,10 @@ class UI {
     }, 3000);
   }
   
+  loaderText(text) {
+    document.querySelector('#loaderText').innerText = text;
+  }
+  
   pauseMenu() {
     const el = document.querySelector('#pauseMenu');
     el.classList.toggle('active');
@@ -67,5 +76,34 @@ class UI {
   
   hideSpinner() {
     document.querySelector('.spinner').style.display = 'none';
+  }  
+  
+  showLeaderboard() {
+    this.updateLeaders();
+    const el = document.querySelector('#results');
+    if(!el.classList.contains('active'))
+      el.classList.add('active');
+  }
+  
+  hideLeaderboard() {
+    const el = document.querySelector('#results');
+    el.classList.remove('active');
+  }
+  
+  toggleLeaderboard() {
+    this.updateLeaders();
+    const el = document.querySelector('#results');
+    el.classList.toggle('active');
+  }
+  
+  updateLeaders() {
+    const el = document.querySelector('#leadersList');
+    el.innerHTML = '';
+    let leaders = this.scene.race.getLeaders(this.scene.cars.length);
+    leaders.forEach((car)=>{
+      let li = document.createElement('li');
+      li.innerText = car.driver;
+      el.appendChild(li);
+    });
   }
 }

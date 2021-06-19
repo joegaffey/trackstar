@@ -63,11 +63,15 @@ body {
 
 .spinner {
   position: absolute;
-  top: 50%;
+  top: calc(50% - 20px);
   margin-left: auto;
   margin-right: auto;
   left: 0;
   right: 0;
+}
+
+#loaderText {
+  color: #888;
 }
 
 @keyframes blink {
@@ -118,6 +122,19 @@ body {
 #mainMenu.active {
   top: 40px;
 }
+
+#results {
+  top: -1000px;
+  min-width: 300px;
+  margin-left: -150px;  
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+#results.active {
+  top: 40px;
+}
+
 
 .menuContent {
   display: none;

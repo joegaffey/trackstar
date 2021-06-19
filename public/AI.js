@@ -1,8 +1,7 @@
 class AI {
   
-  constructor() {
-    this.cars = [];
-    this.wayPoints = [];
+  constructor(scene) {
+    this.scene = scene;
   }
   
   drive(car) {
@@ -11,18 +10,7 @@ class AI {
       return;
     }
     
-    if(!car.nextWP)
-      car.nextWP = this.closestWP(car) || 0;
-    
-    let wp = this.wayPoints[car.nextWP];
-    const dist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
-    
-    if(dist < 500) {
-      car.nextWP++;
-      if(car.nextWP >= this.wayPoints.length)
-        car.nextWP = 0;
-    }
-    
+    let wp = this.scene.track.wayPoints[car.nextWP];
     const angleToWP = Phaser.Math.Angle.CounterClockwise(Phaser.Math.Angle.Between(car.x, car.y, wp.x, wp.y));
     const angleCar = Phaser.Math.Angle.CounterClockwise(car.angle - Math.PI / 2);
     
@@ -59,23 +47,8 @@ class AI {
     }
   }
   
-  closestWP(car) {
-    let dist = 99999;
-    let closestWP = 0;
-    this.wayPoints.forEach((wp, i) => {
-      let newDist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
-      if(newDist < dist) {
-        dist = newDist;   
-        closestWP = i + 2; // Look ahead a couple of points
-      }
-    });
-    if(closestWP >= this.wayPoints.length)
-      closestWP = 0;
-    return closestWP;
-  }
-  
   reset() {
-    this.cars.forEach(car => {
+    this.scene.cars.forEach(car => {
       if(car.isPlayer) 
         car.isAI = false;
       else {
@@ -85,17 +58,17 @@ class AI {
         car = null;
       }
     });
-    this.cars = [];
+    this.scene.cars = [];
   }  
   
   updateCars() {
-    this.cars.forEach(car1 => {
+    this.scene.cars.forEach(car1 => {
       car1.warning = false;
-      this.cars.forEach(car2 => {
+      this.scene.cars.forEach(car2 => {
         if(car1 !== car2 && car1.nextWP && car2.nextWP && car1.nextWP === car2.nextWP) {
           const dist1 = Phaser.Math.Distance.Between(car1.x, car1.y, car2.x, car2.y);
-          const dist2 = Phaser.Math.Distance.Between(car1.x, car1.y,  this.wayPoints[car1.nextWP].x,  this.wayPoints[car1.nextWP].y);
-          const dist3 = Phaser.Math.Distance.Between(car2.x, car2.y,  this.wayPoints[car1.nextWP].x,  this.wayPoints[car1.nextWP].y);
+          const dist2 = Phaser.Math.Distance.Between(car1.x, car1.y,  this.scene.track.wayPoints[car1.nextWP].x,  this.scene.track.wayPoints[car1.nextWP].y);
+          const dist3 = Phaser.Math.Distance.Between(car2.x, car2.y,  this.scene.track.wayPoints[car1.nextWP].x,  this.scene.track.wayPoints[car1.nextWP].y);
           if(dist1 < 100) {
             if(dist2 > dist3)
               car1.warning = true;     

@@ -1,6 +1,7 @@
 class Car {
   
-  constructor(config) {    
+  constructor(config) {
+    this.driver = config.driver;
     this.x = config.x;
     this.y = config.y;
     this.angle = config.angle;

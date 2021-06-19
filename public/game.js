@@ -96,6 +96,7 @@ function init() {
   }
   
   car = new Car({
+    driver: 'Player',
     surface: Physics.tarmac,
     minEngineSpeed: 3000,
     maxEngineSpeed: 12000,
