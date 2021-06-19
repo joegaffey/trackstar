@@ -20,6 +20,7 @@ class Track {
     this.trees = config.trees;
     
     this.renderScale = 1;
+    this.wayPoints = [];
   }
   
   toJSON() {
@@ -42,6 +43,21 @@ class Track {
       margin:this.margin,
       trees:this.trees
     }
+  }
+  
+  closestWP(car) {
+    let dist = 99999;
+    let closestWP = 0;
+    this.wayPoints.forEach((wp, i) => {
+      let newDist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
+      if(newDist < dist) {
+        dist = newDist;   
+        closestWP = i + 2; // Look ahead a couple of points
+      }
+    });
+    if(closestWP >= this.wayPoints.length)
+      closestWP = 0;
+    return closestWP;
   }
   
   draw(scene) {    

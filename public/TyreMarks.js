@@ -44,7 +44,7 @@ class TyreMarks {
         this.drawCar(this.scene.car);   
       }
       if(this.mode === this.ALL) {
-        this.scene.AI.cars.forEach(car => {
+        this.scene.cars.forEach(car => {
           this.drawCar(car);   
         });
       }

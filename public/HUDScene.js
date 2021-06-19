@@ -3,6 +3,7 @@ class HUDScene extends Phaser.Scene {
   constructor ()  {
     super({ key: 'HUDScene', active: true, visible: false });
     this.touches = { left: false, right: false, up: false, down: false };
+    this.raceUpdateCounter = 0;
   }
   
   preload() {
@@ -13,18 +14,32 @@ class HUDScene extends Phaser.Scene {
     this.scene.setVisible(false);
     
     this.gamepad = {};    
-        this.input.gamepad.once('down', function (pad, button, index) {
+    this.input.gamepad.once('down', function (pad, button, index) {
       console.log('Playing with ' + pad.id);
       this.gamepad = pad;      
     }, this);     
     
     this.gameScene = this.scene.get('MainScene');
     
-    const box = this.add.rectangle(80, 80, 100, 100, 0x000000);
-    box.alpha = 0.6;
+    const speedBox = this.add.rectangle(80, 80, 100, 100, 0x000000);
+    speedBox.alpha = 0.6;
     this.uiSpeed = this.add.text(50, 50, '0', { font: '36px Helvetica', fill: '#aaaaaa' });
-    this.add.text(50, 100, 'KMPH', { font: '16px Helvetica', fill: '#aaaaaa' });
+    this.add.text(50, 100, 'KMPH', { font: '16px Helvetica', fill: '#aaaaaa' });    
+    
+    const lapBox = this.add.rectangle(window.innerWidth - 80, 80, 100, 100, 0x000000);
+    lapBox.alpha = 0.6;
+    this.uiLap = this.add.text(window.innerWidth - 80, 70, '0/' + this.gameScene.race.lapsCount, { font: '36px Helvetica', fill: '#aaaaaa', align: 'center' });
+    this.uiLap.setOrigin(0.5, 0.5);
+    this.add.text(window.innerWidth - 110, 100, 'Lap', { font: '16px Helvetica', fill: '#aaaaaa' });
 
+    const leadersBox = this.add.rectangle(30, window.innerHeight - 170, 200, 140, 0x000000);
+    leadersBox.setOrigin(0, 0);
+    leadersBox.alpha = 0.6;
+    const text = ['1  ...', '2  ...', '3  ...', '4  ...', '5  ...'];
+    this.add.text(40, window.innerHeight - 160, 'Race Leaders', { font: '16px Helvetica', fill: '#aaaaaa' });
+    this.uiLeaders = this.add.text(40, window.innerHeight - 132, text, { font: '14px Helvetica', fill: '#aaaaaa', lineSpacing: 4 });
+    this.uiLeaders.setOrigin(0, 0);
+    
     if(isMobile) {
       game.input.addPointer(1);    
       const w = window.innerWidth, h = window.innerHeight;
@@ -71,6 +86,7 @@ class HUDScene extends Phaser.Scene {
       else if(key.code === "KeyU") { this.gameScene.toggleAiDriver(); }
       else if(key.code === "KeyR") { this.gameScene.reset(); }
       else if(key.code === "KeyM") { this.gameScene.UI.mainMenu(); }
+      else if(key.code === "KeyL") { this.gameScene.UI.toggleLeaderboard(); }
     });
     
     // this.text = this.add.text(10, 10, 'Debug', { font: '16px Courier', fill: '#00ff00' });
@@ -78,7 +94,14 @@ class HUDScene extends Phaser.Scene {
   
   update() {    
     // this.text.text = 'FPS: ' + this.game.loop.actualFps;
-
+    if(this.raceUpdateCounter < 0) {
+      this.updateLeaders();
+      this.updateLap();
+      this.raceUpdateCounter = 60;
+    }
+    else 
+      this.raceUpdateCounter--;
+    
     this.uiSpeed.setText(Math.round(car.velocity * 15));
     if (isMobile) {
       this.touches = { left: false, right: false, up: false, down: false };    
@@ -105,6 +128,21 @@ class HUDScene extends Phaser.Scene {
     controls.joyDown = this.gamepad.B || this.gamepad.L2 || this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
   }  
   
+  updateLap() {
+    const lap = this.gameScene.car.lap || 0;
+    this.uiLap.setText(lap + '/' + this.gameScene.race.lapsCount)
+  }
+  
+  updateLeaders() {
+    const text = [];
+    const leaders = this.gameScene.race.getLeaders(5);
+    if(leaders.length === 0)
+      return;
+    leaders.forEach((leader, i) => {
+      text.push((i +  1) + '.  ' + leader.driver);
+    });    
+    this.uiLeaders.setText(text);
+  }  
   
   startlightsSequence() {
     this.lights = this.add.group();
@@ -112,20 +150,21 @@ class HUDScene extends Phaser.Scene {
   }
   
   endLightsSequence() {
-    this.gameScene.racing = true;
-    this.lights.destroy(true);
+    this.gameScene.race.start();
+    this.lights.getChildren().forEach(light => { light.setFillStyle(0x00ff00); });
+    setTimeout(() => { this.lights.destroy(true); }, 3000);
   }
   
   addLightColumn(i) {
     const x = this.scale.width / 2 - 80;
     const y = 100;
+    this.lights.add(this.add.circle(x + 40 * i, y, 18, 0xff0000));
+    this.lights.add(this.add.circle(x + 40 * i, y + 40, 18, 0xff0000));      
     setTimeout(() => {
-      this.lights.add(this.add.circle(x + 40 * i, y, 18, 0xff0000));
-      this.lights.add(this.add.circle(x + 40 * i, y + 40, 18, 0xff0000));
       if(i < 4)
         this.addLightColumn(i + 1);
       else
-        setTimeout(() => { this.endLightsSequence(); }, 2000);
-    }, 2000);
+        setTimeout(() => { this.endLightsSequence(); }, 1500);
+    }, 1500);
   }
 }

@@ -1,7 +1,7 @@
 class Camera {
   
   constructor(scene) {
-    this.camFollow = -1;
+    this.camFollow = 0;
     this.scene = scene;
   }
   
@@ -19,33 +19,20 @@ class Camera {
   }
   
   followCar(car) {
-    if(this.mainCam.car) 
-      this.mainCam.car.hasCamera = false;
-    car.hasCamera = true;
-    this.mainCam.car = car;
     this.mainCam.startFollow(car.carSprite);
-    this.camFollow = car.index - 1;
   }
   
   nextCar() {
     this.camFollow++;
-    let car = this.scene.car;
-    if(this.camFollow > -1 && this.camFollow < this.scene.AI.cars.length) 
-      car = this.scene.AI.cars[this.camFollow]; 
-    else 
-      this.camFollow = -1; 
-    this.followCar(car);      
+    if(this.camFollow >= this.scene.cars.length)
+      this.camFollow = 0;
+    this.followCar(this.scene.cars[this.camFollow]);  
   }
   
   previousCar() {    
     this.camFollow--;
-    let car = this.scene.car;
-    if(this.camFollow > -1 && this.camFollow < this.scene.AI.cars.length) 
-      car = this.scene.AI.cars[this.camFollow]; 
-    else if(this.camFollow < -1) {
-      this.camFollow = this.scene.AI.cars.length - 1; 
-      car = this.scene.AI.cars[this.camFollow]; 
-    }
-    this.followCar(car);      
+    if(this.camFollow < 0)
+      this.camFollow = this.scene.cars.length - 1;
+    this.followCar(this.scene.cars[this.camFollow]);
   }
 }

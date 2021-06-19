@@ -6,6 +6,8 @@ class MainScene extends Phaser.Scene {
     this.track = track;
     this.car = car;
     this.car.isPlayer = true;
+    this.cars = [this.car];    
+    
     this.baseUrl = baseUrl;
     this.renderScale = 1;
     
@@ -14,16 +16,18 @@ class MainScene extends Phaser.Scene {
     this.camera = new Camera(this);
     this.debug = new Debug(this);
     this.UI = new UI(this);
+    this.race = new Race(10, this);
     
-    this.AI = new AI();    
+    this.AI = new AI(this);    
   }  
   
 //////////////////////////////////////////// Preload phase ////////////////////////////////////////////
 
   preload() {
+    this.UI.loaderText('LOADING ASSETS');
     this.isMobile = isMobile = !game.device.os.desktop && game.device.input.touch;
     this.loadBackgroundImage();
-        
+    
     this.load.image('tyres', this.baseUrl + 'tyres.png');
     this.load.image('dust', this.baseUrl + 'dust.png');
     for(let i = 1; i < 14; i++) {
@@ -36,6 +40,7 @@ class MainScene extends Phaser.Scene {
       this.load.image('car' + i, `${this.baseUrl}pitstop_car_${i}.png`);  
     }
     this.load.audio('engine', [this.baseUrl + 'engine.mp3']);
+    this.UI.loaderText('BUILDING SCENE'); // DOM blocks at create() so moved here
   }
   
   loadBackgroundImage() {
@@ -61,9 +66,9 @@ class MainScene extends Phaser.Scene {
   
 //////////////////////////////////////////// Setup phase ////////////////////////////////////////////
 
-  create() {     
-    
-    this.addBackgroundImage();
+  create() {
+    // this.UI.loaderText('BUILDING SCENE');  // DOM is blocked
+    this.addBackgroundImage();    
     this.setBackgroundScale();
     
     if(this.isMobile) {
@@ -134,7 +139,9 @@ class MainScene extends Phaser.Scene {
   }
 
   setupCar(car, i) {
-    car.index = i;
+    car.position = i;
+    car.lap = 0;
+    
     car.x = this.track.gridPositions[i].x * this.renderScale;
     car.y = this.track.gridPositions[i].y * this.renderScale;
     car.angle = this.track.gridPositions[i].angle * Math.PI / 180;
@@ -187,11 +194,13 @@ class MainScene extends Phaser.Scene {
       this.updateCar(this.car);
     }    
         
-    if(this.racing) {
+    if(this.race.inProgress) {
       this.AI.updateCars();
-      this.AI.cars.forEach(car => {
-        this.AI.drive(car);
-        this.updateCar(car);
+      this.cars.forEach(car => {
+        if(car.isAI) {
+          this.AI.drive(car);
+          this.updateCar(car);
+        }
       });
     }    
     this.tyreMarks.draw();
@@ -205,13 +214,42 @@ class MainScene extends Phaser.Scene {
       px += (this.bg.width / 2);
       py += (this.bg.height / 2);
     }
-      
+    
     this.updateCarSurface(car, px, py);     
     car.update();    
     if(car.hasCamera)
       this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;
     
     this.updateCarSprite(car);    
+    
+    if(this.race.inProgress) {
+      if(!car.nextWP)
+        car.nextWP = this.track.closestWP(car) || 0;
+
+      const wp = this.track.wayPoints[car.nextWP];
+      const dist = Phaser.Math.Distance.Between(car.x, car.y, wp.x, wp.y);
+
+      if(dist < 500) {
+        car.nextWP++;
+        if(car.nextWP >= this.track.wayPoints.length) {
+          car.nextWP = 0;
+        }
+        if(car.nextWP === 1) {
+          car.lap++;
+          if(car.lap > this.race.lapsCount)
+            this.raceOver();
+        }
+        
+      }
+    }
+  }
+  
+  raceOver() {
+    this.race.end();
+    this.UI.toast('Race Over!!!');
+    setTimeout(() => {
+      this.UI.showLeaderboard();
+    }, 3000);
   }
   
   updateCarSprite(car) {
@@ -263,29 +301,32 @@ class MainScene extends Phaser.Scene {
   }
   
   addAICars(count) {
-    for(let i = 1; i <= count; i++) {
-      let len = this.AI.cars.length + 1;
-      if(this.car.isAI)
-        len--;
-      if(this.track.gridPositions.length > len) {
-        const car = this.setupCar(this.makeCar(len), len);  
-        if(this.particles.mode === this.particles.ALL)
-          this.car.emitter.start();
-        this.AI.cars.push(car);        
-      }
+    let len = this.cars.length;
+    for(let i = 0; i < count; i++) {
+      if(this.track.gridPositions.length > len + count)
+        this.addAICar(len + i);
       else
         this.UI.toast('No free pit boxes');
     }
   }
   
-  makeCar(index) {
+  addAICar(id) {
+    const car = this.setupCar(this.makeCar(id), id);  
+    car.isAI = true;
+    if(this.particles.mode === this.particles.ALL)
+      this.car.emitter.start();
+    this.cars.push(car);  
+  }
+  
+  makeCar(id) {
     return new Car({
+      driver: names[Math.floor(Math.random() * names.length)],
       surface: Physics.tarmac,
       minEngineSpeed: 3000,
       maxEngineSpeed: 12000,
       engineSpeedFactor: 60000,
       engineSoundFactor: 3500,
-      texture: 'car' + index,
+      texture: 'car' + id,
       scale: this.car.scale
     });
   }
@@ -295,6 +336,8 @@ class MainScene extends Phaser.Scene {
       this.UI.toast('Insuffient track data');
       return;
     }    
+    if(this.cars.length === 1)
+      this.addAICars(9);
     this.setupRacingLine();
     this.HUD.startlightsSequence();
   }
@@ -308,16 +351,14 @@ class MainScene extends Phaser.Scene {
     })
     
     spline = new Phaser.Curves.Spline(this.track.points);
-    this.AI.wayPoints = spline.getDistancePoints(200);
-    this.AI.cars.forEach(car => car.nextWP = 0); 
+    this.track.wayPoints = spline.getDistancePoints(200);
+    this.cars.forEach(car => car.nextWP = 0); 
     // this.debug.racingLine();
   }
   
   reset() {
-    this.racing = false;
-    let len = this.AI.cars.length;
-    if(this.car.isAI)
-      len--;
+    this.race.reset();
+    let len = this.cars.length;
     this.particles.reset();
     this.AI.reset();
     this.car.reset(this.track.gridPositions[0].x * this.renderScale,
@@ -325,21 +366,18 @@ class MainScene extends Phaser.Scene {
                   this.track.gridPositions[0].angle * Math.PI / 180);
     
     this.particles.addEmitter(this.car);
-    this.addAICars(len);
+    this.cars = [this.car];
+    this.addAICars(len - 1);
   }
   
   toggleAiDriver() {
     if(!this.car.isAI) {
       this.UI.toast('AI is in control of player car');
       this.car.isAI = true;
-      this.car.nextWP = null;
-      this.AI.cars.push(this.car);    
     }
     else {
       this.UI.toast('Player is in control of car');
       this.car.isAI = false;
-      this.AI.cars.push(this.car);
-      this.AI.cars = this.AI.cars.filter(car => car !== this.car)
     }
   }
 }

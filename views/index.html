@@ -17,6 +17,8 @@
   <script src="AI.js"></script>
   <script src="TyreMarks.js"></script>
   <script src="Camera.js"></script>
+  <script src="Names.js"></script>
+  <script src="Race.js"></script>
   <script src="Debug.js"></script>
   <script src="UI.js"></script>
   <script src="MainScene.js"></script>
@@ -25,6 +27,7 @@
 </head>
 <body>
   <div class="spinner" style="text-align:center">
+    <div id="loaderText">INITIALIZING ENGINE</div>
     <span class="dot"></span>
     <span class="dot"></span>
     <span class="dot"></span>
@@ -32,21 +35,25 @@
     <span class="dot"></span>
   </div>
   <div id="toast" class="ui"></div>
+  <div id="results" class="ui">
+    <div class="button" id="closeResults">Close</div>
+    <ol id="leadersList"></ol>
+  </div>
   <div id="pauseMenu" class="ui">
-    <div class="button" id="resumeButton">Resume</div>
-    <div class="button" id="restartButton">Restart</div>
+    <div class="button" id="resumeButton">Return</div>
+    <div class="button" id="restartButton">Start</div>
     <div class="button" id="menuButton">Menu</div>
   </div>
   <div id="mainMenu" class="ui">
     <div class="tabs">
-      <span class="button" id="hideMenuButton">Back</span>
-      <span class="button" id="raceButton">Race</span>
-      <span class="button" id="controlsButton">Controls</span>
+      <span class="button" id="hideMenuButton">Return</span>
+      <span class="button" id="controlsButton">Help</span>
+      <span class="button" id="raceButton">Session</span>
       <span class="button" id="settingsButton">Settings</span>
     </div>    
     <div id="controls" class="menuContent active">
       <p>Use a gamepad, arrow or WASD keys to drive</p>
-      <p>Additional keys:</p>
+      <p>Game Controls:</p>
       <ul>
         <li>'I' to add an AI driver</li>
         <li>'O' to start a race</li>
