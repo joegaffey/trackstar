@@ -47,17 +47,17 @@ class Particles {
       this.mode = this.NONE;
     if(this.mode === this.NONE) {
       this.scene.car.emitter.stop();
-      this.scene.AI.cars.forEach(car => { car.emitter.stop(); });
+      this.scene.cars.forEach(car => { car.emitter.stop(); });
       this.scene.UI.toast('Particles off');
     }
     else if(this.mode === this.USER) {
       this.scene.car.emitter.start();
-      this.scene.AI.cars.forEach(car => { car.emitter.stop(); });
+      this.scene.cars.forEach(car => { car.emitter.stop(); });
       this.scene.UI.toast('Particles on - player');
     }
     else if(this.mode === this.ALL) {
       this.scene.car.emitter.start();
-      this.scene.AI.cars.forEach(car => { car.emitter.start(); });
+      this.scene.cars.forEach(car => { car.emitter.start(); });
       this.scene.UI.toast('Particles on - all');
     }
   }

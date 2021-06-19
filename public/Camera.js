@@ -19,10 +19,12 @@ class Camera {
   }
   
   followCar(car) {
+    car.hasCamera = true;
     this.mainCam.startFollow(car.carSprite);
   }
   
   nextCar() {
+    this.scene.cars[this.camFollow].hasCamera = false;
     this.camFollow++;
     if(this.camFollow >= this.scene.cars.length)
       this.camFollow = 0;
@@ -30,6 +32,7 @@ class Camera {
   }
   
   previousCar() {    
+    this.scene.cars[this.camFollow].hasCamera = false;
     this.camFollow--;
     if(this.camFollow < 0)
       this.camFollow = this.scene.cars.length - 1;
