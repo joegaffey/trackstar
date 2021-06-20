@@ -23,6 +23,7 @@ class Car {
     this.isThrottling = false;
     this.isReversing = false;
     this.engineSpeed = this.minEngineSpeed * this.engineSpeedFactor;
+    this.lap = 0;
     
     this.renderScale = 1;
   }
@@ -34,6 +35,7 @@ class Car {
     this.angularVelocity = this.xVelocity = this.yVelocity = 0;
     this.power = 0;
     this.power = 0;
+    this.lap = 0;
   }
   
   throttle(input) {
