@@ -16,7 +16,8 @@ class Physics {
     KERBS: 1,  
     GRASS: 2,
     SAND: 3,
-    DIRT: 4
+    DIRT: 4,
+    BARRIER: 5
   }
 
   static grass = { 
@@ -44,5 +45,9 @@ class Physics {
     skidMarkColor: 0x333333,
     particleColor: 0xFFFFFF,
     particleAlpha: 1
+  }
+  
+  static barrier = { 
+    type: Physics.surface.BARRIER
   }
 }

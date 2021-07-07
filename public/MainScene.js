@@ -4,6 +4,8 @@ class MainScene extends Phaser.Scene {
     super({key: 'MainScene', active: true});    
     
     this.track = track;
+    this.track.scene = this;
+    
     this.car = car;
     this.car.isPlayer = true;
     this.cars = [this.car];    
@@ -60,7 +62,7 @@ class MainScene extends Phaser.Scene {
         this.physicsUrl = this.track.textures[this.physicsKey].regular;
       }   
       this.load.image('bg', this.bgUrl);
-      this.load.image('physics', this.physicsUrl);
+      this.load.image('pre_physics', this.physicsUrl);
     }    
   }
   
@@ -70,6 +72,7 @@ class MainScene extends Phaser.Scene {
     // this.UI.loaderText('BUILDING SCENE');  // DOM is blocked
     this.addBackgroundImage();    
     this.setBackgroundScale();
+    this.track.finalizePhysics();
     
     if(this.isMobile) {
       this.renderScale = 0.4;
@@ -207,15 +210,20 @@ class MainScene extends Phaser.Scene {
   }
   
   updateCar(car) {
-    let px = (car.x / this.bgScale);
-    let py = (car.y / this.bgScale);
+    let px = Math.floor(car.x / this.bgScale);
+    let py = Math.floor(car.y / this.bgScale);
     
     if(!this.track.bgIsTiled) {
       px += (this.bg.width / 2);
       py += (this.bg.height / 2);
     }
     
-    this.updateCarSurface(car, px, py);     
+    const surface = this.track.getSurface(px, py);
+    if(surface.type === Physics.surface.BARRIER)
+      car.crash();
+    else 
+      this.car.surface = surface;
+      
     car.update();    
     if(car.hasCamera)
       this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;
@@ -256,24 +264,6 @@ class MainScene extends Phaser.Scene {
     car.carSprite.rotation = car.shadow.rotation = car.tyresSprite.rotation = car.angle;
     car.carSprite.x = car.shadow.x = car.tyresSprite.x = car.x;
     car.carSprite.y = car.shadow.y = car.tyresSprite.y = car.y;  
-  }
-  
-  updateCarSurface(car, px, py) {
-    const surfacePhysicsPixel = this.textures.getPixel(px, py, 'physics');
-
-    if(surfacePhysicsPixel) {
-      if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
-        car.surface = Physics.tarmac;
-      else if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 0)
-        car.surface = Physics.sand;
-      else if(surfacePhysicsPixel.r == 0 &&  surfacePhysicsPixel.g == 0 && surfacePhysicsPixel.b == 0)
-        car.crash();
-      else
-        car.surface = Physics.grass;
-      // console.log(car.surface)
-    }
-    else 
-      car.surface = Physics.tarmac;
   }
 
 //////////////////////////////////////////// Game controls ////////////////////////////////////////////
