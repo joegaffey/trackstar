@@ -192,23 +192,18 @@ function currentQuote(n) {
 function addDots() {
   const quotes = document.querySelectorAll('.quote');
   const dots = document.querySelector('.dots');
-  for (i = 0; i < quotes.length; i++) {
+  for (let i = 0; i < quotes.length; i++) {
     dots.innerHTML += `<span class="dot" onclick="currentQuote(${i})"></span>`;
   }
 }  
 
 function showQuotes(n) {
-  let i;
-  const quotes = document.getElementsByClassName("quote");
-  const dots = document.getElementsByClassName("dot");
+  const quotes = document.querySelectorAll('.quote');
+  const dots = document.querySelectorAll('.dot');
   if (n > quotes.length) { quoteIndex = 1; }    
-  if (n < 1) {quoteIndex = quotes.length}
-  for (i = 0; i < quotes.length; i++) {
-      quotes[i].style.display = 'none';  
-  }
-  for (i = 0; i < dots.length; i++) {
-      dots[i].className = dots[i].className.replace(' active', '');
-  }
+  if (n < 1) { quoteIndex = quotes.length; }
+  Array.from(quotes).forEach(quote => { quote.style.display = 'none'; });
+  Array.from(dots).forEach(dot => { dot.className = dot.className.replace(' active', ''); });
   quotes[quoteIndex-1].style.display = 'block';  
   dots[quoteIndex-1].className += ' active';
 }

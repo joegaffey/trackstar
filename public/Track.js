@@ -60,14 +60,14 @@ class Track {
     return closestWP;
   }
   
-  draw(scene) {    
+  draw() {    
     const spline = new Phaser.Curves.Spline(this.points);
     this.bounds = spline.getBounds();
-    this.drawGraphicsTextures(scene);      
-    this.drawMapTexture(scene);  
+    this.drawGraphicsTextures();      
+    this.drawMapTexture();  
   }
   
-  drawFinal(scene) {
+  drawFinal() {
     this.points.forEach(point => { point.x *= this.renderScale; point.y *= this.renderScale; });
     this.trees.forEach(tree => { tree.x *= this.renderScale; tree.y *= this.renderScale; });
                         
@@ -81,16 +81,42 @@ class Track {
       tree.x -= this.bounds.x - this.margin;
       tree.y -= this.bounds.y - this.margin;
     })
-    this.draw(scene);
-    this.drawPhysicsTexture(scene);
+    this.draw();
+    this.drawPhysicsTexture();
+  }
+  
+  getSurface(px, py) {
+    let surface = Physics.tarmac;
+    
+    // Old way - worse perf on FF
+    // const surfacePhysicsPixel = this.scene.textures.getPixel(px, py, 'physics');
+    
+    const surfacePhysicsPixel = this.canvas.getPixel(px, py);
+    // console.log(surfacePhysicsPixel)
+
+    if(surfacePhysicsPixel) {
+      if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
+        surface = Physics.tarmac;
+      else if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 0)
+        surface = Physics.sand;
+      else if(surfacePhysicsPixel.r == 0 &&  surfacePhysicsPixel.g == 0 && surfacePhysicsPixel.b == 0)
+        surface = Physics.barrier;
+      else
+        surface = Physics.grass;
+
+    }
+    // console.log(surface)
+    return surface;
   }
     
-  drawPhysicsTexture(scene) {   
-    const graphicsGen = scene.make.graphics({x: 0, y: 0, add: false});    
+  drawPhysicsTexture() {   
+    
+    const w = Math.floor(this.bounds.width) + this.margin * 2;
+    const h = Math.floor(this.bounds.height) + this.margin * 2;
+    
+    const graphicsGen = this.scene.make.graphics({x: 0, y: 0, add: false});    
     graphicsGen.fillStyle(0x00ff00);
-    graphicsGen.fillRect(0, 0, 
-                         this.bounds.width + this.margin * 2, 
-                         this.bounds.height + this.margin * 2);    
+    graphicsGen.fillRect(0, 0, w, h);    
     graphicsGen.fillStyle(0xffffff);
     graphicsGen.fillCircle(this.points[this.points.length -1].x, 
                            this.points[this.points.length -1].y, 
@@ -105,14 +131,24 @@ class Track {
       graphicsGen.fillCircle(tree.x, tree.y, 100 * this.renderScale);
     });
     
-    graphicsGen.generateTexture('physics', 
-                                this.bounds.width + this.margin * 2, 
-                                this.bounds.height + this.margin * 2);   
+    graphicsGen.generateTexture('pre_physics', w, h);
     graphicsGen.destroy();
+    
+    // Alt code using render texture
+    // const rt = this.scene.add.renderTexture(0, 0, w, h);
+    // rt.draw(graphicsGen, 0, 0);
+    // rt.saveTexture('physics');
+    // rt.destroy();
+  }
+  
+  finalizePhysics() {
+    const src = this.scene.textures.get('pre_physics').getSourceImage();
+    this.canvas = this.scene.textures.createCanvas('physics', src.width, src.height).draw(0, 0, src);
+    this.scene.textures.remove('pre_physics');
   }
    
-  drawGraphicsTextures(scene) {
-    const graphicsGen = scene.make.graphics({x: 0, y: 0, add: false});
+  drawGraphicsTextures() {
+    const graphicsGen = this.scene.make.graphics({x: 0, y: 0, add: false});
     graphicsGen.lineStyle(5, 0xffffff);
     graphicsGen.strokeRect(0, 0, 40, 50);
     graphicsGen.generateTexture('start', 40, 40);
@@ -155,36 +191,36 @@ class Track {
     graphicsGen.destroy(); 
   }  
  
-  drawMapTexture(scene) {
-    const rt = scene.add.renderTexture(0, 0,
+  drawMapTexture() {
+    const rt = this.scene.add.renderTexture(0, 0,
                                         this.bounds.width + this.margin * 2, 
                                         this.bounds.height + this.margin * 2);
     
-    const graphics = scene.make.graphics({x: 0, y: 0, add: false});   
+    const graphics = this.scene.make.graphics({x: 0, y: 0, add: false});   
     this.drawKerbs(graphics);
     rt.draw(graphics, 0, 0);
     graphics.clear();
-    this.drawRope(scene, graphics, rt);
-    this.drawFinishLine(scene, rt);
-    this.drawStartingPositions(scene, rt);
-    this.drawTrees(scene, rt);    
+    this.drawRope(graphics, rt);
+    this.drawFinishLine(rt);
+    this.drawStartingPositions(rt);
+    this.drawTrees(rt);    
     rt.saveTexture('map');
     rt.destroy();
     
-    const map = scene.add.image(0, 0, 'map');
+    const map = this.scene.add.image(0, 0, 'map');
     map.setOrigin(0, 0);
     map.depth = 20;
     graphics.destroy();
   }
   
-  drawRope(scene, graphics, rt) {
+  drawRope(graphics, rt) {
     graphics.fillStyle(0x444444, 0.5);
     graphics.fillCircle(this.points[0].x, this.points[0].y, this.width / 2 * this.renderScale);
     graphics.fillStyle(0x444444, 1);
     graphics.fillCircle(this.points[0].x, this.points[0].y, (this.width / 2 * this.renderScale) - 5);
     rt.draw(graphics, 0, 0);
     const spline = new Phaser.Curves.Spline(this.points);
-    this.rope = scene.add.rope(0, 0, this.trackTexture, null, spline.getPoints(this.points.length * 16), true);  
+    this.rope = this.scene.add.rope(0, 0, this.trackTexture, null, spline.getPoints(this.points.length * 16), true);  
     rt.draw(this.rope, 0, 0);
     this.rope.destroy();
   }  
@@ -204,9 +240,9 @@ class Track {
     })
   }
   
-  drawTrees(scene, rt) {
+  drawTrees(rt) {
     this.trees.forEach(tree => {
-      const image = scene.add.image(tree.x, tree.y, 'tree' + tree.i);
+      const image = this.scene.add.image(tree.x, tree.y, 'tree' + tree.i);
       image.setScale(3 * this.renderScale);
       image.angle = Math.ceil(tree.angle);
       image.depth = 60;
@@ -215,12 +251,12 @@ class Track {
     });
   }
   
-  drawFinishLine(scene, rt) {
+  drawFinishLine(rt) {
     const spline = new Phaser.Curves.Spline(this.points);
     let startingPoints = spline.getDistancePoints(this.starterGap * this.renderScale);
     let sp0 = this.points[0];
     let angle = Phaser.Math.Angle.BetweenPoints(sp0, startingPoints[1]);
-    const image = scene.add.image(sp0.x, sp0.y, 'finish');
+    const image = this.scene.add.image(sp0.x, sp0.y, 'finish');
     image.depth = 14;
     image.rotation = angle;
     image.angle -= 90;      
@@ -230,7 +266,7 @@ class Track {
     image.destroy();
   }
     
-  drawStartingPositions(scene, rt) {
+  drawStartingPositions(rt) {
     this.gridPositions = [];
     const spline = new Phaser.Curves.Spline(this.points);
     let startingPoints = spline.getDistancePoints(this.starterGap * this.renderScale);
@@ -238,7 +274,7 @@ class Track {
       startingPoints = startingPoints.reverse();
     for(let i = 2; i < this.pitBoxCount; i++) {
       const p = startingPoints[i];
-      const image = scene.add.image(p.x, p.y, 'start');
+      const image = this.scene.add.image(p.x, p.y, 'start');
       image.depth = 20;
       const angle = Phaser.Math.Angle.BetweenPoints(p, startingPoints[i + 1]);
       image.rotation = angle;
