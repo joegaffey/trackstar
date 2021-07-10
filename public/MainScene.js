@@ -83,7 +83,16 @@ class MainScene extends Phaser.Scene {
     this.bg.setScale(this.bgScale);
     
     this.track.renderScale = this.renderScale;        
-    this.camera.setup();
+    this.camera.setup();    
+    if(this.track.bgIsTiled) {
+      this.cameras.main.setBounds(this.track.bounds.x - this.track.margin, 
+                           this.track.bounds.y - this.track.margin, 
+                           this.track.bounds.width + this.track.margin * 2, 
+                           this.track.bounds.height + this.track.margin * 2);
+    }
+    else {
+      this.cameras.main.setBounds(this.bg.getBounds());  
+    }
     
     this.setupCar(this.car, 0);
     if(this.particles.mode > 0)
