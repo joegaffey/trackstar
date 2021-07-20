@@ -1,4 +1,5 @@
 class Race {
+  
   constructor(lapsCount, scene) {
     this.inProgress = false;  
     this.scene = scene;
@@ -8,10 +9,12 @@ class Race {
   }
   
   start() {
+    this.isStarting = false;
     this.inProgress = true;
   }
   
   end() {
+    this.isStarting = false;
     this.inProgress = false;
   }
   
@@ -24,6 +27,7 @@ class Race {
   }
   
   reset(lapsCount) {
+    this.isStarting = false;
     this.inProgress = false;
     if(lapsCount)
       this.lapsCount = lapsCount;

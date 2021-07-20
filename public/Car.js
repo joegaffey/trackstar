@@ -34,8 +34,12 @@ class Car {
     this.angle = angle;
     this.angularVelocity = this.xVelocity = this.yVelocity = 0;
     this.power = 0;
-    this.power = 0;
+    this.reverse = 0;
     this.lap = 0;
+    this.isThrottling = false;
+    this.isReversing = false;
+    this.isTurningLeft = false;
+    this.isTurningRight = false;
   }
   
   throttle(input) {
