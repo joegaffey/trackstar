@@ -33,7 +33,7 @@ class MainScene extends Phaser.Scene {
     this.load.image('tyres', this.baseUrl + 'tyres.png');
     this.load.image('dust', this.baseUrl + 'dust.png');
     for(let i = 1; i < 14; i++) {
-      this.load.image('tree' + i, `${this.baseUrl}tree${i}.png`);  
+      this.load.image('tree' + i, `${this.baseUrl}tree${i}.png`);
     }
     for(let i = 1; i < 14; i++) {
       this.load.image('tree' + i, `${this.baseUrl}tree${i}.png`);  
@@ -69,9 +69,10 @@ class MainScene extends Phaser.Scene {
 //////////////////////////////////////////// Setup phase ////////////////////////////////////////////
 
   create() {
-    // this.UI.loaderText('BUILDING SCENE');  // DOM is blocked
     this.addBackgroundImage();    
     this.setBackgroundScale();
+    
+    this.UI.loaderText('PROCESSING PHYSICS');
     this.track.finalizePhysics();
     
     if(this.isMobile) {
@@ -184,7 +185,6 @@ class MainScene extends Phaser.Scene {
     return car;
   }
   
-  
 /////////////////////////////////////////////////////////////////// Main loop ///////////////////////////////////////////////////////////////////////////////
   
   update(time, delta) {
@@ -198,13 +198,14 @@ class MainScene extends Phaser.Scene {
     if(this.paused)
       return;    
     
-    if(!this.car.isAI) {
+    if(!this.car.isAI && !this.race.isStarting) {
       this.car.brake(controls.joyDown);
       this.car.throttle(controls.joyUp);
       this.car.steerLeft(controls.joyLeft);
       this.car.steerRight(controls.joyRight);
-      this.updateCar(this.car);
     }    
+    if(!this.car.isAI) 
+      this.updateCar(this.car);
         
     if(this.race.inProgress) {
       this.AI.updateCars();
@@ -214,7 +215,7 @@ class MainScene extends Phaser.Scene {
           this.updateCar(car);
         }
       });
-    }    
+    }        
     this.tyreMarks.draw();
   }
   
@@ -334,11 +335,19 @@ class MainScene extends Phaser.Scene {
     if(!this.track.points.length > 0) {
       this.UI.toast('Insuffient track data');
       return;
-    }    
+    }
+    this.resetPlayerCar();
     if(this.cars.length === 1)
       this.addAICars(9);
     this.setupRacingLine();
+    this.race.isStarting = true;
     this.HUD.startlightsSequence();
+  }
+  
+  resetPlayerCar() {
+    this.car.reset(this.track.gridPositions[0].x * this.renderScale,
+                  this.track.gridPositions[0].y * this.renderScale,
+                  this.track.gridPositions[0].angle * Math.PI / 180);
   }
   
   setupRacingLine() {
@@ -360,10 +369,7 @@ class MainScene extends Phaser.Scene {
     let len = this.cars.length;
     this.particles.reset();
     this.AI.reset();
-    this.car.reset(this.track.gridPositions[0].x * this.renderScale,
-                  this.track.gridPositions[0].y * this.renderScale,
-                  this.track.gridPositions[0].angle * Math.PI / 180);
-    
+    this.resetPlayerCar();
     this.particles.addEmitter(this.car);
     this.cars = [this.car];
     this.addAICars(len - 1);
