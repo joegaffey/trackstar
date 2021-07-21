@@ -81,8 +81,8 @@ class HUDScene extends Phaser.Scene {
       else if(key.code === "Enter" || key.code === "Space") { this.gameScene.pause(); }
       else if(key.code === "BracketRight") { this.gameScene.camera.nextCar(); }
       else if(key.code === "BracketLeft") { this.gameScene.camera.previousCar(); }
-      else if(key.code === "KeyI") { this.gameScene.addAICars(1); }
-      else if(key.code === "KeyO") { this.gameScene.startRace(); }
+      else if(key.code === "KeyI" && !this.gameScene.race.inProgress) { this.gameScene.addAICars(1); }
+      else if(key.code === "KeyO" && !this.gameScene.race.inProgress) { this.gameScene.startRace(); }
       else if(key.code === "KeyP") { this.gameScene.toggleParticles(); }
       else if(key.code === "KeyT") { this.gameScene.toggleTyreMarks(); }
       else if(key.code === "KeyU") { this.gameScene.toggleAiDriver(); }
