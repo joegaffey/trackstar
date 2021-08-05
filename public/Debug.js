@@ -29,4 +29,12 @@ class Debug {
     graphics.strokeRect(b.x, b.y, b.width, b.height);
     graphics.depth = 60;
   }
+  
+  cars(cars, color, duration) {
+    cars.forEach(car => {
+      car.carSprite.setTint(color);
+      if(duration)
+        setInterval(() => { car.carSprite.setTint(0xffffff); }, duration);
+    });
+  }
 }
