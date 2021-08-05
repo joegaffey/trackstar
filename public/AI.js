@@ -69,18 +69,17 @@ class AI {
           const dist1 = Phaser.Math.Distance.Between(car1.x, car1.y, car2.x, car2.y);
           const dist2 = Phaser.Math.Distance.Between(car1.x, car1.y,  this.scene.track.wayPoints[car1.nextWP].x,  this.scene.track.wayPoints[car1.nextWP].y);
           const dist3 = Phaser.Math.Distance.Between(car2.x, car2.y,  this.scene.track.wayPoints[car1.nextWP].x,  this.scene.track.wayPoints[car1.nextWP].y);
-          if(dist1 < 100) {
-            if(dist2 > dist3)
-              car1.warning = true;     
+          if(dist1 < 50) {
+            // car1.collideCar(car2); 
+            this.scene.debug.cars([car1, car2], 0xff0000, 0.5);     
+          }
+          else if(dist1 < 100) {
+            if(dist2 > dist3) 
+              car1.warning = true;
             else
               car2.warning = true;
-          }
-          // if(dist1 < 50) {
-          //   if(dist2 >= dist3)
-          //     car1.collideCar(car2);     
-          //   else
-          //     car2.collideCar(car1);            
-          // }
+            // this.scene.debug.cars([car1, car2], 0xffff00, 0.5);
+          }          
         }          
       });  
     });    

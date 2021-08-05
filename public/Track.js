@@ -44,7 +44,7 @@ class Track {
       trees:this.trees
     }
   }
-  
+   
   closestWP(car) {
     let dist = 99999;
     let closestWP = 0;
@@ -60,14 +60,13 @@ class Track {
     return closestWP;
   }
   
-  draw() {    
-    const spline = new Phaser.Curves.Spline(this.points);
-    this.bounds = spline.getBounds();
-    this.drawGraphicsTextures();      
-    this.drawMapTexture();  
+  drawFinal() {
+    this.adjustRenderScale();
+    this.drawGraphics();
+    this.drawPhysicsTexture();
   }
   
-  drawFinal() {
+  adjustRenderScale() {
     this.points.forEach(point => { point.x *= this.renderScale; point.y *= this.renderScale; });
     this.trees.forEach(tree => { tree.x *= this.renderScale; tree.y *= this.renderScale; });
                         
@@ -81,9 +80,9 @@ class Track {
       tree.x -= this.bounds.x - this.margin;
       tree.y -= this.bounds.y - this.margin;
     })
-    this.draw();
-    this.drawPhysicsTexture();
-  }
+  }  
+  
+  /////////////////////////////// Physics Functions //////////////////////////////////////////////////
   
   getSurface(px, py) {
     let surface = Physics.tarmac;
@@ -146,7 +145,17 @@ class Track {
     this.canvas = this.scene.textures.createCanvas('physics', src.width, src.height).draw(0, 0, src);
     this.scene.textures.remove('pre_physics');
   }
+  
+  
+  /////////////////////////////// Graphics Functions //////////////////////////////////////////////////
    
+  drawGraphics() {    
+    const spline = new Phaser.Curves.Spline(this.points);
+    this.bounds = spline.getBounds();
+    this.drawGraphicsTextures();      
+    this.drawMapTexture();  
+  }
+  
   drawGraphicsTextures() {
     const graphicsGen = this.scene.make.graphics({x: 0, y: 0, add: false});
     graphicsGen.lineStyle(5, 0xffffff);

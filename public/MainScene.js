@@ -1,6 +1,6 @@
 class MainScene extends Phaser.Scene {
   
-  constructor() {
+  constructor() {    
     super({key: 'MainScene', active: true});    
     
     this.track = track;
@@ -25,7 +25,7 @@ class MainScene extends Phaser.Scene {
   
 //////////////////////////////////////////// Preload phase ////////////////////////////////////////////
 
-  preload() {
+  preload() {     
     this.UI.loaderText('LOADING ASSETS');
     this.isMobile = isMobile = !game.device.os.desktop && game.device.input.touch;
     this.loadBackgroundImage();
@@ -73,7 +73,12 @@ class MainScene extends Phaser.Scene {
     this.setBackgroundScale();
     
     this.UI.loaderText('PROCESSING PHYSICS');
-    this.track.finalizePhysics();
+    try { 
+      this.track.finalizePhysics();
+    }
+    catch(e) {
+      alert('Failed to intialize physics')
+    }
     
     if(this.isMobile) {
       this.renderScale = 0.4;
@@ -103,7 +108,12 @@ class MainScene extends Phaser.Scene {
     
     this.camera.followCar(this.car);
     
-    this.tyreMarks.setup();
+    try {
+      this.tyreMarks.setup();
+    }
+    catch(e) {
+      alert('Failed to set up tyremarks')
+    }
          
     this.UI.hideSpinner();
     
@@ -126,8 +136,12 @@ class MainScene extends Phaser.Scene {
   
   addBackgroundImage() {
     if(this.track.bgIsTiled) {
-      this.track.drawFinal(this);
-      
+      try {
+        this.track.drawFinal(this); 
+      }
+      catch(e) {
+        alert('Failed to render background!') 
+      }
       this.bg = this.add.tileSprite(this.track.bounds.x - this.track.margin, 
                                      this.track.bounds.y - this.track.margin, 
                                      this.track.bounds.width + this.track.margin * 2, 
@@ -229,8 +243,10 @@ class MainScene extends Phaser.Scene {
     }
     
     const surface = this.track.getSurface(px, py);
-    if(surface.type === Physics.surface.BARRIER)
+    if(surface.type === Physics.surface.BARRIER) {
       car.crash();
+      this.debug.cars([car], 0xff0000, 0.5);   
+    }
     else 
       this.car.surface = surface;
       
@@ -256,18 +272,9 @@ class MainScene extends Phaser.Scene {
           car.lap++;
           if(car.lap > this.race.lapsCount)
             this.raceOver();
-        }
-        
+        }        
       }
     }
-  }
-  
-  raceOver() {
-    this.race.end();
-    this.UI.toast('Race Over!!!');
-    setTimeout(() => {
-      this.UI.showLeaderboard();
-    }, 3000);
   }
   
   updateCarSprite(car) {
@@ -339,9 +346,17 @@ class MainScene extends Phaser.Scene {
     this.resetPlayerCar();
     if(this.cars.length === 1)
       this.addAICars(9);
-    this.setupRacingLine();
+    this.setRacingLine();
     this.race.isStarting = true;
     this.HUD.startlightsSequence();
+  }
+  
+  raceOver() {
+    this.race.end();
+    this.UI.toast('Race Over!!!');
+    setTimeout(() => {
+      this.UI.showLeaderboard();
+    }, 3000);
   }
   
   resetPlayerCar() {
@@ -350,7 +365,7 @@ class MainScene extends Phaser.Scene {
                   this.track.gridPositions[0].angle * Math.PI / 180);
   }
   
-  setupRacingLine() {
+  setRacingLine() {
     let spline = new Phaser.Curves.Spline(this.track.points);
     this.bounds = spline.getBounds();    
     this.track.points.forEach(point => {

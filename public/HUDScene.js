@@ -74,8 +74,9 @@ class HUDScene extends Phaser.Scene {
     });
     this.input.keyboard.on('keydown', (key) =>  { 
       // console.log(key);
-      if(this.gameScene.race.isStarting)
+      if(this.gameScene.race.isStarting) 
         return;
+           
       if(key.code === "Minus") { this.gameScene.camera.zoomOut(); }
       else if(key.code === "Equal") { this.gameScene.camera.zoomIn(); }
       else if(key.code === "Enter" || key.code === "Space") { this.gameScene.pause(); }

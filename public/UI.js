@@ -37,6 +37,9 @@ class UI {
     const settingsButton = document.querySelector('#settingsButton');
     settingsButton.onclick = () => { this.switchMenuContent('settings'); };
     
+    const perfButton = document.querySelector('#perfButton');
+    perfButton.onclick = () => { this.switchMenuContent('performance'); };
+    
     const raceButton = document.querySelector('#raceButton');
     raceButton.onclick = () => { this.switchMenuContent('race'); };  
     
