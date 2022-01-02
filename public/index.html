@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TrackStar</title>
+  
+  <meta content="user-scalable=0" name="viewport">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  
+  <link rel="stylesheet" href="./style.css">  
+  <script src="./lib/phaser3.54.0.min.js"></script>
+  <script src="./scripts/Physics.js"></script>
+  <script src="./scripts/Particles.js"></script>
+  <script src="./scripts/Track.js"></script>
+  <script src="./scripts/Car.js"></script>
+  <script src="./scripts/AI.js"></script>
+  <script src="./scripts/TyreMarks.js"></script>
+  <script src="./scripts/Camera.js"></script>
+  <script src="./scripts/Names.js"></script>
+  <script src="./scripts/Race.js"></script>
+  <script src="./scripts/Debug.js"></script>
+  <script src="./scripts/UI.js"></script>
+  <script src="./scripts/MainScene.js"></script>
+  <script src="./scripts/HUDScene.js"></script>
+  <script src="./scripts/audio.js"></script>
+  <script src="./scripts/game.js"></script>
+</head>
+<body>
+  <div class="spinner" style="text-align:center">
+    <div id="loaderText">INITIALIZING ENGINE</div>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+  <div id="toast" class="ui"></div>
+  <div id="results" class="ui">
+    <div class="button" id="closeResults">Close</div>
+    <ol id="leadersList"></ol>
+  </div>
+  <div id="pauseMenu" class="ui">
+    <div class="button" id="resumeButton">Return</div>
+    <div class="button" id="restartButton">Start</div>
+    <div class="button" id="menuButton">Menu</div>
+  </div>
+  <div id="mainMenu" class="ui">
+    <div class="tabs">
+      <span class="button" id="hideMenuButton">Return</span>
+      <span class="button" id="controlsButton">Help</span>
+      <span class="button" id="raceButton">Session</span>
+      <span class="button" id="settingsButton">Settings</span>
+      <span class="button" id="perfButton">Performance</span>
+    </div>
+    <div id="controls" class="menuContent active">
+      <p>Use a gamepad, arrow or WASD keys to drive</p>
+      <p>Game Controls:</p>
+      <ul>
+        <li>'I' to add an AI driver</li>
+        <li>'O' to start a race</li>
+        <li>'R' to reset the grid</li>
+        <li>'U' to toggle the AI driver</li>
+        <li>'Enter or Space' to pause/resume</li>
+        <li>'M' for main menu</li>
+        <li>'P' to change particles settings</li>
+        <li>'T' to change tyre marks setting</li>
+        <li>'+' and '-' to zoom in and out</li>
+        <li>'+' and '-' to zoom in and out</li>
+        <li>'[' and ']' to change camera</li>
+      </ul>
+    </div>
+    <div id="performance" class="menuContent">
+      <p>Coming soon (use keys for now)</p>
+      <ul>
+        <li>
+          <p>Tyre marks</p>
+          <input type="radio" id="tOff" name="tyres" value="none" disabled>
+          <label for="off">Off</label><br>
+          <input type="radio" id="tPlayer" name="tyres" value="player">
+          <label for="player">Player car only</label><br>
+          <input type="radio" id="tAll" name="tyres" value="all">
+          <label for="all">All cars</label>
+        </li>
+        <li>
+          <p>Particles</p>
+          <input type="radio" id="pOff" name="particles" value="none" disabled>
+          <label for="off">Off</label><br>
+          <input type="radio" id="pPlayer" name="particles" value="player">
+          <label for="player">Player car only</label><br>
+          <input type="radio" id="pAll" name="particles" value="all">
+          <label for="all">All cars</label>
+        </li>
+        <li>
+          <p>Render scale</p>
+          <input type="range" min="20" max="200" value="120" step="10" disabled>
+        </li>
+      </ul>
+    </div>
+    <div id="race" class="menuContent">
+      <p>Coming soon (use keys for now)</p>
+      <ul>
+        <li>
+          <p>AI Drivers</p>
+          <input type="range" min="0" max="20" value="10" step="1" disabled>
+        </li>
+        <li>
+          <p>Number of laps</p>
+          <input type="range" min="1" max="100" value="5" step="1" disabled>
+        </li>
+      </ul>
+      <div id="goButton" class="button" disabled>Go!!!</div>
+    </div>
+     <div id="settings" class="menuContent">
+      <p>Coming soon (use keys for now)</p>
+      <ul>
+        <li>
+          <p>Effects volume</p>
+          <input type="range" min="0" max="100" value="20" step="10" disabled>
+        </li>
+        <li>
+          <p>Camera zoom</p>
+          <input type="range" min="0.2" max="2" value="1" step="0.1" disabled>
+        </li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
