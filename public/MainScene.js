@@ -104,8 +104,6 @@ class MainScene extends Phaser.Scene {
     if(this.particles.mode > 0)
       this.car.emitter.start();
         
-    this.addEngineSound();
-    
     this.camera.followCar(this.car);
     
     try {
@@ -120,18 +118,10 @@ class MainScene extends Phaser.Scene {
     this.HUD = this.scene.get('HUDScene');
     this.HUD.scene.setVisible(true);
     
+    this.pause();
+    
     // this.debug.tyreMarks();
     // this.debug.physics(); 
-  }
-  
-  addEngineSound() {
-    this.engineSound = this.sound.add('engine');
-    // this.engineSound.addMarker({ name: 'clip', start: 1, duration: 1, config: {} });
-    this.engineSound.rate = this.car.minEngineSpeed / this.car.engineSoundFactor;
-    // this.engineSound.detune = 50;
-    // this.engineSound.play('clip', { loop: true, delay: 0, volume: 0.1 });
-    // this.engineSound.play({ loop: true, seek: 0.1, duration: 1, delay: 0, volume: 0.1 });
-    this.engineSound.play({ loop: true, delay: 0, volume: 0.1 });
   }
   
   addBackgroundImage() {
@@ -252,7 +242,7 @@ class MainScene extends Phaser.Scene {
       
     car.update();    
     if(car.hasCamera)
-      this.engineSound.rate = car.engineSpeed / car.engineSoundFactor;
+      audio.engine.power(car.engineSpeed / car.engineSoundFactor);
     
     this.updateCarSprite(car);    
     
@@ -289,12 +279,12 @@ class MainScene extends Phaser.Scene {
     if(this.paused) {
       this.paused = false;
       this.particles.resume();
-      this.engineSound.resume();
+      audio.engine.restart()
     }
     else {
       this.paused = true; 
       this.particles.pause();
-      this.engineSound.pause();
+      audio.engine.stop()
     }
     this.UI.pauseMenu();
   }
