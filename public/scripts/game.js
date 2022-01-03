@@ -28,6 +28,8 @@ async function getTrackData(trackId) {
 }
 
 if(trackId) {
+  if(trackId === '1')
+    trackId = 'test.json';
   console.log('Loading track: ' + trackId);
   getTrackData(trackId).then(trackData => {
     if(trackData) {

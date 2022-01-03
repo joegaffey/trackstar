@@ -1,127 +1,213 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TrackStar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
   
-  <meta content="user-scalable=0" name="viewport">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+* {
+  box-sizing: border-box
+}
+
+body {
+	font-family: Verdana, sans-serif; 
+  margin:0; 
+  background-color: #010101; 
+	color: #f2f2f2;
+  min-width: 300px;
+}
+
+.quote {
+	display: none;
+}
+
+.quotes-container {
+  max-width: 1000px;
+  height: 200px;
+  position: relative;
+  margin: auto;
+}
+
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: #a2a2a2;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+}
+
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+  color: white;
+}
+
+.title {  
+  font-size: 36px;
+  padding-top: calc(.25 * 100vh);
+  text-align: center;
+  font-weight: lighter;
+  letter-spacing: 4px;
+}
+
+.text {  
+  font-size: 15px;
+  padding: 50px;
+  padding-bottom: 10px;
+  text-align: center;
+  font-style: oblique;
+}
   
-  <link rel="stylesheet" href="./style.css">  
-  <script src="./lib/phaser3.54.0.min.js"></script>
-  <script src="./scripts/Physics.js"></script>
-  <script src="./scripts/Particles.js"></script>
-  <script src="./scripts/Track.js"></script>
-  <script src="./scripts/Car.js"></script>
-  <script src="./scripts/AI.js"></script>
-  <script src="./scripts/TyreMarks.js"></script>
-  <script src="./scripts/Camera.js"></script>
-  <script src="./scripts/Names.js"></script>
-  <script src="./scripts/Race.js"></script>
-  <script src="./scripts/Debug.js"></script>
-  <script src="./scripts/UI.js"></script>
-  <script src="./scripts/MainScene.js"></script>
-  <script src="./scripts/HUDScene.js"></script>
-  <script src="./scripts/audio.js"></script>
-  <script src="./scripts/game.js"></script>
+.links {
+  padding: 50px;
+  padding-top: 80px;
+  text-align: center;
+}
+  
+.links > a {
+  font-size: 13px;
+  line-height: 1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 2px;
+  border: 2px solid #888;
+  color: #888;
+  border-radius: 300px;
+  width: 150px;
+  margin: 8px;
+  padding: 8px;
+  display: inline-block;
+  transition: 0.6s ease;
+}
+  
+.links > a:hover {
+  color: white;
+  border-color: white;
+}
+
+.attributed {
+  font-size: 12px;
+  padding: 10px;
+  height: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.dot {
+  cursor: pointer;
+  height: 10px;
+  width: 10px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+  background-color: #717171;
+}
+
+.fade {
+  animation-name: fade;
+  animation-duration: 1s;
+}
+
+@-webkit-keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+
+@keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+
+@media only screen and (max-width: 700px) {
+  .links > a { width: 100%; }
+  .title { padding-top: calc(.2 * 100vh); }
+}
+</style>
 </head>
+  
 <body>
-  <div class="spinner" style="text-align:center">
-    <div id="loaderText">INITIALIZING ENGINE</div>
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
-  </div>
-  <div id="toast" class="ui"></div>
-  <div id="results" class="ui">
-    <div class="button" id="closeResults">Close</div>
-    <ol id="leadersList"></ol>
-  </div>
-  <div id="pauseMenu" class="ui">
-    <div class="button" id="resumeButton">Return</div>
-    <div class="button" id="restartButton">Start</div>
-    <div class="button" id="menuButton">Menu</div>
-  </div>
-  <div id="mainMenu" class="ui">
-    <div class="tabs">
-      <span class="button" id="hideMenuButton">Return</span>
-      <span class="button" id="controlsButton">Help</span>
-      <span class="button" id="raceButton">Session</span>
-      <span class="button" id="settingsButton">Settings</span>
-      <span class="button" id="perfButton">Performance</span>
-    </div>
-    <div id="controls" class="menuContent active">
-      <p>Use a gamepad, arrow or WASD keys to drive</p>
-      <p>Game Controls:</p>
-      <ul>
-        <li>'I' to add an AI driver</li>
-        <li>'O' to start a race</li>
-        <li>'R' to reset the grid</li>
-        <li>'U' to toggle the AI driver</li>
-        <li>'Enter or Space' to pause/resume</li>
-        <li>'M' for main menu</li>
-        <li>'P' to change particles settings</li>
-        <li>'T' to change tyre marks setting</li>
-        <li>'+' and '-' to zoom in and out</li>
-        <li>'+' and '-' to zoom in and out</li>
-        <li>'[' and ']' to change camera</li>
-      </ul>
-    </div>
-    <div id="performance" class="menuContent">
-      <p>Coming soon (use keys for now)</p>
-      <ul>
-        <li>
-          <p>Tyre marks</p>
-          <input type="radio" id="tOff" name="tyres" value="none" disabled>
-          <label for="off">Off</label><br>
-          <input type="radio" id="tPlayer" name="tyres" value="player">
-          <label for="player">Player car only</label><br>
-          <input type="radio" id="tAll" name="tyres" value="all">
-          <label for="all">All cars</label>
-        </li>
-        <li>
-          <p>Particles</p>
-          <input type="radio" id="pOff" name="particles" value="none" disabled>
-          <label for="off">Off</label><br>
-          <input type="radio" id="pPlayer" name="particles" value="player">
-          <label for="player">Player car only</label><br>
-          <input type="radio" id="pAll" name="particles" value="all">
-          <label for="all">All cars</label>
-        </li>
-        <li>
-          <p>Render scale</p>
-          <input type="range" min="20" max="200" value="120" step="10" disabled>
-        </li>
-      </ul>
-    </div>
-    <div id="race" class="menuContent">
-      <p>Coming soon (use keys for now)</p>
-      <ul>
-        <li>
-          <p>AI Drivers</p>
-          <input type="range" min="0" max="20" value="10" step="1" disabled>
-        </li>
-        <li>
-          <p>Number of laps</p>
-          <input type="range" min="1" max="100" value="5" step="1" disabled>
-        </li>
-      </ul>
-      <div id="goButton" class="button" disabled>Go!!!</div>
-    </div>
-     <div id="settings" class="menuContent">
-      <p>Coming soon (use keys for now)</p>
-      <ul>
-        <li>
-          <p>Effects volume</p>
-          <input type="range" min="0" max="100" value="20" step="10" disabled>
-        </li>
-        <li>
-          <p>Camera zoom</p>
-          <input type="range" min="0.2" max="2" value="1" step="0.1" disabled>
-        </li>
-      </ul>
-    </div>
-  </div>
+
+<h1 class="title fade">TRACKSTAR</h1>
+<div class="quotes-container">
+<div class="quote fade">
+  <div class="text">"What’s behind you doesn’t matter."</div>
+  <div class="attributed">Enzo Ferrari</div>
+</div>
+<div class="quote fade">
+  <div class="text">"If you’re in control, you’re not going fast enough."</div>
+  <div class="attributed">Parnelli Jones</div>
+</div>
+<div class="quote fade">
+  <div class="text">"He ran out of talent about halfway through the corner."</div>
+  <div class="attributed">Buddy Baker</div>
+</div>
+<div class="quote fade">
+  <div class="text">"Auto racing began five minutes after the second car was built."</div>
+  <div class="attributed">Henry Ford</div>
+</div>
+<div class="quote fade">
+  <div class="text">"If you can leave two black stripes from the exit of one corner to the braking zone of the next, you have enough horsepower."</div>
+  <div class="attributed">Mark Donohue</div>
+</div>
+  <a class="prev" onclick="advanceQuotes(-1)">&#10094;</a>
+  <a class="next" onclick="advanceQuotes(1)">&#10095;</a>
+</div>
+
+<div class="dots" style="text-align:center"></div>
+  
+<div class="links fade">
+  <a href="./game.html">Mondello</a>
+  <a href="./game.html#1">Test Track</a>
+  <a href="./editor.html">Editor</a>
+</div>
+
+<script>
+var quoteIndex = 1;
+  
+addDots();
+showQuotes(quoteIndex);
+  
+function advanceQuotes(n) {
+  showQuotes(quoteIndex += n);
+}
+
+function currentQuote(n) {
+  showQuotes(quoteIndex = n);
+}
+  
+function addDots() {
+  const quotes = document.querySelectorAll('.quote');
+  const dots = document.querySelector('.dots');
+  for (let i = 0; i < quotes.length; i++) {
+    dots.innerHTML += `<span class="dot" onclick="currentQuote(${i})"></span>`;
+  }
+}  
+
+function showQuotes(n) {
+  const quotes = document.querySelectorAll('.quote');
+  const dots = document.querySelectorAll('.dot');
+  if (n > quotes.length) { quoteIndex = 1; }    
+  if (n < 1) { quoteIndex = quotes.length; }
+  Array.from(quotes).forEach(quote => { quote.style.display = 'none'; });
+  Array.from(dots).forEach(dot => { dot.className = dot.className.replace(' active', ''); });
+  quotes[quoteIndex-1].style.display = 'block';  
+  dots[quoteIndex-1].className += ' active';
+}
+</script>
+
 </body>
 </html>

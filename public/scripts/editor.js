@@ -43,6 +43,8 @@ function sendTrack() {
   }).then(res => res.json())
     .then(res => {
     console.log('Track uploaded to server with id: ' + res.id);
-    window.location.replace('./#' +  res.id);
+    window.location.replace('./game.html#' +  res.id);
+  }).catch(error => {
+    alert('Server unavailable');
   });
 }
