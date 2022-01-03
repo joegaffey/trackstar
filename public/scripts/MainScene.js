@@ -189,11 +189,11 @@ class MainScene extends Phaser.Scene {
   
   update(time, delta) {
     
-    // this.frameTime += delta
-    // if(this.frameTime < 16.5) 
-    //   return;
-    // else 
-    //   this.frameTime = 0;
+    this.frameTime += delta
+    if(fps > 75 && this.frameTime < 16.5)
+      return;
+    else 
+      this.frameTime = 0;
     
     if(this.paused)
       return;    

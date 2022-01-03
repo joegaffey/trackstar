@@ -106,8 +106,13 @@ class Car {
     
     this.x += this.xVelocity * this.renderScale * 4;
     this.y -= this.yVelocity * this.renderScale * 4;
-    this.angle += this.angularVelocity;    
-     
+    
+    // if(fps > 20) {
+    //   this.x *= (60 / fps);
+    //   this.y *= (60 / fps);
+    // }
+    
+    this.angle += this.angularVelocity;     
     // console.log(this.x + ' ' + this.y)
   }
   
