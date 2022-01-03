@@ -1,3 +1,19 @@
+//https://blog.bullgare.com/2019/03/simple-way-to-detect-browsers-fps-via-js/
+let fps;
+let times = [];
+function fpsLoop() {
+  window.requestAnimationFrame(() => {
+    const now = performance.now();
+    while (times.length > 0 && times[0] <= now - 1000) {
+      times.shift();
+    }
+    times.push(now);
+    fps = times.length;
+    fpsLoop();
+  });
+}
+fpsLoop();
+
 let isMobile = false;
 
 const controls = {
@@ -116,7 +132,8 @@ function init() {
     input: {
       gamepad: true
     },
-    // fps: {
+    // Causes perf issues
+    // fps: {  
     //   target: 60,
     //   forceSetTimeOut: true
     // },
