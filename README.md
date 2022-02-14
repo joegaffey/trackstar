@@ -4,9 +4,9 @@ Get out on that track and show them what you can do!
 
 Inspired by top down racers like [Circuit Superstars](https://store.steampowered.com/app/1097130/Circuit_Superstars/), [Real World Racing](https://steamcommunity.com/sharedfiles/filedetails/?id=94564971) and [Ultimate Racing 2D](https://store.steampowered.com/app/808080/Ultimate_Racing_2D/), TrackStar is an attempt to create a semi-realistic car racing simulator that runs in the browser so anyone can hop into a virtual car anywhere they have access to an internet connection (or even offline via upcoming PWA support).
 
-Try it out [here](http://trackstar.glitch.me/intro).  Use a gamepad, touch (in progress), keyboard arrows or WASD keys to drive. Enjoy!
+Try it out [here](https://trackstar.glitch.me/).  Use a gamepad, touch (in progress), keyboard arrows or WASD keys to drive. Enjoy!
 
-Also check out the track editor [here](http://trackstar.glitch.me/editor)!
+Also check out the track editor [here](https://trackstar.glitch.me/editor)!
 
 ## Track Editor User Guide
 
