@@ -16,7 +16,7 @@ app.get("/editor", (request, response) => {
 });
 
 app.get("/intro", (request, response) => {
-  response.sendFile(__dirname + "/public/intro.html");
+  response.sendFile(__dirname + "/public/index.html");
 });
 
 app.post("/tracks", (request, response) => {
