@@ -40,20 +40,35 @@ class TyreMarks {
           sy = (r * this.tileSize + this.tileSize / 2) * this.scene.bgScale;
         } else {
           const half = tw / 2;
-          sx = this.scene.bg.x + (c * this.tileSize + this.tileSize / 2 - half) * this.scene.bgScale;
-          sy = this.scene.bg.y + (r * this.tileSize + this.tileSize / 2 - half) * this.scene.bgScale;
+          sx = (c * this.tileSize + this.tileSize / 2 - half) * this.scene.bgScale;
+          sy = (r * this.tileSize + this.tileSize / 2 - half) * this.scene.bgScale;
         }
         rt.setPosition(sx, sy);
         rt.setScale(this.scene.bgScale);
         rt.setOrigin(0.5, 0.5);
 
-        this.tiles.push({rt, col: c, row: r});
+        this.tiles.push({rt, col: c, row: r, dirty: false});
       }
     }
+
+    const dg = this.scene.add.graphics();
+    dg.depth = 30;
+    dg.lineStyle(2, 0xff00ff, 0.5);
+    this.tiles.forEach(t => {
+      const hw = this.tileSize / 2 * this.scene.bgScale;
+      dg.strokeRect(t.rt.x - hw, t.rt.y - hw, this.tileSize * this.scene.bgScale, this.tileSize * this.scene.bgScale);
+    });
+    this._grid = dg;
+    this._grid.setVisible(false);
   }
-  
+
+  toggleGrid() {
+    if(this._grid) this._grid.setVisible(!this._grid.visible);
+  }
+
   reset() {
-    this.tiles.forEach(t => t.rt.clear());
+    this.tiles.forEach(t => { t.rt.clear(); t.rt.setVisible(false); t.dirty = false; });
+    this._skip = 0;
   }
 
   incrementMode() {
@@ -61,7 +76,7 @@ class TyreMarks {
     if(this.mode > this.ALL)
       this.mode = this.NONE;
     if(this.mode === this.NONE) {
-      this.tiles.forEach(t => t.rt.clear());
+      this.tiles.forEach(t => { t.rt.clear(); t.rt.setVisible(false); t.dirty = false; });
       this.scene.UI.toast('Tyre marks off');
     }
     else if(this.mode === this.USER)
@@ -72,6 +87,23 @@ class TyreMarks {
   
   draw() {
     if(this.mode === this.NONE) return;
+
+    const cam = this.scene.cameras.main;
+    const view = cam.worldView;
+    this.tiles.forEach(t => {
+      if(!t.dirty) { t.rt.setVisible(false); return; }
+      const hw = this.tileSize / 2 * this.scene.bgScale;
+      const tx = t.rt.x, ty = t.rt.y;
+      t.rt.setVisible(
+        tx + hw > view.x && tx - hw < view.x + view.width &&
+        ty + hw > view.y && ty - hw < view.y + view.height
+      );
+    });
+
+    this._skip = (this._skip || 0) + 1;
+    if(this._skip % 2 !== 0) return;
+    this._skip = 0;
+
     const isSkidding = car => car.curveSkid || car.powerSkid || car.brakeSkid;
     if(this.mode === this.ALL) {
       if(!this.scene.cars.some(isSkidding)) return;
@@ -81,6 +113,7 @@ class TyreMarks {
     const draws = [];
 
     cars.forEach(car => {
+      if(!car._nearCamera) return;
       if(!car.curveSkid && !car.powerSkid && !car.brakeSkid) return;
       if(!car.tyresSprite) return;
 
@@ -101,7 +134,7 @@ class TyreMarks {
       car.tyresSprite.tint = 0x000000;
       car.tyresSprite.alpha = 0.01;
       if(car.surface.type !== Physics.surface.TARMAC) {
-        car.tyresSprite.alpha = 0.2;
+        car.tyresSprite.alpha = car.surface.type === Physics.surface.GRASS ? 0.5 : 0.2;
         car.tyresSprite.tint = car.surface.skidMarkColor;
       } else {
         if(car.curveSkid || car.brakeSkid)
@@ -110,7 +143,8 @@ class TyreMarks {
           car.tyresSprite.alpha = 0.1;
       }
 
-      const key = tile.rt;
+      const key = col + ',' + row;
+      tile.dirty = true;
       if(!draws[key]) draws[key] = {rt: tile.rt, list: []};
       draws[key].list.push({sprite: car.tyresSprite, x: texX - col * this.tileSize, y: texY - row * this.tileSize});
     });

@@ -172,6 +172,7 @@ class MainScene extends Phaser.Scene {
     car.tyresSprite.scaleX = car.tyresSprite.scaleY = car.scale * this.renderScale / this.bgScale;
     car.tyresSprite.flipY = true;
     car.tyresSprite.rotation = car.angle;
+    car.tyresSprite.setVisible(false);
     
     car.shadow = this.add.sprite(car.x, car.y, 'car1');
     car.shadow.setOrigin(0.8, 0.6);
@@ -204,25 +205,46 @@ class MainScene extends Phaser.Scene {
     if(this.paused)
       return;    
     
-    if(!this.car.isAI && !this.race.isStarting) {
+    if(!this.car.isAI && !this.car.eliminated && !this.race.isStarting) {
       this.car.brake(state.controls.joyDown);
       this.car.throttle(state.controls.joyUp);
       this.car.steerLeft(state.controls.joyLeft);
       this.car.steerRight(state.controls.joyRight);
-    }    
-    if(!this.car.isAI) 
+    }
+    if(!this.car.isAI && !this.car.eliminated)
       this.updateCar(this.car);
         
     if(this.race.inProgress) {
       this.AI.updateCars();
+      this.cars = this.cars.filter(c => !c.eliminated);
       this.cars.forEach(car => {
         if(car.isAI) {
           this.AI.drive(car);
           this.updateCar(car);
         }
       });
-    }        
+    }
+    if(this.car.eliminated)
+      this.cameras.main.stopFollow();
     this.tyreMarks.draw();
+  }
+  
+  isNearCamera(car) {
+    const view = this.cameras.main.worldView;
+    const mx = view.width * 0.25, my = view.height * 0.25;
+    return car.x > view.x - mx && car.x < view.x + view.width + mx &&
+           car.y > view.y - my && car.y < view.y + view.height + my;
+  }
+
+  eliminateCar(car) {
+    car.eliminated = true;
+    car.carSprite.destroy();
+    car.shadow.destroy();
+    car.tyresSprite.destroy();
+    if(car.emitter) {
+      car.emitter.stop();
+    }
+    this.UI.toast(car.driver + ' eliminated!');
   }
   
   updateCar(car) {
@@ -237,18 +259,27 @@ class MainScene extends Phaser.Scene {
     const surface = this.track.getSurface(px, py);
     if(surface.type === Physics.surface.BARRIER) {
       car.crash();
-      this.debug.cars([car], 0xff0000, 0.5);   
-    }
-    else 
+      car.barrierFrames = (car.barrierFrames || 0) + 1;
+      if(car.barrierFrames > 60) {
+        this.eliminateCar(car);
+        return;
+      }
+    } else {
+      car.barrierFrames = 0;
       this.car.surface = surface;
+    }
       
     car.update();
-    if(this.particles.mode > 0)
-      this.particles.update(car);
+    car._nearCamera = this.isNearCamera(car);
+    if(car._nearCamera) {
+      if(this.particles.mode > 0)
+        this.particles.update(car);
+      this.updateCarSprite(car);
+    } else if(car.emitter && car.emitter.emitting) {
+      car.emitter.stop();
+    }
     if(car.hasCamera)
       audio.update(car.velocity, car.surface.type, car.curveSkid || car.powerSkid || car.brakeSkid, car.engineSpeed);
-    
-    this.updateCarSprite(car);    
     
     if(this.race.inProgress) {
       if(!car.nextWP)
@@ -294,7 +325,11 @@ class MainScene extends Phaser.Scene {
   toggleTyreMarks() {
     this.tyreMarks.incrementMode();
   }
-  
+
+  toggleGrid() {
+    this.tyreMarks.toggleGrid();
+  }
+
   toggleParticles() {
     this.particles.incrementMode();
   }

@@ -93,8 +93,13 @@ class HUDScene extends Phaser.Scene {
       right : Phaser.Input.Keyboard.KeyCodes.D
     });
     this.input.keyboard.on('keydown', (key) =>  { 
-      if(this.gameScene.race.isStarting) 
-        return;
+      if(this.gameScene.race.isStarting) {
+        if(key.code !== "KeyP" && key.code !== "KeyT" && key.code !== "KeyG" &&
+           key.code !== "KeyF" && key.code !== "KeyQ" && key.code !== "KeyE" &&
+           key.code !== "KeyU" && key.code !== "KeyR" && key.code !== "KeyM" &&
+           key.code !== "Minus" && key.code !== "Equal" &&
+           key.code !== "BracketRight" && key.code !== "BracketLeft") return;
+      }
          
       if(key.code === "Minus") { this.gameScene.camera.zoomOut(); }
       else if(key.code === "Equal") { this.gameScene.camera.zoomIn(); }
@@ -105,6 +110,7 @@ class HUDScene extends Phaser.Scene {
       else if(key.code === "KeyO" && !this.gameScene.race.inProgress) { this.gameScene.startRace(); }
       else if(key.code === "KeyP") { this.gameScene.toggleParticles(); }
       else if(key.code === "KeyT") { this.gameScene.toggleTyreMarks(); }
+      else if(key.code === "KeyG") { this.gameScene.toggleGrid(); }
       else if(key.code === "KeyU") { this.gameScene.toggleAiDriver(); }
       else if(key.code === "KeyR") { this.gameScene.reset(); }
       else if(key.code === "KeyM") { this.gameScene.UI.mainMenu(); }

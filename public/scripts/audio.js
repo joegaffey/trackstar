@@ -130,6 +130,7 @@ audio.update = function(speed, surfaceType, isSkidding, engineSpeed) {
       roadVol = Math.min(0.12, sqSpeed * 0.006);
       roadFreq = 150 + sqSpeed * 15;
     }
+    roadVol *= Math.min(1, sqSpeed * 3);
     layers.road.gain.gain.value = roadVol;
     layers.road.filter.frequency.value = roadFreq;
   }

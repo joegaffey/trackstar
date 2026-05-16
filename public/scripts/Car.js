@@ -56,7 +56,6 @@ class Car {
     this.isTurningLeft = false;
     this.isTurningRight = false;
     this.currentGear = 0;
-    this.autoMode = true;
     this.shiftCooldown = 0;
     this.engineSpeed = this.minEngineSpeed;
   }
