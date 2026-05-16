@@ -1,6 +1,6 @@
 //Original code from https://www.redblobgames.com/x/1618-webaudio/
 
-var context = new AudioContext();
+var context;
 
 function fill_one(t, env, state) {
   return 1.0;

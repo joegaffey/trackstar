@@ -34,7 +34,24 @@ class Particles {
   resume() {
     this.emitters.forEach(emitter => { emitter.start(); });
   }
-  
+
+  update(car) {
+    const emitter = car.emitter;
+    const speed = Math.sqrt(car.velocity);
+    const shouldEmit = speed > 0.3;
+
+    if(shouldEmit && !emitter.emitting) {
+      emitter.start();
+    } else if(!shouldEmit && emitter.emitting) {
+      emitter.stop();
+    }
+
+    if(emitter.emitting) {
+      emitter.frequency = Math.max(20, 120 - speed * 10);
+      emitter.quantity = Math.ceil(speed * 1.5);
+    }
+  }
+
   incrementMode() {
     this.mode++;
     if(this.mode > this.ALL) 
@@ -59,17 +76,17 @@ class Particles {
   getConfig(car) {
     let alphaConfig ={
       onEmit: (particle, key, t, value) => {
-        if(car.surface.type === Physics.surface.TARMAC && car.isSkidding)  
-          return 20 / car.surface.particleAlpha;
-        else
-          return 200 / car.surface.particleAlpha;  
+        const isSkidding = car.curveSkid || car.powerSkid || car.brakeSkid;
+        if(car.surface.type === Physics.surface.TARMAC)
+          return isSkidding ? 0.09 : 0.05;
+        return car.surface.particleAlpha * 0.4;
       }
     };
     
     let config = {
       emitting: false,
-      frequency: 50,
-      maxParticles: 40,
+      frequency: 200,
+      maxParticles: 400,
       speed: {
         onEmit: (particle, key, t, value) => {
           return car.velocity;
@@ -77,18 +94,23 @@ class Particles {
       },
       lifespan: {
         onEmit: (particle, key, t, value) => {
-          return car.velocity * 100;
+          return Math.max(100, car.velocity * 50);
         }
       },
       alpha: alphaConfig,
       tint: {
         onEmit: (particle, key, t, value) => {
+          const isSkidding = car.curveSkid || car.powerSkid || car.brakeSkid;
+          if(car.surface.type === Physics.surface.TARMAC)
+            return isSkidding ? 0xFFFFFF : 0xBBAA88;
+          if(car.surface.type === Physics.surface.GRASS)
+            return 0x665533;
           return car.surface.particleColor;
         }
       },
-      scale: { start: 0.2 * this.scene.renderScale,
-               end: 2 * this.scene.renderScale },
-      blendMode: 'NORMAL'
+      scale: { start: 0.3 * this.scene.renderScale,
+               end: 1.5 * this.scene.renderScale },
+      blendMode: 'ADD'
     }
     return config;
   }

@@ -242,7 +242,9 @@ class MainScene extends Phaser.Scene {
     else 
       this.car.surface = surface;
       
-    car.update();    
+    car.update();
+    if(this.particles.mode > 0)
+      this.particles.update(car);
     if(car.hasCamera)
       audio.engine.power(car.engineSpeed / car.engineSoundFactor);
     
@@ -311,7 +313,7 @@ class MainScene extends Phaser.Scene {
     const car = this.setupCar(this.makeCar(id), id);  
     car.isAI = true;
     if(this.particles.mode === this.particles.ALL)
-      this.car.emitter.start();
+      car.emitter.start();
     this.cars.push(car);  
   }
   
