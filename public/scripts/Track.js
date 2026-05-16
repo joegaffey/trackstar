@@ -131,12 +131,16 @@ class Track {
   
   finalizePhysics() {
     const src = this.scene.textures.get('pre_physics').getSourceImage();
-    const canvas = this.scene.textures.createCanvas('physics', src.width, src.height).draw(0, 0, src);
-    this.scene.textures.remove('pre_physics');
-    const ctx = canvas.getContext();
-    const imgData = ctx.getImageData(0, 0, src.width, src.height);
+    const w = src.width, h = src.height;
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(src, 0, 0);
+    const imgData = ctx.getImageData(0, 0, w, h);
     this.physicsData = imgData.data;
-    this.physicsW = src.width;
+    this.physicsW = w;
+    this.scene.textures.addCanvas('physics', c);
+    this.scene.textures.remove('pre_physics');
   }
   
    
