@@ -39,22 +39,24 @@ class TyreMarks {
   }
   
   draw() {
-    if(this.mode !== this.NONE) {
-      this.texture.beginDraw();
-      if(this.mode === this.ALL || 
-         this.mode === this.USER) {
-        this.drawCar(this.scene.car);   
-      }
-      if(this.mode === this.ALL) {
-        this.scene.cars.forEach(car => {
-          this.drawCar(car);   
-        });
-      }
-      this.texture.endDraw();
-    }
+    if(this.mode === this.NONE) return;
+    this._skip = (this._skip || 0) + 1;
+    if(this._skip % 3 !== 0) return;
+    const isSkidding = car => car.curveSkid || car.powerSkid || car.brakeSkid;
+    if(this.mode === this.ALL) {
+      if(!this.scene.cars.some(isSkidding)) return;
+    } else if(!isSkidding(this.scene.car)) return;
+    this.texture.beginDraw();
+    const cars = this.mode === this.ALL ? this.scene.cars : [this.scene.car];
+    cars.forEach(car => {
+      if(car.curveSkid || car.powerSkid || car.brakeSkid)
+        this.drawCar(car);
+    });
+    this.texture.endDraw();
   }
     
   drawCar(car) {
+    if(!car.tyresSprite) return;
     car.tyresSprite.tint = 0x000000;
     if(car.surface.type !== Physics.surface.TARMAC) {    
       car.tyresSprite.alpha = 0.2;

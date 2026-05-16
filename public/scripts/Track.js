@@ -87,21 +87,19 @@ class Track {
   
   getSurface(px, py) {
     let surface = Physics.tarmac;
-    
-    const surfacePhysicsPixel = this.canvas.getPixel(px, py);
-
-    if(surfacePhysicsPixel) {
-      if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
+    if(!this.physicsData) return surface;
+    const i = (py * this.physicsW + px) * 4;
+    if(i >= 0 && i + 2 < this.physicsData.length) {
+      const r = this.physicsData[i], g = this.physicsData[i + 1], b = this.physicsData[i + 2];
+      if(r === 255 && g === 255 && b === 255)
         surface = Physics.tarmac;
-      else if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 0)
+      else if(r === 255 && g === 255 && b === 0)
         surface = Physics.sand;
-      else if(surfacePhysicsPixel.r == 0 &&  surfacePhysicsPixel.g == 0 && surfacePhysicsPixel.b == 0)
+      else if(r === 0 && g === 0 && b === 0)
         surface = Physics.barrier;
       else
         surface = Physics.grass;
-
     }
-    // console.log(surface)
     return surface;
   }
     
@@ -133,8 +131,12 @@ class Track {
   
   finalizePhysics() {
     const src = this.scene.textures.get('pre_physics').getSourceImage();
-    this.canvas = this.scene.textures.createCanvas('physics', src.width, src.height).draw(0, 0, src);
+    const canvas = this.scene.textures.createCanvas('physics', src.width, src.height).draw(0, 0, src);
     this.scene.textures.remove('pre_physics');
+    const ctx = canvas.getContext();
+    const imgData = ctx.getImageData(0, 0, src.width, src.height);
+    this.physicsData = imgData.data;
+    this.physicsW = src.width;
   }
   
    

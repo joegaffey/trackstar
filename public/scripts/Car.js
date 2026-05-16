@@ -138,13 +138,13 @@ class Car {
       this.shiftCooldown--;
       return;
     }
-    if(this.currentGear > 0 && Math.sqrt(this.velocity) < 0.3 && !this.isThrottling && !this.isReversing) {
+    const speed = Math.sqrt(this.velocity);
+    if(this.currentGear > 0 && speed < 0.3 && !this.isThrottling && !this.isReversing) {
       this.currentGear = 0;
       this.engineSpeed = this.minEngineSpeed;
       return;
     }
     if(this.autoMode) {
-      const speed = Math.sqrt(this.velocity);
       if(this.currentGear === 0 && this.isThrottling) {
         this.shiftUp();
       } else if(this.currentGear > 0 && this.currentGear < this.gearRatios.length) {

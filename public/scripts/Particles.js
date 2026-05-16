@@ -19,6 +19,7 @@ class Particles {
   }
   
   addEmitter(car) {
+    car._pc = { speed: 0, lifespan: 100, alpha: 0.05, tint: 0xBBAA88 };
     const emitter = this.scene.add.particles(0, 0, 'dust', this.getConfig(car));
     emitter.car = car;
     emitter.setDepth(35);
@@ -39,16 +40,33 @@ class Particles {
     const emitter = car.emitter;
     const speed = Math.sqrt(car.velocity);
     const shouldEmit = speed > 0.3;
+    const shouldStop = speed < 0.1;
 
     if(shouldEmit && !emitter.emitting) {
       emitter.start();
-    } else if(!shouldEmit && emitter.emitting) {
+    } else if(shouldStop && emitter.emitting) {
       emitter.stop();
     }
 
     if(emitter.emitting) {
-      emitter.frequency = Math.max(20, 120 - speed * 10);
-      emitter.quantity = Math.ceil(speed * 1.5);
+      const freq = Math.max(20, 120 - speed * 10);
+      if(freq !== emitter.frequency) emitter.frequency = freq;
+      const qty = Math.ceil(speed * 1.5);
+      if(qty !== emitter.quantity) emitter.quantity = qty;
+      const pc = car._pc;
+      pc.speed = car.velocity;
+      pc.lifespan = Math.max(100, car.velocity * 50);
+      if(car.surface.type === Physics.surface.TARMAC) {
+        const isSkidding = car.curveSkid || car.powerSkid || car.brakeSkid;
+        pc.alpha = isSkidding ? 0.09 : 0.05;
+        pc.tint = isSkidding ? 0xFFFFFF : 0xBBAA88;
+      } else if(car.surface.type === Physics.surface.GRASS) {
+        pc.alpha = car.surface.particleAlpha * 0.4;
+        pc.tint = 0x665533;
+      } else {
+        pc.alpha = car.surface.particleAlpha * 0.4;
+        pc.tint = car.surface.particleColor;
+      }
     }
   }
 
@@ -74,40 +92,14 @@ class Particles {
   }
   
   getConfig(car) {
-    let alphaConfig ={
-      onEmit: (particle, key, t, value) => {
-        const isSkidding = car.curveSkid || car.powerSkid || car.brakeSkid;
-        if(car.surface.type === Physics.surface.TARMAC)
-          return isSkidding ? 0.09 : 0.05;
-        return car.surface.particleAlpha * 0.4;
-      }
-    };
-    
     let config = {
       emitting: false,
       frequency: 200,
       maxParticles: 400,
-      speed: {
-        onEmit: (particle, key, t, value) => {
-          return car.velocity;
-        }
-      },
-      lifespan: {
-        onEmit: (particle, key, t, value) => {
-          return Math.max(100, car.velocity * 50);
-        }
-      },
-      alpha: alphaConfig,
-      tint: {
-        onEmit: (particle, key, t, value) => {
-          const isSkidding = car.curveSkid || car.powerSkid || car.brakeSkid;
-          if(car.surface.type === Physics.surface.TARMAC)
-            return isSkidding ? 0xFFFFFF : 0xBBAA88;
-          if(car.surface.type === Physics.surface.GRASS)
-            return 0x665533;
-          return car.surface.particleColor;
-        }
-      },
+      speed: { onEmit: () => car._pc.speed },
+      lifespan: { onEmit: () => car._pc.lifespan },
+      alpha: { onEmit: () => car._pc.alpha },
+      tint: { onEmit: () => car._pc.tint },
       scale: { start: 0.3 * this.scene.renderScale,
                end: 1.5 * this.scene.renderScale },
       blendMode: 'ADD'

@@ -33,7 +33,7 @@ class MainScene extends Phaser.Scene {
     this.debug = new Debug(this);
     this.UI = new UI(this);
     this.race = new Race(10, this);
-    
+    this.frameTime = 0;
     this.AI = new AI(this);    
   }  
   
@@ -194,7 +194,7 @@ class MainScene extends Phaser.Scene {
   }
   
   update(time, delta) {
-    
+    if(delta > 50) delta = 50;
     this.frameTime += delta
     if(state.fps > 75 && this.frameTime < 16.5)
       return;
