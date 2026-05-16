@@ -1,128 +1,143 @@
-//Original code from https://www.redblobgames.com/x/1618-webaudio/
+var context, masterGain;
+var layers = {};
 
-var context;
+function fill_noise(t) { return Math.random() * 2 - 1; }
+function fill_sine(t, env) { var p = (t * env.freq) % 1.0; return Math.sin(p * Math.PI * 2) * 0.5 + 0.5; }
+function fill_engine(t, env) { var p = (t * env.freq) % 1.0, a = p * Math.PI * 2; return Math.sin(a) + Math.sin(a * 2) * 0.15; }
 
-function fill_one(t, env, state) {
-  return 1.0;
-}
-
-function fill_phasor_power(t, env, state) {
-  var phase = (t * env.freq) % 1.0;
-  return Math.pow(phase, env.power);
-}
-
-function make_buffer(fill, env) {
+function makeBuffer(fill, env) {
   var count = context.sampleRate * 2;
-  var buffer = context.createBuffer(1, count, context.sampleRate);
-  var data = buffer.getChannelData(0);
-  var state = {};
-  var prev_random = 0.0;
-  for (var i = 0; i < count; i++) {
-    var t = i / context.sampleRate;
-    data[i] = fill(t, env, state);
-  }
-  var source = context.createBufferSource();
-  source.buffer = buffer;
-  return source;
+  var buf = context.createBuffer(1, count, context.sampleRate);
+  var d = buf.getChannelData(0);
+  for(var i = 0; i < count; i++) d[i] = fill(i / context.sampleRate, env || {});
+  var s = context.createBufferSource();
+  s.buffer = buf;
+  return s;
 }
 
-function fill_hihat(t, env, state) {
-  var prev_random = state.prev_random || 0;
-  var next_random = Math.random() * 2 - 1;
-  var curr = (3*next_random - prev_random) / 2;
-  prev_random = next_random;
-  return curr;
+function stopSource(s) { try{ s.stop(); }catch(e){} try{ s.disconnect(); }catch(e){} }
+
+function addLayer(name, filterType, freq, Q) {
+  var src = makeBuffer(fill_noise); src.loop = true;
+  var f = context.createBiquadFilter();
+  f.type = filterType; f.frequency.value = freq;
+  if(Q !== undefined) f.Q.value = Q;
+  var g = context.createGain(); g.gain.value = 0;
+  src.connect(f); f.connect(g); g.connect(masterGain);
+  layers[name] = { src: src, filter: f, gain: g };
 }
 
-var noise, constant, drive, gain1, gain2, gain3;
-
-function rotor() {
-  noise = make_buffer(fill_hihat, {});
-  noise.loop = true;
-
-  var filter1 = context.createBiquadFilter();
-  filter1.type = "bandpass";
-  filter1.frequency.value = 4000;
-  filter1.Q.value = 1;
-  noise.connect(filter1);
-
-  gain1 = context.createGain();
-  gain1.gain.value = 0.5;
-  filter1.connect(gain1);
-
-  constant = make_buffer(fill_one, {});
-  constant.loop = true;
-  gain2 = context.createGain();
-  gain2.gain.value = 0.2;
-  constant.connect(gain2);
-
-  gain3 = context.createGain();
-  gain3.gain.value = 0;
-  gain1.connect(gain3);
-  gain2.connect(gain3);
-
-  var freq = 20;
-  drive = make_buffer(fill_phasor_power, {power: 4, freq: freq});
-  drive.loop = true;
-  drive.connect(gain3.gain);
-
-  gain3.connect(context.destination);
+function removeLayer(name) {
+  var l = layers[name];
+  if(!l) return;
+  stopSource(l.src); try{ l.filter.disconnect(); }catch(e){} try{ l.gain.disconnect(); }catch(e){}
+  delete layers[name];
 }
 
-function restart() {
-  stop();
-  rotor();
-  noise.start();
-  drive.start();
-  constant.start();
+var engine;
+
+function buildEngine() {
+  var noise = makeBuffer(fill_noise); noise.loop = true;
+  var constant = makeBuffer(function(t){ return 1.0; }); constant.loop = true;
+  var drive = makeBuffer(fill_sine, {freq: 20}); drive.loop = true;
+
+  var noiseFilter = context.createBiquadFilter();
+  noiseFilter.type = 'bandpass'; noiseFilter.frequency.value = 4000; noiseFilter.Q.value = 1;
+  noise.connect(noiseFilter);
+  var noiseGain = context.createGain(); noiseGain.gain.value = 0.13;
+  noiseFilter.connect(noiseGain);
+
+  var constantGain = context.createGain(); constantGain.gain.value = 0.05;
+  constant.connect(constantGain);
+
+  var sum = context.createGain(); sum.gain.value = 0;
+  noiseGain.connect(sum);
+  constantGain.connect(sum);
+
+  var driveGain = context.createGain(); driveGain.gain.value = 0.5;
+  drive.connect(driveGain); driveGain.connect(sum.gain);
+
+  sum.connect(masterGain);
+
+  engine = { noise: noise, constant: constant, drive: drive,
+    noiseFilter: noiseFilter, noiseGain: noiseGain,
+    constantGain: constantGain, driveGain: driveGain, sum: sum,
+    sources: [noise, constant, drive] };
 }
 
-function rate(rate = 1) {
-  if(noise) noise.playbackRate.value = rate;
-  if(drive) drive.playbackRate.value = rate;
-  if(constant) drive.playbackRate.value = rate;
-}
-
-function gain(level = 2) {
-  if(gain1) gain1.gain.value = level * 0.5;
-  if(gain2) gain2.gain.value = level * 0.2;
-}
-
-function stop() {
-  if(noise) noise.stop();
-  if(drive) drive.stop();
-  if(constant) constant.stop();
+function disposeEngine() {
+  if(engine && engine.sources) engine.sources.forEach(stopSource);
+  ['noiseFilter','noiseGain','constantGain','driveGain','sum'].forEach(function(k){
+    try{ if(engine && engine[k]) engine[k].disconnect(); }catch(e){}
+  });
+  engine = null;
 }
 
 const audio = {};
 
 audio.init = function() {
-  if(!context)
-    context = new AudioContext();
+  if(context) return;
+  context = new AudioContext();
+  context.resume();
+  masterGain = context.createGain();
+  masterGain.gain.value = 0.7;
+  masterGain.connect(context.destination);
 }
 
-audio.engine = {}
-audio.engine.restart = function() {
+audio.start = function() {
   audio.init();
-  audio.engine.stop();
-  audio.engine.start();
+  disposeEngine();
+  buildEngine();
+  engine.sources.forEach(function(s){ s.start(); });
+
+  removeLayer('tire'); removeLayer('wind'); removeLayer('road');
+  addLayer('tire', 'lowpass', 3000);
+  addLayer('wind', 'bandpass', 2000, 0.5);
+  addLayer('road', 'lowpass', 250);
+  Object.keys(layers).forEach(function(k){ layers[k].src.start(); });
 }
-audio.engine.stop = function() {
-  if(noise) noise.stop();
-  if(drive) drive.stop();
-  if(constant) constant.stop();
+
+audio.stop = function() {
+  disposeEngine();
+  Object.keys(layers).forEach(removeLayer);
 }
-audio.engine.start = function() {
-  audio.init();
-  audio.engine.stop();
-  rotor(0.5, 0.2, 20);
-  noise.start();
-  drive.start();
-  constant.start();
-}
-audio.engine.power = function(power) {
-  rate(power * 3);
-  gain(power / 20);
-}
+
+audio.update = function(speed, surfaceType, isSkidding, engineSpeed) {
+  var power = engineSpeed / 3500;
+  var rate = Math.max(0.1, power * 3);
+  var sqSpeed = Math.sqrt(speed);
+
+  if(engine) {
+    if(engine.noise) engine.noise.playbackRate.value = rate;
+    if(engine.drive) engine.drive.playbackRate.value = rate;
+    if(engine.noiseGain) engine.noiseGain.gain.value = power * 0.025;
+    if(engine.constantGain) engine.constantGain.gain.value = power * 0.01;
+  }
+
+  if(layers.wind) {
+    layers.wind.gain.gain.value = Math.min(0.1, sqSpeed * 0.005);
+    layers.wind.filter.frequency.value = 1000 + sqSpeed * 100;
+  }
+  if(layers.road) {
+    var roadVol, roadFreq;
+    if(surfaceType === 2) {
+      roadVol = Math.min(0.55, 0.2 + sqSpeed * 0.025);
+      roadFreq = 150 + sqSpeed * 10;
+    } else if(surfaceType === 3 || surfaceType === 4) {
+      roadVol = Math.min(0.2, 0.05 + sqSpeed * 0.01);
+      roadFreq = 120 + sqSpeed * 10;
+    } else {
+      roadVol = Math.min(0.12, sqSpeed * 0.006);
+      roadFreq = 150 + sqSpeed * 15;
+    }
+    layers.road.gain.gain.value = roadVol;
+    layers.road.filter.frequency.value = roadFreq;
+  }
+  if(layers.tire) {
+    var skid = isSkidding ? 1 : 0;
+    layers.tire.gain.gain.value = skid * Math.min(0.2, 0.02 + sqSpeed * 0.008);
+    layers.tire.filter.frequency.value = 800 + sqSpeed * 80;
+  }
+};
 
 export default audio;

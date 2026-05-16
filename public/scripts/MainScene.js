@@ -246,7 +246,7 @@ class MainScene extends Phaser.Scene {
     if(this.particles.mode > 0)
       this.particles.update(car);
     if(car.hasCamera)
-      audio.engine.power(car.engineSpeed / car.engineSoundFactor);
+      audio.update(car.velocity, car.surface.type, car.curveSkid || car.powerSkid || car.brakeSkid, car.engineSpeed);
     
     this.updateCarSprite(car);    
     
@@ -281,12 +281,12 @@ class MainScene extends Phaser.Scene {
     if(this.paused) {
       this.paused = false;
       this.particles.resume();
-      audio.engine.restart()
+      audio.start()
     }
     else {
       this.paused = true; 
       this.particles.pause();
-      audio.engine.stop()
+      audio.stop()
     }
     this.UI.pauseMenu();
   }
