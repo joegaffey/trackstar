@@ -142,3 +142,14 @@ audio.update = function(speed, surfaceType, isSkidding, engineSpeed) {
 };
 
 export default audio;
+
+audio.beep = function(freq, duration, vol) {
+  audio.init();
+  var osc = context.createOscillator();
+  osc.type = 'square';
+  osc.frequency.value = freq;
+  var g = context.createGain();
+  g.gain.value = vol || 0.15;
+  osc.connect(g); g.connect(masterGain);
+  osc.start(); osc.stop(context.currentTime + duration);
+};

@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { state } from './shared.js';
+import audio from './audio.js';
 
 class HUDScene extends Phaser.Scene {
   
@@ -184,6 +185,7 @@ class HUDScene extends Phaser.Scene {
   endLightsSequence() {
     this.gameScene.race.start();
     this.lights.getChildren().forEach(light => { light.setFillStyle(0x00ff00); });
+    audio.beep(660, 0.4, 0.08);
     setTimeout(() => { this.lights.destroy(true); }, 3000);
   }
   
@@ -191,7 +193,8 @@ class HUDScene extends Phaser.Scene {
     const x = this.scale.width / 2 - 80;
     const y = 100;
     this.lights.add(this.add.circle(x + 40 * i, y, 18, 0xff0000));
-    this.lights.add(this.add.circle(x + 40 * i, y + 40, 18, 0xff0000));      
+    this.lights.add(this.add.circle(x + 40 * i, y + 40, 18, 0xff0000));
+    audio.beep(440, 0.12, 0.06);
     setTimeout(() => {
       if(i < 4)
         this.addLightColumn(i + 1);
