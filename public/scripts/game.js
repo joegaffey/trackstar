@@ -24,31 +24,31 @@ Object.assign(window, { Phaser });
 
 let trackId = window.location.hash.slice(1);
 
-async function getTrackData(trackId) {
-  try {
-    const response = await fetch(`${state.gameServer}/tracks/${trackId}`);
-    const trackData = await response.json();
-    return trackData;
+if(trackId === 'local') {
+  const saved = localStorage.getItem('trackstar-track');
+  if(saved) {
+    state.track = new Track(JSON.parse(saved));
   }
-  catch(e) {
-    return null; 
-  }  
+  init();
 }
-
-if(trackId) {
+else if(trackId) {
   if(trackId === '1')
     trackId = 'test.json';
-  console.log('Loading track: ' + trackId);
-  getTrackData(trackId).then(trackData => {
+  const url = trackId.includes('/') || trackId.startsWith('.') ? trackId : `./tracks/${trackId}`;
+  console.log('Loading track: ' + url);
+  fetch(url).then(r => r.ok ? r.json() : null).then(trackData => {
     if(trackData) {
       state.track = new Track(trackData);
       init();
     }
     else {
-      console.log('Failed to load track: ' + trackId);
+      console.log('Failed to load track: ' + url);
       alert(`Track ${trackId} is not available! Loading default track.`);
       init();
     }
+  }).catch(() => {
+    alert(`Track ${trackId} is not available! Loading default track.`);
+    init();
   });
 }
 else 
