@@ -1,3 +1,6 @@
+import * as Phaser from 'phaser';
+import { state } from './shared.js';
+
 class HUDScene extends Phaser.Scene {
   
   constructor ()  {
@@ -7,10 +10,22 @@ class HUDScene extends Phaser.Scene {
   }
   
   preload() {
-    this.load.image('arrow', 'https://cdn.glitch.com/181bb66d-bf97-4454-bcc6-867ac28e67cc%2Farrow.png?v=1617402036719');
   }
 
-  create () {    
+  create () {
+    if(!this.textures.exists('arrow')) {
+      const g = this.make.graphics({ add: false });
+      g.fillStyle(0xffffff);
+      g.beginPath();
+      g.moveTo(50, 0);
+      g.lineTo(0, 100);
+      g.lineTo(100, 100);
+      g.closePath();
+      g.fillPath();
+      g.generateTexture('arrow', 100, 100);
+      g.destroy();
+    }
+    
     this.scene.setVisible(false);
     
     this.gamepad = {};    
@@ -40,8 +55,8 @@ class HUDScene extends Phaser.Scene {
     this.uiLeaders = this.add.text(40, window.innerHeight - 132, text, { font: '14px Helvetica', fill: '#aaaaaa', lineSpacing: 4 });
     this.uiLeaders.setOrigin(0, 0);
     
-    if(isMobile) {
-      game.input.addPointer(1);    
+    if(state.isMobile) {
+      this.game.input.addPointer(1);    
       const w = window.innerWidth, h = window.innerHeight;
       let baseline = h - 150;
       if(baseline < h / 2)
@@ -73,10 +88,9 @@ class HUDScene extends Phaser.Scene {
       right : Phaser.Input.Keyboard.KeyCodes.D
     });
     this.input.keyboard.on('keydown', (key) =>  { 
-      // console.log(key);
       if(this.gameScene.race.isStarting) 
         return;
-           
+         
       if(key.code === "Minus") { this.gameScene.camera.zoomOut(); }
       else if(key.code === "Equal") { this.gameScene.camera.zoomIn(); }
       else if(key.code === "Enter" || key.code === "Space") { this.gameScene.pause(); }
@@ -91,12 +105,9 @@ class HUDScene extends Phaser.Scene {
       else if(key.code === "KeyM") { this.gameScene.UI.mainMenu(); }
       else if(key.code === "KeyL") { this.gameScene.UI.toggleLeaderboard(); }
     });
-    
-    // this.text = this.add.text(10, 10, 'Debug', { font: '16px Courier', fill: '#00ff00' });
   }
   
   update() {    
-    // this.text.text = 'FPS: ' + this.game.loop.actualFps;
     if(this.raceUpdateCounter < 0) {
       this.updateLeaders();
       this.updateLap();
@@ -105,8 +116,8 @@ class HUDScene extends Phaser.Scene {
     else 
       this.raceUpdateCounter--;
     
-    this.uiSpeed.setText(Math.round(car.velocity * 15));
-    if (isMobile) {
+    this.uiSpeed.setText(Math.round(state.car.velocity * 15));
+    if (state.isMobile) {
       this.touches = { left: false, right: false, up: false, down: false };    
     
       if(this.input.pointer1.isDown) {
@@ -123,12 +134,11 @@ class HUDScene extends Phaser.Scene {
         if(Phaser.Math.Distance.Between(x, y, this.left.x, this.left.y) < 80) this.touches.left = true; 
         if(Phaser.Math.Distance.Between(x, y, this.right.x, this.right.y) < 80) this.touches.right = true;
       }
-      // console.log(touches);
     }
-    controls.joyLeft = (this.gamepad.leftStick && this.gamepad.leftStick.x < 0) || this.gamepad.left || this.wasdKeys.left.isDown || this.arrowKeys.left.isDown || this.touches.left;
-    controls.joyRight = (this.gamepad.leftStick && this.gamepad.leftStick.x > 0) ||this.gamepad.right || this.wasdKeys.right.isDown || this.arrowKeys.right.isDown || this.touches.right;
-    controls.joyUp = this.gamepad.A || this.gamepad.R2 || this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
-    controls.joyDown = this.gamepad.B || this.gamepad.L2 || this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
+    state.controls.joyLeft = (this.gamepad.leftStick && this.gamepad.leftStick.x < 0) || this.gamepad.left || this.wasdKeys.left.isDown || this.arrowKeys.left.isDown || this.touches.left;
+    state.controls.joyRight = (this.gamepad.leftStick && this.gamepad.leftStick.x > 0) ||this.gamepad.right || this.wasdKeys.right.isDown || this.arrowKeys.right.isDown || this.touches.right;
+    state.controls.joyUp = this.gamepad.A || this.gamepad.R2 || this.wasdKeys.up.isDown || this.arrowKeys.up.isDown || this.touches.up;
+    state.controls.joyDown = this.gamepad.B || this.gamepad.L2 || this.wasdKeys.down.isDown || this.arrowKeys.down.isDown || this.touches.down;
   }  
   
   updateLap() {
@@ -171,3 +181,5 @@ class HUDScene extends Phaser.Scene {
     }, 1500);
   }
 }
+
+export default HUDScene;

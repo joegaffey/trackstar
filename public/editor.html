@@ -7,11 +7,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   
   <link rel="stylesheet" href="./style.css">
-  <script src="./lib/phaser3.54.0.min.js"></script>
-  <script src="./scripts/Track.js"></script>
-  <script src="./scripts/EditorUIScene.js"></script>
-  <script src="./scripts/TrackBuilderScene.js"></script>
-  <script src="./scripts/editor.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "phaser": "https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js"
+    }
+  }
+  </script>
+  <script type="module" src="./scripts/editor.js"></script>
 </head>
 <body>
 </body>

@@ -14,15 +14,13 @@ function fill_phasor_power(t, env, state) {
 function make_buffer(fill, env) {
   var count = context.sampleRate * 2;
   var buffer = context.createBuffer(1, count, context.sampleRate);
-
-  var data = buffer.getChannelData(0 /* channel */);
+  var data = buffer.getChannelData(0);
   var state = {};
   var prev_random = 0.0;
   for (var i = 0; i < count; i++) {
     var t = i / context.sampleRate;
     data[i] = fill(t, env, state);
   }
-
   var source = context.createBufferSource();
   source.buffer = buffer;
   return source;
@@ -126,3 +124,5 @@ audio.engine.power = function(power) {
   rate(power * 3);
   gain(power / 20);
 }
+
+export default audio;

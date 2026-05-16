@@ -1,16 +1,30 @@
+import * as Phaser from 'phaser';
+import { state } from './shared.js';
+import Physics from './Physics.js';
+import Car from './Car.js';
+import Particles from './Particles.js';
+import TyreMarks from './TyreMarks.js';
+import Camera from './Camera.js';
+import Debug from './Debug.js';
+import UI from './UI.js';
+import AI from './AI.js';
+import Race from './Race.js';
+import audio from './audio.js';
+import names from './Names.js';
+
 class MainScene extends Phaser.Scene {
   
   constructor() {    
     super({key: 'MainScene', active: true});    
     
-    this.track = track;
+    this.track = state.track;
     this.track.scene = this;
     
-    this.car = car;
+    this.car = state.car;
     this.car.isPlayer = true;
     this.cars = [this.car];    
     
-    this.baseUrl = baseUrl;
+    this.baseUrl = state.baseUrl;
     this.renderScale = 1;
     
     this.particles = new Particles(this);
@@ -23,11 +37,10 @@ class MainScene extends Phaser.Scene {
     this.AI = new AI(this);    
   }  
   
-//////////////////////////////////////////// Preload phase ////////////////////////////////////////////
-
   preload() {     
     this.UI.loaderText('LOADING ASSETS');
-    this.isMobile = isMobile = !game.device.os.desktop && game.device.input.touch;
+    state.isMobile = !this.game.device.os.desktop && this.game.device.input.touch;
+    this.isMobile = state.isMobile;
     this.loadBackgroundImage();
     
     this.load.image('tyres', this.baseUrl + 'tyres.png');
@@ -38,7 +51,7 @@ class MainScene extends Phaser.Scene {
     for(let i = 1; i < 20; i++) {
       this.load.image('car' + i, `${this.baseUrl}/cars/pitstop_car_${i}.png`);  
     }
-    this.UI.loaderText('BUILDING SCENE'); // DOM blocks at create() so moved here
+    this.UI.loaderText('BUILDING SCENE');
   }
   
   loadBackgroundImage() {
@@ -62,8 +75,6 @@ class MainScene extends Phaser.Scene {
     }    
   }
   
-//////////////////////////////////////////// Setup phase ////////////////////////////////////////////
-
   create() {
     this.addBackgroundImage();    
     this.setBackgroundScale();
@@ -115,9 +126,6 @@ class MainScene extends Phaser.Scene {
     this.HUD.scene.setVisible(true);
     
     this.pause();
-    
-    // this.debug.tyreMarks();
-    // this.debug.physics(); 
   }
   
   addBackgroundImage() {
@@ -185,12 +193,10 @@ class MainScene extends Phaser.Scene {
     return car;
   }
   
-/////////////////////////////////////////////////////////////////// Main loop ///////////////////////////////////////////////////////////////////////////////
-  
   update(time, delta) {
     
     this.frameTime += delta
-    if(fps > 75 && this.frameTime < 16.5)
+    if(state.fps > 75 && this.frameTime < 16.5)
       return;
     else 
       this.frameTime = 0;
@@ -199,10 +205,10 @@ class MainScene extends Phaser.Scene {
       return;    
     
     if(!this.car.isAI && !this.race.isStarting) {
-      this.car.brake(controls.joyDown);
-      this.car.throttle(controls.joyUp);
-      this.car.steerLeft(controls.joyLeft);
-      this.car.steerRight(controls.joyRight);
+      this.car.brake(state.controls.joyDown);
+      this.car.throttle(state.controls.joyUp);
+      this.car.steerLeft(state.controls.joyLeft);
+      this.car.steerRight(state.controls.joyRight);
     }    
     if(!this.car.isAI) 
       this.updateCar(this.car);
@@ -268,8 +274,6 @@ class MainScene extends Phaser.Scene {
     car.carSprite.x = car.shadow.x = car.tyresSprite.x = car.x;
     car.carSprite.y = car.shadow.y = car.tyresSprite.y = car.y;  
   }
-
-//////////////////////////////////////////// Game controls ////////////////////////////////////////////
   
   pause() {
     if(this.paused) {
@@ -387,3 +391,5 @@ class MainScene extends Phaser.Scene {
     }
   }
 }
+
+export default MainScene;

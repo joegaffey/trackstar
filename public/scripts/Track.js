@@ -1,3 +1,6 @@
+import * as Phaser from 'phaser';
+import Physics from './Physics.js';
+
 class Track {
   
   constructor(config) {   
@@ -82,16 +85,10 @@ class Track {
     })
   }  
   
-  /////////////////////////////// Physics Functions //////////////////////////////////////////////////
-  
   getSurface(px, py) {
     let surface = Physics.tarmac;
     
-    // Old way - worse perf on FF
-    // const surfacePhysicsPixel = this.scene.textures.getPixel(px, py, 'physics');
-    
     const surfacePhysicsPixel = this.canvas.getPixel(px, py);
-    // console.log(surfacePhysicsPixel)
 
     if(surfacePhysicsPixel) {
       if(surfacePhysicsPixel.r == 255 &&  surfacePhysicsPixel.g == 255 && surfacePhysicsPixel.b == 255)
@@ -132,12 +129,6 @@ class Track {
     
     graphicsGen.generateTexture('pre_physics', w, h);
     graphicsGen.destroy();
-    
-    // Alt code using render texture
-    // const rt = this.scene.add.renderTexture(0, 0, w, h);
-    // rt.draw(graphicsGen, 0, 0);
-    // rt.saveTexture('physics');
-    // rt.destroy();
   }
   
   finalizePhysics() {
@@ -146,8 +137,6 @@ class Track {
     this.scene.textures.remove('pre_physics');
   }
   
-  
-  /////////////////////////////// Graphics Functions //////////////////////////////////////////////////
    
   drawGraphics() {    
     const spline = new Phaser.Curves.Spline(this.points);
@@ -300,3 +289,5 @@ class Track {
     }
   }  
 }
+
+export default Track;

@@ -1,5 +1,11 @@
-//https://blog.bullgare.com/2019/03/simple-way-to-detect-browsers-fps-via-js/
-let fps;
+import * as Phaser from 'phaser';
+import { state } from './shared.js';
+import Track from './Track.js';
+import Car from './Car.js';
+import Physics from './Physics.js';
+import MainScene from './MainScene.js';
+import HUDScene from './HUDScene.js';
+
 let times = [];
 function fpsLoop() {
   window.requestAnimationFrame(() => {
@@ -8,33 +14,19 @@ function fpsLoop() {
       times.shift();
     }
     times.push(now);
-    fps = times.length;
+    state.fps = times.length;
     fpsLoop();
   });
 }
 fpsLoop();
 
-let isMobile = false;
-
-const controls = {
-  joyUp: false,
-  joyDown: false,
-  joyLeft: false,
-  joyRight: false
-}
-
-const baseUrl = './assets/';
-const gameServer = '.';
-
-let track = null;
-let car = null;
-let game = null;
+Object.assign(window, { Phaser });
 
 let trackId = window.location.hash.slice(1);
 
 async function getTrackData(trackId) {
   try {
-    const response = await fetch(`${gameServer}/tracks/${trackId}`);
+    const response = await fetch(`${state.gameServer}/tracks/${trackId}`);
     const trackData = await response.json();
     return trackData;
   }
@@ -49,7 +41,7 @@ if(trackId) {
   console.log('Loading track: ' + trackId);
   getTrackData(trackId).then(trackData => {
     if(trackData) {
-      track = new Track(trackData);
+      state.track = new Track(trackData);
       init();
     }
     else {
@@ -97,23 +89,23 @@ function getDefaultTrack() {
       smallScale: 3,
       regularScale: 6,
       map: {      
-        regular: baseUrl + 'maps/mondello_international.jpg',
-        small: baseUrl + 'maps/mondello_international_small.jpg'
+        regular: state.baseUrl + 'maps/mondello_international.jpg',
+        small: state.baseUrl + 'maps/mondello_international_small.jpg'
       },
       physics: {
-        regular: baseUrl + 'maps/mondello_international_physics.png',
-        small: baseUrl + 'maps/mondello_international_physics_small.png'
+        regular: state.baseUrl + 'maps/mondello_international_physics.png',
+        small: state.baseUrl + 'maps/mondello_international_physics_small.png'
       }
     }
   });
 }
 
 function init() {
-  if(!track) {
-    track = getDefaultTrack();
+  if(!state.track) {
+    state.track = getDefaultTrack();
   }
   
-  car = new Car({
+  state.car = new Car({
     driver: 'Player',
     surface: Physics.tarmac,
     minEngineSpeed: 3000,
@@ -140,5 +132,5 @@ function init() {
     scene: [MainScene, HUDScene]    
   }
 
-  game = new Phaser.Game(config);
+  state.game = new Phaser.Game(config);
 }

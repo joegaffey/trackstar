@@ -1,3 +1,5 @@
+import Physics from './Physics.js';
+
 class Particles {
     
   constructor(scene) {
@@ -5,40 +7,32 @@ class Particles {
     this.NONE = 0;
     this.USER = 1;
     this.ALL = 2;
-    this.mode = this.ALL; //On for All cars by default
+    this.mode = this.ALL;
     this.emitters = [];    
-    this.particles = [];    
   }
   
   reset() {
     this.emitters.forEach(em => {
-      em.killAll();      
-      em.remove();      
+      em.destroy();      
     });
     this.emitters = [];
-      this.particles.forEach(pa => {
-      pa.destroy();   
-    });
-    this.particles = [];
   }
   
   addEmitter(car) {
-    const particles = this.scene.add.particles('dust');
-    particles.car = car;
-    particles.setDepth(35);
-    this.particles.push(particles);
-    
-    car.emitter = particles.createEmitter(this.getConfig(particles));
-    car.emitter.startFollow(car.carSprite);
-    this.emitters.push(car.emitter);
+    const emitter = this.scene.add.particles(0, 0, 'dust', this.getConfig(car));
+    emitter.car = car;
+    emitter.setDepth(35);
+    emitter.startFollow(car.carSprite);
+    this.emitters.push(emitter);
+    car.emitter = emitter;
   }
   
   pause() {
-    this.emitters.forEach(emitter => { emitter.pause(); });
+    this.emitters.forEach(emitter => { emitter.stop(); });
   }
   
   resume() {
-    this.emitters.forEach(emitter => { emitter.resume(); });
+    this.emitters.forEach(emitter => { emitter.start(); });
   }
   
   incrementMode() {
@@ -62,34 +56,34 @@ class Particles {
     }
   }
   
-  getConfig(particles) {
+  getConfig(car) {
     let alphaConfig ={
       onEmit: (particle, key, t, value) => {
-        if(particles.car.surface.type === Physics.surface.TARMAC && particles.car.isSkidding)  
-          return 20 / particles.car.surface.particleAlpha;
+        if(car.surface.type === Physics.surface.TARMAC && car.isSkidding)  
+          return 20 / car.surface.particleAlpha;
         else
-          return 200 / particles.car.surface.particleAlpha;  
+          return 200 / car.surface.particleAlpha;  
       }
     };
     
     let config = {
-      on: false,
+      emitting: false,
       frequency: 50,
       maxParticles: 40,
       speed: {
         onEmit: (particle, key, t, value) => {
-          return particles.car.velocity;
+          return car.velocity;
         }
       },
       lifespan: {
         onEmit: (particle, key, t, value) => {
-          return particles.car.velocity * 100;
+          return car.velocity * 100;
         }
       },
       alpha: alphaConfig,
       tint: {
         onEmit: (particle, key, t, value) => {
-          return particles.car.surface.particleColor;
+          return car.surface.particleColor;
         }
       },
       scale: { start: 0.2 * this.scene.renderScale,
@@ -99,54 +93,5 @@ class Particles {
     return config;
   }
 }
-  
-// let alphaConfig = {
-//   onEmit: (particle, key, t, value) => {
-//     if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
-//       return { start: 20 / this.car.surface.particleAlpha, end: 0, ease: 'Linear' };  
-//     else
-//       return { start: 200 / this.car.surface.particleAlpha, end: 0, ease: 'Linear' };  
-//   }
-// };
-// let alphaConfig = { start: 1, end: 0, ease: 'Linear' };  
-// let alphaConfig = {
-//   onEmit: (particle, key, t, value) => {
-//     if(this.car.surface.type === Physics.surface.TARMAC && this.car.isSkidding)  
-//       return { start: 20 / this.car.surface.particleAlpha, end: 0, ease: 'Linear' };  
-//     else
-//       return { start: 200 / this.car.surface.particleAlpha, end: 0, ease: 'Linear' };  
-//   }
-// };
-//     let alphaConfig ={
-//       onEmit: (particle, key, t, value) => {
-//         if(particles.car.surface.type === Physics.surface.TARMAC && particles.car.isSkidding)  
-//           return 20 / particles.car.surface.particleAlpha;
-//         else
-//           return 200 / particles.car.surface.particleAlpha;  
-//       }
-//     };
-// let alphaConfig = { start: 1, end: 0, ease: 'Linear' };
-//     let config = {
-//       on: false,
-//       frequency: 50,
-//       maxParticles: 40,
-//       speed: {
-//         onEmit: (particle, key, t, value) => {
-//             return particles.car.velocity;
-//         }
-//       },
-//       lifespan: {
-//         onEmit: (particle, key, t, value) => {
-//           return particles.car.velocity * 100;
-//         }
-//       },
-//       alpha: alphaConfig,
-//       tint: {
-//         onEmit: (particle, key, t, value) => {
-//           return particles.car.surface.particleColor;
-//         }
-//       },
-//       scale: { start: 0.1 * this.mapScale * this.renderScale, 
-//                end: 1 * this.mapScale * this.renderScale },
-//       blendMode: 'NORMAL'
-//     }
+
+export default Particles;

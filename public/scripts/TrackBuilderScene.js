@@ -1,3 +1,6 @@
+import * as Phaser from 'phaser';
+import { state } from './shared.js';
+
 class TrackBuilderScene extends Phaser.Scene {
   
   constructor() {
@@ -28,7 +31,7 @@ class TrackBuilderScene extends Phaser.Scene {
   create() {
     this.graphics = this.add.graphics();
 
-    this.track = track;
+    this.track = state.track;
     this.track.scale = 4;
         
     this.editorUIScene = this.game.scene.scenes[1];
@@ -50,14 +53,11 @@ class TrackBuilderScene extends Phaser.Scene {
     });
     
     this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
-      // if(deltaY > 0 && this.cameras.main.zoom > 0.1 || deltaY > 0 && this.cameras.main.zoom < 1)  
       if(deltaY > 0 || this.cameras.main.zoom > 0.1)  
         this.cameras.main.zoom += deltaY * 0.0001;
-        // this.cameras.main.x = pointer.x - this.background.width / 2;
-        // this.cameras.main.y = pointer.y - this.background.height / 2;
     });
-    
-    // @TODO background dragging
+
+        // @TODO background dragging
 //     this.background.setInteractive({ draggable: true });
     
 //     this.background.on('dragstart', (pointer) => {  
@@ -76,7 +76,7 @@ class TrackBuilderScene extends Phaser.Scene {
 //       console.log(3);
 //       this.cameras.main.x = pointer.worldX;
 //       this.cameras.main.y = pointer.worldY;
-//     });       
+//     });    
     
     this.shapePoints = [];
     
@@ -109,20 +109,20 @@ class TrackBuilderScene extends Phaser.Scene {
         const bounds = spline.getBounds();
       }
     });      
-    
-    // @TODO draw bitmaps for sand etc
-//     var rt = this.make.renderTexture({ 
-//       x: this.background.x, 
-//       y: this.background.y,
-//       width: this.background.width, 
-//       height: this.background.height 
-//     }).setOrigin(0, 0);    
 
-//     this.input.on('pointermove', (pointer) => {
-//         if (!this.track.isOpen && pointer.isDown) {
-//             rt.draw('ball', pointer.worldX, pointer.worldY);
-//         }
-//     });    
+    // @TODO draw bitmaps for sand etc
+    //     var rt = this.make.renderTexture({ 
+    //       x: this.background.x, 
+    //       y: this.background.y,
+    //       width: this.background.width, 
+    //       height: this.background.height 
+    //     }).setOrigin(0, 0);    
+
+    //     this.input.on('pointermove', (pointer) => {
+    //         if (!this.track.isOpen && pointer.isDown) {
+    //             rt.draw('ball', pointer.worldX, pointer.worldY);
+    //         }
+    //     });    
    
     this.input.keyboard.on('keydown', (key) =>  { 
       if(key.code === "KeyW" || key.code === "ArrowUp") { this.cameras.main.y -= 10; }
@@ -160,7 +160,6 @@ class TrackBuilderScene extends Phaser.Scene {
   }
     
   drawSpline() {
-    // this.graphics.depth = 10;
     if(this.track.points.length > 0) {
       this.graphics.fillStyle(0xaaaaaa, 1);
       this.graphics.fillCircle(this.track.points[0].x, this.track.points[0].y, this.track.width / 2 + this.track.borderWidth / 2);
@@ -208,7 +207,7 @@ class TrackBuilderScene extends Phaser.Scene {
       this.clearControls();
     }
   }
-    
+      
 //   drawCars() {
 //     let i = 0;
 //     this.carSprites.clear(true, true);      
@@ -221,7 +220,7 @@ class TrackBuilderScene extends Phaser.Scene {
 //       this.carSprites.add(carSprite);
 //     });
 //   }
-  
+
   clearControls() {
     if(this.controlGraphics)
       this.controlGraphics.clear();
@@ -291,10 +290,9 @@ class TrackBuilderScene extends Phaser.Scene {
     cpSprite.depth = 18;
     this.splinePointSprites.add(cpSprite);
 
-    // @TODO fix for better hit area
-    // const shape = new Phaser.Geom.Circle(0, 0, 100);
-    // cpSprite.setInteractive(shape, Phaser.Geom.Circle.Contains);
-
+// @TODO fix for better hit area
+// const shape = new Phaser.Geom.Circle(0, 0, 100);
+// cpSprite.setInteractive(shape, Phaser.Geom.Circle.Contains);
 //       cpSprite.setInteractive({
 //         hitArea: shape,
 //         // hitAreaCallback: callback,
@@ -345,6 +343,7 @@ class TrackBuilderScene extends Phaser.Scene {
   }
 }
 
+export default TrackBuilderScene;
 
 /* @TODO Look into bezier curves a bit more
   

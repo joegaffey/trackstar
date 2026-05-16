@@ -1,3 +1,6 @@
+import * as Phaser from 'phaser';
+import { sendTrack } from './sendTrack.js';
+
 class EditorUIScene extends Phaser.Scene {
   
   constructor ()  {
@@ -112,3 +115,5 @@ class EditorUIScene extends Phaser.Scene {
     });
   }
 }
+
+export default EditorUIScene;

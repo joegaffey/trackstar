@@ -39,3 +39,5 @@ class Camera {
     this.followCar(this.scene.cars[this.camFollow]);
   }
 }
+
+export default Camera;

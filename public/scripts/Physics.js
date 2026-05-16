@@ -1,15 +1,15 @@
 class Physics {  
-  
+
   static maxPower = 0.2;
-  static maxReverse = 0.05;//0.05;
+  static maxReverse = 0.05;
   
-  static powerFactor = 0.0005;//0.001;
-  static reverseFactor = 0.01;//0.0005;
+  static powerFactor = 0.0005;
+  static reverseFactor = 0.01;
   static engineBrakingFactor = 0.0005;
 
   static drag = 0.95;
-  static angularDrag = 0.9;//0.95;
-  static turnSpeed = 0.002;//0.002
+  static angularDrag = 0.9;
+  static turnSpeed = 0.002;
 
   static surface = {
     TARMAC: 0,
@@ -51,3 +51,5 @@ class Physics {
     type: Physics.surface.BARRIER
   }
 }
+
+export default Physics;

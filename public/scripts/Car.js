@@ -1,3 +1,5 @@
+import Physics from './Physics.js';
+
 class Car {
   
   constructor(config) {
@@ -75,11 +77,9 @@ class Car {
     this.yVelocity -= car.yVelocity / 2;
     this.collisionTimer = 30;
     this.throttle(false);
-    // this.angle -= car.angle / 2;
     
     car.xVelocity += this.xVelocity / 2;
     car.yVelocity += this.yVelocity / 2;
-    // car.angle *= this.angle;    
   }
 
   update() {
@@ -103,15 +103,15 @@ class Car {
     //   this.angularVelocity *= 1.05;  
     // if(this.brakeSkid)
     //   this.angularVelocity /= 1.01;  
-    
+
     this.x += this.xVelocity * this.renderScale * 4;
     this.y -= this.yVelocity * this.renderScale * 4;
-    
+        
     // if(fps > 20) {
     //   this.x *= (60 / fps);
     //   this.y *= (60 / fps);
     // }
-    
+
     this.angle += this.angularVelocity;     
     // console.log(this.x + ' ' + this.y)
   }
@@ -152,3 +152,5 @@ class Car {
     this.velocity = Math.abs(this.xVelocity)**2 + Math.abs(this.yVelocity)**2;
   }
 }
+
+export default Car;

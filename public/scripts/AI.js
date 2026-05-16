@@ -1,3 +1,5 @@
+import * as Phaser from 'phaser';
+
 class AI {
   
   constructor(scene) {
@@ -70,7 +72,6 @@ class AI {
           const dist2 = Phaser.Math.Distance.Between(car1.x, car1.y,  this.scene.track.wayPoints[car1.nextWP].x,  this.scene.track.wayPoints[car1.nextWP].y);
           const dist3 = Phaser.Math.Distance.Between(car2.x, car2.y,  this.scene.track.wayPoints[car1.nextWP].x,  this.scene.track.wayPoints[car1.nextWP].y);
           if(dist1 < 50) {
-            // car1.collideCar(car2); 
             this.scene.debug.cars([car1, car2], 0xff0000, 0.5);     
           }
           else if(dist1 < 100) {
@@ -78,10 +79,11 @@ class AI {
               car1.warning = true;
             else
               car2.warning = true;
-            // this.scene.debug.cars([car1, car2], 0xffff00, 0.5);
           }          
         }          
       });  
     });    
   }
 }
+
+export default AI;

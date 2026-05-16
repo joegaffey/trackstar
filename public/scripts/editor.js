@@ -1,3 +1,11 @@
+import * as Phaser from 'phaser';
+import { state } from './shared.js';
+import Track from './Track.js';
+import TrackBuilderScene from './TrackBuilderScene.js';
+import EditorUIScene from './EditorUIScene.js';
+
+Object.assign(window, { Phaser });
+
 const config = {
   type: Phaser.AUTO,
   backgroundColor: 0x444444,
@@ -7,9 +15,9 @@ const config = {
   scene: [TrackBuilderScene, EditorUIScene]
 };
 
-const baseUrl = '../assets/';
+state.baseUrl = '../assets/';
 
-const track = new Track({
+state.track = new Track({
   isReverse: false,
   isOpen: true,
   points: [],
@@ -28,23 +36,4 @@ const track = new Track({
   trees:[]
 });
 
-const game = new Phaser.Game(config);
-
-const server = '.';
-      
-function sendTrack() {
-  fetch(`${server}/tracks`, {
-    method: 'post',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(track.toJSON())
-  }).then(res => res.json())
-    .then(res => {
-    console.log('Track uploaded to server with id: ' + res.id);
-    window.location.replace('./game.html#' +  res.id);
-  }).catch(error => {
-    alert('Server unavailable');
-  });
-}
+state.game = new Phaser.Game(config);

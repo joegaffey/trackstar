@@ -49,3 +49,5 @@ class Race {
       return sorted.slice(0, count);
   }
 }
+
+export default Race;

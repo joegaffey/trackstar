@@ -1,5 +1,3 @@
-// https://www.grandprix.com/drivers
-
 const names = [
   'George Abecassis',
   'Kenny Acheson',
@@ -628,3 +626,5 @@ const names = [
   'Renzo Zorzi',
   'Ricardo Zunino'
 ];
+
+export default names;

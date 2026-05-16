@@ -6,23 +6,15 @@
   <meta content="user-scalable=0" name="viewport">
   <meta name="apple-mobile-web-app-capable" content="yes">
   
-  <link rel="stylesheet" href="./style.css">  
-  <script src="./lib/phaser3.54.0.min.js"></script>
-  <script src="./scripts/Physics.js"></script>
-  <script src="./scripts/Particles.js"></script>
-  <script src="./scripts/Track.js"></script>
-  <script src="./scripts/Car.js"></script>
-  <script src="./scripts/AI.js"></script>
-  <script src="./scripts/TyreMarks.js"></script>
-  <script src="./scripts/Camera.js"></script>
-  <script src="./scripts/Names.js"></script>
-  <script src="./scripts/Race.js"></script>
-  <script src="./scripts/Debug.js"></script>
-  <script src="./scripts/UI.js"></script>
-  <script src="./scripts/MainScene.js"></script>
-  <script src="./scripts/HUDScene.js"></script>
-  <script src="./scripts/audio.js"></script>
-  <script src="./scripts/game.js"></script>
+  <link rel="stylesheet" href="./style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "phaser": "https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js"
+    }
+  }
+  </script>
+  <script type="module" src="./scripts/game.js"></script>
 </head>
 <body>
   <div class="spinner" style="text-align:center">
