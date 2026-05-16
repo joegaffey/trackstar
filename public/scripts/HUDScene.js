@@ -39,7 +39,12 @@ class HUDScene extends Phaser.Scene {
     const speedBox = this.add.rectangle(80, 80, 100, 100, 0x000000);
     speedBox.alpha = 0.6;
     this.uiSpeed = this.add.text(50, 50, '0', { font: '36px Helvetica', fill: '#aaaaaa' });
-    this.add.text(50, 100, 'KMPH', { font: '16px Helvetica', fill: '#aaaaaa' });    
+    this.add.text(50, 100, 'KMPH', { font: '16px Helvetica', fill: '#aaaaaa' });
+    
+    const gearBox = this.add.rectangle(80, 165, 100, 65, 0x000000);
+    gearBox.alpha = 0.6;
+    this.uiGear = this.add.text(80, 155, 'N', { font: '28px Helvetica', fill: '#aaaaaa' }).setOrigin(0.5, 0.5);
+    this.uiAuto = this.add.text(80, 180, '', { font: '12px Helvetica', fill: '#aaaaaa' }).setOrigin(0.5, 0.5);
     
     const lapBox = this.add.rectangle(window.innerWidth - 80, 80, 100, 100, 0x000000);
     lapBox.alpha = 0.6;
@@ -104,6 +109,9 @@ class HUDScene extends Phaser.Scene {
       else if(key.code === "KeyR") { this.gameScene.reset(); }
       else if(key.code === "KeyM") { this.gameScene.UI.mainMenu(); }
       else if(key.code === "KeyL") { this.gameScene.UI.toggleLeaderboard(); }
+      else if(key.code === "KeyF") { this.gameScene.car.toggleAutoMode(); }
+      else if(key.code === "KeyQ") { this.gameScene.car.shiftDown(); }
+      else if(key.code === "KeyE") { this.gameScene.car.shiftUp(); }
     });
   }
   
@@ -117,6 +125,11 @@ class HUDScene extends Phaser.Scene {
       this.raceUpdateCounter--;
     
     this.uiSpeed.setText(Math.round(state.car.velocity * 15));
+    const car = this.gameScene.car;
+    const forwardSpeed = Math.sin(car.angle) * car.xVelocity + Math.cos(car.angle) * car.yVelocity;
+    const gearText = forwardSpeed < -0.1 ? 'R' : (car.currentGear === 0 ? 'N' : String(car.currentGear));
+    this.uiGear.setText(gearText);
+    this.uiAuto.setText(this.gameScene.car.autoMode ? 'AUTO' : 'MANUAL');
     if (state.isMobile) {
       this.touches = { left: false, right: false, up: false, down: false };    
     

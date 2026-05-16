@@ -24,10 +24,23 @@ class Car {
     this.angularVelocity = 0;
     this.isThrottling = false;
     this.isReversing = false;
-    this.engineSpeed = this.minEngineSpeed * this.engineSpeedFactor;
+    this.engineSpeed = this.minEngineSpeed;
     this.lap = 0;
     
     this.renderScale = 1;
+
+    this.gearRatios = config.gearRatios || [1.8, 1.35, 1.0, 0.8, 0.65];
+    this.finalDrive = config.finalDrive !== undefined ? config.finalDrive : 1.0;
+    this.autoMode = true;
+    this.currentGear = 0;
+    this.shiftUpRPM = config.shiftUpRPM || 9000;
+    this.shiftDownRPM = config.shiftDownRPM || 6800;
+    this.shiftCooldown = 0;
+  }
+  
+  get gearMultiplier() {
+    if(this.currentGear === 0) return 0;
+    return this.gearRatios[this.currentGear - 1] * this.finalDrive;
   }
   
   reset(x, y, angle) {
@@ -42,6 +55,24 @@ class Car {
     this.isReversing = false;
     this.isTurningLeft = false;
     this.isTurningRight = false;
+    this.currentGear = 0;
+    this.autoMode = true;
+    this.shiftCooldown = 0;
+    this.engineSpeed = this.minEngineSpeed;
+  }
+  
+  shiftUp() {
+    if(this.currentGear < this.gearRatios.length) {
+      this.currentGear++;
+      this.shiftCooldown = 20;
+    }
+  }
+
+  shiftDown() {
+    if(this.currentGear > 1) {
+      this.currentGear--;
+      this.shiftCooldown = 20;
+    }
   }
   
   throttle(input) {
@@ -84,6 +115,7 @@ class Car {
 
   update() {
     this.updateEngine();
+    this.updateGear();
     
     this.updatePower();
     this.canTurn = this.power > 0.005 || this.reverse > 0.005; 
@@ -94,39 +126,75 @@ class Car {
     this.curveSkid = this.angularVelocity < -0.015 || this.angularVelocity > 0.015;
     this.powerSkid = this.isThrottling && (this.power > 0.02 && this.velocity < 2);
     this.brakeSkid = this.reverse > 0.02 && (this.velocity > 3);
-    // if(this.curveSkid || this.powerSkid || this.brakeSkid)
-    //   console.log('Skids: ' + this.curveSkid +  ' ' + this.powerSkid +  ' ' + this.brakeSkid)
-    
-    // if(this.powerSkid)
-    //   this.angularVelocity *= 1.03;  
-    // if(this.curveSkid)
-    //   this.angularVelocity *= 1.05;  
-    // if(this.brakeSkid)
-    //   this.angularVelocity /= 1.01;  
 
     this.x += this.xVelocity * this.renderScale * 4;
     this.y -= this.yVelocity * this.renderScale * 4;
-        
-    // if(fps > 20) {
-    //   this.x *= (60 / fps);
-    //   this.y *= (60 / fps);
-    // }
 
     this.angle += this.angularVelocity;     
-    // console.log(this.x + ' ' + this.y)
+  }
+  
+  updateGear() {
+    if(this.shiftCooldown > 0) {
+      this.shiftCooldown--;
+      return;
+    }
+    if(this.currentGear > 0 && Math.sqrt(this.velocity) < 0.3 && !this.isThrottling && !this.isReversing) {
+      this.currentGear = 0;
+      this.engineSpeed = this.minEngineSpeed;
+      return;
+    }
+    if(this.autoMode) {
+      const speed = Math.sqrt(this.velocity);
+      if(this.currentGear === 0 && this.isThrottling) {
+        this.shiftUp();
+      } else if(this.currentGear > 0 && this.currentGear < this.gearRatios.length) {
+        const maxSpeedForGear = (this.shiftUpRPM - this.minEngineSpeed) / (this.gearMultiplier * 2000);
+        if(speed > maxSpeedForGear) {
+          this.shiftUp();
+        }
+      }
+      if(this.currentGear > 1) {
+        const minSpeedForGear = (this.shiftDownRPM - this.minEngineSpeed) / (this.gearMultiplier * 2000);
+        if(speed < minSpeedForGear) {
+          this.shiftDown();
+        }
+      }
+    }
+    if(this.currentGear > 1 && this.engineSpeed <= this.shiftDownRPM) {
+      this.shiftDown();
+    }
+  }
+
+  toggleAutoMode() {
+    this.autoMode = !this.autoMode;
+    if(this.autoMode && this.currentGear === 0) {
+      this.currentGear = 1;
+      this.shiftCooldown = 10;
+    }
   }
   
   updateEngine() {
-    if(this.power * this.engineSpeedFactor < this.minEngineSpeed)
-      this.engineSpeed = this.minEngineSpeed;
-    else if(this.power * this.engineSpeedFactor > this.maxEngineSpeed)
-      this.engineSpeed = this.maxEngineSpeed;
-    else
-      this.engineSpeed = this.power * this.engineSpeedFactor;
+    if(this.currentGear > 0) {
+      const speed = Math.abs(this.xVelocity) + Math.abs(this.yVelocity);
+      this.engineSpeed = speed * this.gearMultiplier * 2000 + this.minEngineSpeed;
+      this.engineSpeed = Math.max(this.minEngineSpeed, Math.min(this.maxEngineSpeed, this.engineSpeed));
+      this.engineSpeed += this.power * this.engineSpeedFactor * 0.2;
+    } else {
+      this.engineSpeed = this.minEngineSpeed + this.power * this.engineSpeedFactor;
+    }
+    this.engineSpeed = Math.max(this.minEngineSpeed, Math.min(this.maxEngineSpeed, this.engineSpeed));
   }
   
   updatePower() {
-    this.isThrottling ? this.power += Physics.powerFactor * this.isThrottling : this.power -= Physics.engineBrakingFactor;
+    if(this.isThrottling) {
+      this.power += Physics.powerFactor * this.isThrottling;
+    } else if(this.currentGear > 0) {
+      const gearRatio = this.gearMultiplier;
+      const rpmRatio = this.engineSpeed / this.maxEngineSpeed;
+      this.power -= Physics.engineBrakingFactor * Math.max(0.5, gearRatio) * rpmRatio;
+    } else {
+      this.power -= Physics.engineBrakingFactor * 0.3;
+    }
     this.isReversing ? this.reverse += Physics.reverseFactor : this.reverse -= Physics.engineBrakingFactor;
 
     this.power = Math.max(0, Math.min(Physics.maxPower, this.power));
@@ -145,11 +213,23 @@ class Car {
   }
   
   updateVelocity() {
-    this.xVelocity += Math.sin(this.angle) * (this.power - this.reverse);
-    this.yVelocity += Math.cos(this.angle) * (this.power - this.reverse);
-    this.xVelocity *= this.surface.drag;
-    this.yVelocity *= this.surface.drag;
+    const gearRatio = this.currentGear > 0 ? this.gearMultiplier : 0;
+    this.xVelocity += Math.sin(this.angle) * (this.power * gearRatio - this.reverse);
+    this.yVelocity += Math.cos(this.angle) * (this.power * gearRatio - this.reverse);
+    const effectiveDrag = gearRatio > 0 ? this.surface.drag + (1 - gearRatio) * 0.08 : this.surface.drag;
+    this.xVelocity *= effectiveDrag;
+    this.yVelocity *= effectiveDrag;
     this.velocity = Math.abs(this.xVelocity)**2 + Math.abs(this.yVelocity)**2;
+    if(gearRatio > 0) {
+      const maxSpeed = (this.maxEngineSpeed - this.minEngineSpeed) / (gearRatio * 2000);
+      const currentSpeed = Math.sqrt(this.velocity);
+      if(currentSpeed > maxSpeed) {
+        const scale = maxSpeed / currentSpeed;
+        this.xVelocity *= scale;
+        this.yVelocity *= scale;
+        this.velocity = maxSpeed * maxSpeed;
+      }
+    }
   }
 }
 

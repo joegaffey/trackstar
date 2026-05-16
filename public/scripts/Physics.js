@@ -1,11 +1,11 @@
 class Physics {  
 
-  static maxPower = 0.2;
+  static maxPower = 0.17;
   static maxReverse = 0.05;
   
   static powerFactor = 0.0005;
   static reverseFactor = 0.01;
-  static engineBrakingFactor = 0.0005;
+  static engineBrakingFactor = 0.0010;
 
   static drag = 0.95;
   static angularDrag = 0.9;
