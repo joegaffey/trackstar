@@ -376,6 +376,7 @@ class MainScene extends Phaser.Scene {
     let len = this.cars.length;
     this.particles.reset();
     this.AI.reset();
+    this.tyreMarks.reset();
     this.resetPlayerCar();
     this.particles.addEmitter(this.car);
     this.cars = [this.car];
