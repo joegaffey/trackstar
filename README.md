@@ -39,3 +39,14 @@ Thanks to the [OpenGameArt.com](https://opengameart.org/) contributors
 for the excellent graphics assets.
 
 Satellite imagery is courtesy of [Google Earth](https://www.google.com/earth/).
+
+## Todo
+
+- Overlay handling for bridges, tunnels, trees etc
+- AI path fixes and optimizations
+- Editor support for satellite map tracks
+- Engine RPM widget (HUD)
+- Tyre temperature widget (HUD)
+- Gear ratios widget (HUD)
+- Multiplayer networking
+- Vehicle editor
