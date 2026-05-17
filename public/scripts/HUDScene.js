@@ -131,7 +131,7 @@ class HUDScene extends Phaser.Scene {
     else 
       this.raceUpdateCounter--;
     
-    this.uiSpeed.setText(Math.round(state.car.velocity * 15));
+    this.uiSpeed.setText(Math.round(Math.sqrt(state.car.velocity) * 40));
     const car = this.gameScene.car;
     const forwardSpeed = Math.sin(car.angle) * car.xVelocity + Math.cos(car.angle) * car.yVelocity;
     const gearText = forwardSpeed < -0.1 ? 'R' : (car.currentGear === 0 ? 'N' : String(car.currentGear));

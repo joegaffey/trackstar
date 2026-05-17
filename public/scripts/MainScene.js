@@ -11,6 +11,7 @@ import AI from './AI.js';
 import Race from './Race.js';
 import audio from './audio.js';
 import names from './Names.js';
+import PostFX from './postfx.js';
 
 class MainScene extends Phaser.Scene {
   
@@ -112,6 +113,12 @@ class MainScene extends Phaser.Scene {
       this.car.emitter.start();
         
     this.camera.followCar(this.car);
+
+    const renderer = this.game.renderer;
+    if(renderer && renderer.pipelines) {
+      renderer.pipelines.addPostPipeline('PostFX', PostFX);
+      this.cameras.main.setPostPipeline(PostFX);
+    }
     
     try {
       this.tyreMarks.setup();
