@@ -1,9 +1,10 @@
+import EngineAudio, { presets } from './engine-audio.js';
+
 var context, masterGain;
 var layers = {};
+var currentPreset = 'procar';
 
 function fill_noise(t) { return Math.random() * 2 - 1; }
-function fill_sine(t, env) { var p = (t * env.freq) % 1.0; return Math.sin(p * Math.PI * 2) * 0.5 + 0.5; }
-function fill_engine(t, env) { var p = (t * env.freq) % 1.0, a = p * Math.PI * 2; return Math.sin(a) + Math.sin(a * 2) * 0.15; }
 
 function makeBuffer(fill, env) {
   var count = context.sampleRate * 2;
@@ -34,44 +35,7 @@ function removeLayer(name) {
   delete layers[name];
 }
 
-var engine;
-
-function buildEngine() {
-  var noise = makeBuffer(fill_noise); noise.loop = true;
-  var constant = makeBuffer(function(t){ return 1.0; }); constant.loop = true;
-  var drive = makeBuffer(fill_sine, {freq: 20}); drive.loop = true;
-
-  var noiseFilter = context.createBiquadFilter();
-  noiseFilter.type = 'bandpass'; noiseFilter.frequency.value = 4000; noiseFilter.Q.value = 1;
-  noise.connect(noiseFilter);
-  var noiseGain = context.createGain(); noiseGain.gain.value = 0.13;
-  noiseFilter.connect(noiseGain);
-
-  var constantGain = context.createGain(); constantGain.gain.value = 0.05;
-  constant.connect(constantGain);
-
-  var sum = context.createGain(); sum.gain.value = 0;
-  noiseGain.connect(sum);
-  constantGain.connect(sum);
-
-  var driveGain = context.createGain(); driveGain.gain.value = 0.5;
-  drive.connect(driveGain); driveGain.connect(sum.gain);
-
-  sum.connect(masterGain);
-
-  engine = { noise: noise, constant: constant, drive: drive,
-    noiseFilter: noiseFilter, noiseGain: noiseGain,
-    constantGain: constantGain, driveGain: driveGain, sum: sum,
-    sources: [noise, constant, drive] };
-}
-
-function disposeEngine() {
-  if(engine && engine.sources) engine.sources.forEach(stopSource);
-  ['noiseFilter','noiseGain','constantGain','driveGain','sum'].forEach(function(k){
-    try{ if(engine && engine[k]) engine[k].disconnect(); }catch(e){}
-  });
-  engine = null;
-}
+var engineAudio;
 
 const audio = {};
 
@@ -86,9 +50,14 @@ audio.init = function() {
 
 audio.start = function() {
   audio.init();
-  disposeEngine();
-  buildEngine();
-  engine.sources.forEach(function(s){ s.start(); });
+
+  if(engineAudio) {
+    engineAudio.dispose();
+    engineAudio = null;
+  }
+
+  engineAudio = new EngineAudio();
+  engineAudio.init(context, masterGain, presets[currentPreset]);
 
   removeLayer('tire'); removeLayer('wind'); removeLayer('road');
   addLayer('tire', 'lowpass', 3000);
@@ -98,36 +67,34 @@ audio.start = function() {
 }
 
 audio.stop = function() {
-  disposeEngine();
+  if(engineAudio) {
+    engineAudio.dispose();
+    engineAudio = null;
+  }
   Object.keys(layers).forEach(removeLayer);
 }
 
-audio.update = function(speed, surfaceType, isSkidding, engineSpeed) {
-  var power = engineSpeed / 3500;
-  var rate = Math.max(0.1, power * 3);
+audio.update = function(speed, surfaceType, isSkidding, engineSpeed, throttle, gearRatio) {
   var sqSpeed = Math.sqrt(speed);
 
-  if(engine) {
-    if(engine.noise) engine.noise.playbackRate.value = rate;
-    if(engine.drive) engine.drive.playbackRate.value = rate;
-    if(engine.noiseGain) engine.noiseGain.gain.value = power * 0.025;
-    if(engine.constantGain) engine.constantGain.gain.value = power * 0.01;
+  if(engineAudio) {
+    engineAudio.update(engineSpeed, throttle, gearRatio);
   }
 
   if(layers.wind) {
-    layers.wind.gain.gain.value = Math.min(0.1, sqSpeed * 0.005);
+    layers.wind.gain.gain.value = Math.min(0.15, sqSpeed * 0.0075);
     layers.wind.filter.frequency.value = 1000 + sqSpeed * 100;
   }
   if(layers.road) {
     var roadVol, roadFreq;
     if(surfaceType === 2) {
-      roadVol = Math.min(0.55, 0.2 + sqSpeed * 0.025);
+      roadVol = Math.min(0.825, 0.3 + sqSpeed * 0.0375);
       roadFreq = 150 + sqSpeed * 10;
     } else if(surfaceType === 3 || surfaceType === 4) {
-      roadVol = Math.min(0.2, 0.05 + sqSpeed * 0.01);
+      roadVol = Math.min(0.3, 0.075 + sqSpeed * 0.015);
       roadFreq = 120 + sqSpeed * 10;
     } else {
-      roadVol = Math.min(0.12, sqSpeed * 0.006);
+      roadVol = Math.min(0.18, sqSpeed * 0.009);
       roadFreq = 150 + sqSpeed * 15;
     }
     roadVol *= Math.min(1, sqSpeed * 3);
@@ -136,11 +103,22 @@ audio.update = function(speed, surfaceType, isSkidding, engineSpeed) {
   }
   if(layers.tire) {
     var skid = isSkidding ? 1 : 0;
-    layers.tire.gain.gain.value = skid * Math.min(0.2, 0.02 + sqSpeed * 0.008);
+    layers.tire.gain.gain.value = skid * Math.min(0.6, 0.06 + sqSpeed * 0.024);
     layers.tire.filter.frequency.value = 800 + sqSpeed * 80;
   }
 };
 
+audio.setCarSound = function(name) {
+  if(!presets[name]) return;
+  currentPreset = name;
+  if(engineAudio) {
+    engineAudio.dispose();
+    engineAudio = new EngineAudio();
+    engineAudio.init(context, masterGain, presets[name]);
+  }
+};
+
+window.audio = audio;
 export default audio;
 
 audio.beep = function(freq, duration, vol) {

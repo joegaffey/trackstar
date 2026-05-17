@@ -30,7 +30,7 @@ Use mouse wheel or + and - keys to zoom in and out.
 
 Borrowing initial physics code from [pakastins](https://github.com/pakastin) amazing [car.js.org](https://car.js.org/), TrackStar is being developed online at [Glitch.com](https://glitch.com/) using modern [Web Standards](https://www.w3.org/standards/) based technologies and the [Phaser](https://phaser.io/) HTML5 game framework.
 
-Engine audio is based on this [post](https://www.redblobgames.com/x/1618-webaudio/) by [@redblobgames](https://twitter.com/redblobgames).
+Engine audio uses the [engine-audio](https://github.com/markeasting/engine-audio) library by [Mark Easting](https://github.com/markeasting) for sample-based engine sound synthesis. Generative audio (ambient layers, beeps) and original engine audio are based on this [post](https://www.redblobgames.com/x/1618-webaudio/) by [@redblobgames](https://twitter.com/redblobgames).
 
 Thanks to the [OpenGameArt.com](https://opengameart.org/) contributors 
 [looneybits](https://opengameart.org/users/looneybits), 

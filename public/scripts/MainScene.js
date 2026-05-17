@@ -279,7 +279,7 @@ class MainScene extends Phaser.Scene {
       car.emitter.stop();
     }
     if(car.hasCamera)
-      audio.update(car.velocity, car.surface.type, car.curveSkid || car.powerSkid || car.brakeSkid, car.engineSpeed);
+      audio.update(car.velocity, car.surface.type, car.curveSkid || car.powerSkid || car.brakeSkid, car.engineSpeed, car.isThrottling ? 1 : 0, car.gearMultiplier);
     
     if(this.race.inProgress) {
       if(!car.nextWP)
