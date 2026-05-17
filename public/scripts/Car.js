@@ -96,20 +96,68 @@ class Car {
       this.isTurningRight = false;
   }
 
-  crash() {
-    this.xVelocity *= -1.1;
-    this.yVelocity *= -1.1;
-    this.power = 0;
+  collideBarrier(track, bgScale, bgW, bgH) {
+    const r = 24;
+    const steps = 16;
+    let nx = 0, ny = 0, count = 0;
+
+    for(let i = 0; i < steps; i++) {
+      const a = (i / steps) * Math.PI * 2;
+      let px = Math.floor(this.x / bgScale + Math.cos(a) * r);
+      let py = Math.floor(this.y / bgScale + Math.sin(a) * r);
+      if(!track.bgIsTiled) { px += bgW / 2; py += bgH / 2; }
+      if(track.getSurface(px, py).type === Physics.surface.BARRIER) {
+        nx -= Math.cos(a);
+        ny -= Math.sin(a);
+        count++;
+      }
+    }
+
+    if(count > 3) {
+      const len = Math.sqrt(nx * nx + ny * ny);
+      if(len > 0) { nx /= len; ny /= len; }
+      const vn = this.xVelocity * nx + this.yVelocity * ny;
+      if(vn < 0) {
+        this.xVelocity -= (1 + 0.2) * vn * nx;
+        this.yVelocity -= (1 + 0.2) * vn * ny;
+      }
+      this.x += nx * this.renderScale * 8;
+      this.y += ny * this.renderScale * 8;
+      this.power = 0;
+      this.collisionTimer = 10;
+    }
+    return count > 3;
   }
   
-  collideCar(car) {
-    this.xVelocity -= car.xVelocity / 2;
-    this.yVelocity -= car.yVelocity / 2;
-    this.collisionTimer = 30;
+  collideCar(other) {
+    const dx = other.x - this.x;
+    const dy = other.y - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const minDist = 50 * this.renderScale;
+    if(dist >= minDist || dist < 0.01) return;
+
+    const nx = dx / dist, ny = dy / dist;
+
+    const overlap = minDist - dist;
+    this.x -= nx * overlap * 0.5;
+    this.y -= ny * overlap * 0.5;
+    other.x += nx * overlap * 0.5;
+    other.y += ny * overlap * 0.5;
+
+    const dvx = this.xVelocity - other.xVelocity;
+    const dvy = this.yVelocity - other.yVelocity;
+    const dvn = dvx * nx + dvy * ny;
+    if(dvn > 0) return;
+
+    const impulse = -(1 + 0.1) * dvn * 0.5;
+    this.xVelocity -= impulse * nx;
+    this.yVelocity += impulse * ny;
+    other.xVelocity += impulse * nx;
+    other.yVelocity -= impulse * ny;
+
+    this.collisionTimer = 15;
+    other.collisionTimer = 15;
     this.throttle(false);
-    
-    car.xVelocity += this.xVelocity / 2;
-    car.yVelocity += this.yVelocity / 2;
   }
 
   update() {

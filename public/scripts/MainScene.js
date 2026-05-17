@@ -224,12 +224,18 @@ class MainScene extends Phaser.Scene {
     if(this.race.inProgress) {
       this.AI.updateCars();
       this.cars = this.cars.filter(c => !c.eliminated);
-      this.cars.forEach(car => {
+      for(let i = 0; i < this.cars.length; i++) {
+        const car = this.cars[i];
         if(car.isAI) {
           this.AI.drive(car);
           this.updateCar(car);
         }
-      });
+      }
+    }
+    for(let i = 0; i < this.cars.length; i++) {
+      for(let j = i + 1; j < this.cars.length; j++) {
+        this.cars[i].collideCar(this.cars[j]);
+      }
     }
     if(this.car.eliminated)
       this.cameras.main.stopFollow();
@@ -265,7 +271,12 @@ class MainScene extends Phaser.Scene {
     
     const surface = this.track.getSurface(px, py);
     if(surface.type === Physics.surface.BARRIER) {
-      car.crash();
+      const hit = car.collideBarrier(this.track, this.bgScale, this.bg.width, this.bg.height);
+      if(!hit) {
+        car.xVelocity *= -1.1;
+        car.yVelocity *= -1.1;
+        car.power = 0;
+      }
       car.barrierFrames = (car.barrierFrames || 0) + 1;
       if(car.barrierFrames > 60) {
         this.eliminateCar(car);
